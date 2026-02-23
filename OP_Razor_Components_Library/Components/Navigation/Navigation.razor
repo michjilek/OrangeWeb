@@ -1,0 +1,94 @@
+﻿@using OP_Razor_Components_Library.Components.EditableText
+@using OP_Razor_Components_Library.Components.Navigation.Services
+@using OP_Shared_Library.Services
+@inject TranslationsService TranslationsService
+@inject EditModeService EditModeService
+@inject NavigationService NavigationService
+@implements IDisposable
+
+@if (isLoaded)
+{
+    <nav class="navbar">
+        <div class="navbar-right">
+            @foreach (var navigationItem in NavigationService.NavigationItems)
+            {
+                <NavLink class="nav-item uppercase-text"
+                         @key="navigationItem.Id"
+                         href="@navigationItem.Href">
+                         <EditableText Id ="@navigationItem.TextId"
+                                            EditMode="@EditModeService.IsEditing"/>
+                </NavLink>
+            }
+        </div>
+        <button class="navbar-toggler" @onclick="ToggleMenu">☰</button>
+
+        @*when we clicked outside mobile menu, close mobile-menu *@
+        @if (_isMenuOpen)
+        {
+            <div class="menu-backdrop" @onclick="CloseMenu"></div>
+        }
+
+        <div class="mobile-menu"
+             style="@(_isMenuOpen ? "display:flex;" : "display:none;")">
+            @foreach (var navigationItem in NavigationService.NavigationItems)
+            {
+                <NavLink class="nav-item uppercase-text"
+                         @key="navigationItem.Id"
+                         href="@navigationItem.Href"
+                         @onclick="CloseMenu">
+                    <EditableText Id="@navigationItem.TextId"
+                                  EditMode="@EditModeService.IsEditing" />
+                </NavLink>
+            }
+        </div>
+    </nav>
+}
+
+@code {
+
+    #region Private Properties
+    private bool _isMenuOpen = false;
+    private bool isLoaded = false;
+    #endregion
+
+    #region Private Methods
+    private void ToggleMenu()
+    {
+        _isMenuOpen = !_isMenuOpen;
+    }
+    private void CloseMenu()
+    {
+        _isMenuOpen = false;
+    }
+    #endregion
+
+    #region Ctor
+    protected override async Task OnInitializedAsync()
+    {
+        await TranslationsService.LoadAsync();
+
+        EditModeService.OnEditModeChanged += HandleEditModeChanged;
+
+        await NavigationService.LoadAsync();
+        // NavigationService.OnChanged += Refresh;
+
+        isLoaded = true;
+    }
+    public void Dispose()
+    {
+        EditModeService.OnEditModeChanged -= HandleEditModeChanged;
+    }
+    #endregion
+
+    #region Handle
+    private void HandleEditModeChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+    // private void Refresh()
+    // {
+    //     InvokeAsync(StateHasChanged);
+    // }
+    #endregion
+}
+

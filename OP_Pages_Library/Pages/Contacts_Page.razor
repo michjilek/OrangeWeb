@@ -1,0 +1,112 @@
+﻿@page "/contacts"
+@using OP_Razor_Components_Library.Components.EditableText
+@using OP_Razor_Components_Library.Components.QuestionForm
+@using OP_Razor_Image_Library.Icons.Contacts
+@using OP_Shared_Library.Interfaces
+@using OP_Shared_Library.Services
+@using OP_Shared_Library.Struct
+@using static OP_Razor_Components_Library.Components.QuestionForm.QuestionForm
+@inject EditModeService EditModeService
+@inject TranslationsService TranslationsService
+@inject IContactFormSender ContactFormSender
+
+<h1 class="uppercase-text mb"><EditableText Id="Contacts_title" EditMode="@EditModeService.IsEditing" /></h1>
+
+<section class="contacts_border">
+    <div class="left_border">
+        <div class="contacts_svg_board">
+            <Svg_contacts />
+        </div>
+        <div class="left_panel">
+            <div class="left_panel_item_component">
+                <div class="left_panel_item">
+                    <div class="icon">
+                        <div class="border">
+                            <Svg_place />
+                        </div>
+                    </div>
+                    <div class="text">
+                        <EditableText Id="Contacts_place" EditMode="@EditModeService.IsEditing" />
+                    </div>
+                </div>
+            </div>
+            <div class="left_panel_item_component">
+                <div class="left_panel_item">
+                    <div class="icon">
+                        <div class="border">
+                            <Svg_phone />
+                        </div>
+                    </div>
+                    <div class="text">
+                        <EditableText Id="Contacts_phone" EditMode="@EditModeService.IsEditing" />
+                    </div>
+                </div>
+            </div>
+            <div class="left_panel_item_component">
+                <div class="left_panel_item">
+                    <div class="icon">
+                        <div class="border">
+                            <Svg_mail />
+                        </div>
+                    </div>
+                    <div class="text">
+                        <EditableText Id="Contacts_mail" EditMode="@EditModeService.IsEditing" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <QuestionForm ValidSubmitClicked="OnSubmitValueClicked" @ref="_questionForm" />
+</section>
+
+@code {
+    #region Private Properties
+    //private bool isLoaded = false;
+    private QuestionForm _questionForm;
+    #endregion
+
+    #region Ctor
+    protected override async Task OnInitializedAsync()
+    {
+        await TranslationsService.LoadAsync();
+
+        // Register On Edit Change Title
+        EditModeService.OnEditModeChanged += HandleEditModeChanged;
+
+        //isLoaded = true;
+    }
+    #endregion
+
+    #region Handle
+    private void HandleEditModeChanged()
+    {
+        // Redraw the component when the edit mode changes
+        InvokeAsync(StateHasChanged);
+    }
+    // Handle form submission
+    private async Task OnSubmitValueClicked(ContactFormModel formModel)
+    {
+        // Prevent processing in edit mode
+        if (EditModeService.IsEditing)
+        {
+            return;
+        }
+
+        // Process the form submission
+        var submission = new ContactFormSubmission
+        {
+            FullName = formModel.FullName,
+            Phone = formModel.Phone,
+            Email = formModel.Email,
+            Message = formModel.Message
+        };
+
+        // Send to service
+        var wasOk = await ContactFormSender.SendAsync(submission);
+
+        // Reset the form
+        if (wasOk) _questionForm.SetNewEditContext();
+    }
+    #endregion
+
+}

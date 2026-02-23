@@ -1,0 +1,993 @@
+﻿@using OP_Shared_Library.Services
+@using OP_Shared_Library.Struct
+@using System
+@using System.Collections.Generic
+@using System.Linq
+@using System.Threading.Tasks
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.JSInterop
+@implements IAsyncDisposable
+@inject FontSettingsService FontSettingsService
+@inject EditModeService EditModeService
+@inject GoogleFontsCatalogService GoogleFontsCatalogService
+@inject IJSRuntime JSRuntime
+
+@if (EditModeService.IsEditing)
+{
+    <div class="font-settings-editor">
+        <button type="button"
+                class="font-settings-editor__toggle"
+                @onclick="TogglePanel">
+            @(_isPanelOpen ? "ZAVŘÍT FONTY" : "FONTY")
+        </button>
+
+        @if (_isPanelOpen)
+        {
+            @* HINT *@
+            @* noopener - because of prevent tab-napping, new opened window can manipulate with original
+               noreferrer - dont send URL of original site
+               we use it alwys, when use targte="_blank", because of safety *@
+            <div class="font-settings-editor__panel">
+                <p class="font-settings-editor__hint">
+                    Vyberte font ze seznamu nebo údaje vyplňte ručně pomocí odkazu z Google Fonts.
+                    <a class="font-settings-editor__external-link"
+                       href="https://fonts.google.com"
+                       target="_blank"
+                       rel="noopener noreferrer">Otevřít Google Fonts</a>
+                </p>
+
+                @* INFO STRIP *@
+                @if (_isFontCatalogLoading)
+                {
+                    <div class="font-settings-editor__message font-settings-editor__message--info">Načítám seznam fontů…</div>
+                }
+                @* WARNING STRIP *@
+                else if (!string.IsNullOrEmpty(_fontCatalogError))
+                {
+                    <div class="font-settings-editor__message font-settings-editor__message--warning">@_fontCatalogError</div>
+                }
+                @* GOOGLE FONTS *@
+                else if (_fontOptions.Count > 0)
+                {
+                    @* FONT PICKER CONTAINER *@
+                    <div class="font-settings-editor__field">
+                        <label>Vyberte font z Google Fonts</label>
+                        @* FONT PICKER WITH BUTTONS *@
+                        <div class="font-settings-editor__picker">
+                            @* FONT PICKER WRAPPER WITH FONT LIST *@
+                            <div class="font-settings-editor__picker-input-wrapper">
+                                @* FONT PICKER INPUT *@
+                                @* @ref: Blazor fil this refernce after draw. The we can refer to this element easily.
+                                   Here it is because of focus on int after click on load more fonts. *@
+                                <input @ref="_fontPickerInputRef"
+                                       value="@_fontPickerValue"
+                                       @oninput="OnFontPickerChanged"
+                                       @onchange="OnFontPickerChanged"
+                                       @onkeydown="OnFontPickerKeyDown"
+                                       @onfocus="OnFontPickerFocus"
+                                       @onblur="OnFontPickerBlur"
+                                       placeholder="Začněte psát název fontu"
+                                       class="font-settings-editor__input font-settings-editor__input--picker"
+                                       disabled="@(_isSaving || _isLoading)" />
+                                @* FONT LIST *@
+                                @if (_showFontSuggestions && _filteredFontOptions.Count > 0)
+                                {
+                                    <ul class="font-settings-editor__suggestions">
+                                        @* ITEMS BEFORE MORE CLICKED *@
+                                        @foreach (var option in _filteredFontOptions)
+                                        {
+                                            var isActive = IsOptionActive(option);
+                                            <li class="font-settings-editor__suggestion-item">
+                                                @* List item button *@
+                                                <button type="button"
+                                                        class="font-settings-editor__suggestion-button @(isActive ? "font-settings-editor__suggestion-button--active" : null)"
+                                                        style="@BuildSuggestionButtonStyle(option)"
+                                                        @onclick="() => OnFontOptionClicked(option)"
+                                                        @onmousedown:preventDefault
+                                                        @onpointerdown:preventDefault>
+                                                    <span class="font-settings-editor__suggestion-name">@option.Family</span>
+                                                    <span class="font-settings-editor__suggestion-sample">Žluťoučký kůň.</span>
+                                                </button>
+                                            </li>
+                                        }
+                                        @if (_hasMoreFontSuggestions)
+                                        {
+                                            <li class="font-settings-editor__suggestion-item">
+                                                <button type="button"
+                                                        class="font-settings-editor__suggestion-load-more"
+                                                        @onclick="LoadMoreFontSuggestionsAsync"
+                                                        @onmousedown:preventDefault
+                                                        @onpointerdown:preventDefault>
+                                                    Načíst další fonty…
+                                                </button>
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                            </div>
+                            @* FONT PICKER BUTTONS *@
+                            <div class="font-settings-editor__picker-controls">
+                                @* BUTTON UP - PREVIOUS *@
+                                <button type="button"
+                                        class="font-settings-editor__picker-button"
+                                        @onclick="NavigateToPreviousFont"
+                                        disabled="@(_isSaving || _isLoading || _fontOptions.Count == 0)"
+                                        aria-label="Předchozí font">
+                                    <span aria-hidden="true">▲</span>
+                                </button>
+                                @* BUTTON DOWN - NEXT *@
+                                <button type="button"
+                                        class="font-settings-editor__picker-button"
+                                        @onclick="NavigateToNextFont"
+                                        disabled="@(_isSaving || _isLoading || _fontOptions.Count == 0)"
+                                        aria-label="Další font">
+                                    <span aria-hidden="true">▼</span>
+                                </button>
+                            </div>
+                        </div>
+                        @if (_suggestionStylesheetLinks.Count > 0)
+                        {
+                            @foreach (var url in _suggestionStylesheetLinks)
+                            {
+                                <link rel="stylesheet" href="@url" />
+                            }
+                        }
+                    </div>
+                }
+
+                @* ERROR STRIP *@
+                @if (!string.IsNullOrEmpty(_errorMessage))
+                {
+                    <div class="font-settings-editor__message font-settings-editor__message--error">@_errorMessage</div>
+                }
+
+                @* SUCCESS STRIP *@
+                @if (!string.IsNullOrEmpty(_statusMessage))
+                {
+                    <div class="font-settings-editor__message font-settings-editor__message--success">@_statusMessage</div>
+                }
+
+                @* FONT FAMILY NAME *@
+                <div class="font-settings-editor__field">
+                    <label>Font family</label>
+                    <input @bind="_model.FontFamily"
+                           placeholder="Např. Roboto"
+                           class="font-settings-editor__input"
+                           disabled="@_isSaving" />
+                </div>
+
+                @* GOOGLE FONTS URL *@
+                <div class="font-settings-editor__field">
+                    <label>Google Fonts URL</label>
+                    <input @bind="_model.GoogleFontUrl"
+                           placeholder="https://fonts.googleapis.com/..."
+                           class="font-settings-editor__input"
+                           disabled="@_isSaving" />
+                </div>
+
+                @* FALLBACK *@
+                <div class="font-settings-editor__field">
+                    <label>Fallback font family</label>
+                    <input @bind="_model.FallbackFontFamily"
+                           placeholder="sans-serif"
+                           class="font-settings-editor__input"
+                           disabled="@_isSaving" />
+                </div>
+
+                @* PREVIEW *@
+                @if (!string.IsNullOrEmpty(_previewStylesheetUrl))
+                {
+                    <link rel="stylesheet" href="@_previewStylesheetUrl" @key="_previewStylesheetUrl" />
+                }
+
+                <div class="font-settings-editor__preview" style="font-family: @_previewFontFamily">
+                    Přehled textu: Příliš žluťoučký kůň úpěl ďábelské ódy.
+                </div>
+
+                @* SAVE BUTTON *@
+                <div class="font-settings-editor__actions">
+                    <button type="button"
+                            class="font-settings-editor__save"
+                            @onclick="SaveAsync"
+                            disabled="@(_isSaving || _isLoading)">
+                        @(_isSaving ? "Ukládám..." : "Použít")
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    #region Private Properties
+    // Backing model for current font settings displayed/edited in the UI
+    private FontSettings _model = new();
+
+    // Full Google Fonts catalog fetched from the service (immutable reference list)
+    private IReadOnlyList<GoogleFontDefinition> _fontOptions = Array.Empty<GoogleFontDefinition>();
+
+    // UI state: is the editor panel expanded
+    private bool _isPanelOpen;
+
+    // UI/network state flags
+    private bool _isLoading = true;   // true while loading current settings
+    private bool _isSaving;           // true while saving
+
+    // User-facing messages
+    private string _statusMessage;   // success/neutral status
+    private string _errorMessage;    // error details
+
+    // Preview state: computed CSS font-family string used by the preview block
+    private string _previewFontFamily = "'Arimo', sans-serif";
+
+    // Preview state: validated & normalized Google Fonts stylesheet URL for <link/>
+    private string _previewStylesheetUrl;
+
+    // Google Fonts catalog loading state
+    private bool _isFontCatalogLoading = true;
+    private string _fontCatalogError; // non-fatal error when catalog fetch fails
+
+    // Picker (typeahead) input state
+    private string _fontPickerValue = string.Empty; // raw text in the input
+
+    // Index of the currently selected/active font within _fontOptions (-1 = none)
+    private int _activeFontIndex = -1;
+
+    // Whether the suggestion dropdown is visible
+    private bool _showFontSuggestions;
+
+    // Currently filtered subset for suggestions (based on _fontPickerValue, limit, etc.)
+    private IReadOnlyList<GoogleFontDefinition> _filteredFontOptions = Array.Empty<GoogleFontDefinition>();
+
+    // Tracks which suggestion stylesheet URLs have been injected already (avoid duplicates)
+    private readonly HashSet<string> _loadedSuggestionStylesheetUrls = new(StringComparer.OrdinalIgnoreCase);
+
+    // Actual list used to render <link> tags for visible suggestions
+    private List<string> _suggestionStylesheetLinks = new();
+
+    // Pagination/limit for suggestion list rendering
+    private int _suggestionLimit = DefaultSuggestionLimit;
+    private bool _hasMoreFontSuggestions; // true when user can "load more"
+
+    // Reference to the input element to restore focus after clicking "load more"
+    private ElementReference _fontPickerInputRef;
+
+    // Prevents closing the dropdown on certain interactions (e.g., load more)
+    private bool _suppressNextBlur;
+
+    // When true, skip applying the text filter (used after selecting an item)
+    private bool _ignoreSearchFilter;
+
+    // JavaScript module reference for refreshing the custom font stylesheet
+    private IJSObjectReference _jsModule;
+    #endregion
+
+    #region Constants
+    // Constants for suggestion behavior
+    private const int DefaultSuggestionLimit = 60;   // initial number of items shown
+    private const int SuggestionIncrement = 60;      // how many to add on each "load more"
+    private const int NextLetterSampleSize = 15;     // ensures next alphabet group is represented
+    #endregion
+
+    #region Ctor
+    // Lifecycle: subscribe to services and load both catalog and current settings
+    protected override async Task OnInitializedAsync()
+    {
+        EditModeService.OnEditModeChanged += HandleEditModeChanged;
+        FontSettingsService.OnFontSettingsChange += HandleFontSettingsChanged;
+        await Task.WhenAll(LoadFontCatalogAsync(), LoadSettingsAsync());
+    }
+    #endregion
+
+    #region Private methods
+    // Fetch persisted settings from the service and sync UI state
+    private async Task LoadSettingsAsync()
+    {
+        _isLoading = true;
+        try
+        {
+            var settings = await FontSettingsService.GetSettingsAsync();
+            UpdateModel(settings);
+            _errorMessage = null;
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = ex.Message;
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    // Replace local model values and recompute preview/picker state
+    private void UpdateModel(FontSettings settings)
+    {
+        _model = new FontSettings
+        {
+            FontFamily = settings.FontFamily,
+            GoogleFontUrl = settings.GoogleFontUrl,
+            FallbackFontFamily = settings.FallbackFontFamily
+        };
+
+        UpdatePreview();
+        SyncFontPickerWithModel();
+    }
+
+    // Load Google Fonts catalog used by the picker; non-fatal if it fails
+    private async Task LoadFontCatalogAsync()
+    {
+        try
+        {
+            _fontOptions = await GoogleFontsCatalogService.GetFontsAsync();
+            _fontCatalogError = null;
+            UpdateActiveFontIndex();
+            ResetSuggestionLimit();
+            UpdateFilteredFontOptions();
+        }
+        catch
+        {
+            _fontOptions = Array.Empty<GoogleFontDefinition>();
+            _fontCatalogError = "Nepodařilo se načíst seznam fontů. Zkuste to prosím později nebo zadejte údaje ručně.";
+            _activeFontIndex = -1;
+            UpdateFilteredFontOptions();
+        }
+        finally
+        {
+            _isFontCatalogLoading = false;
+        }
+    }
+
+    // Build CSS font-family string from settings (ensures proper quoting/fallbacks) !
+    private string BuildPreviewFontFamily(FontSettings settings)
+    {
+        // Will collect all font-family parts in the correct order
+        var parts = new List<string>();
+
+        // 1) Process primary font family
+        if (!string.IsNullOrWhiteSpace(settings.FontFamily))
+        {
+            // Split by comma because user might have entered "Roboto, Roboto Condensed"
+            foreach (var part in settings.FontFamily.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            {
+                // Remove quotes if the user already wrote 'Roboto' or "Roboto"
+                var cleaned = part.Trim('\'', '"');
+                if (!string.IsNullOrWhiteSpace(cleaned))
+                {
+                    // Add it back but in a normalized way → always quoted
+                    // CSS wants quotes for names with spaces
+                    parts.Add($"'{cleaned}'");
+                }
+            }
+        }
+
+        // 2) Process fallback font family/families
+        if (!string.IsNullOrWhiteSpace(settings.FallbackFontFamily))
+        {
+            // Fallbacks often are without quotes (Arial, sans-serif), thats why no more cover by quotes
+            foreach (var part in settings.FallbackFontFamily.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            {
+                if (!string.IsNullOrWhiteSpace(part))
+                {
+                    // Add as-is (e.g. Arial, system-ui, sans-serif)
+                    parts.Add(part);
+                }
+            }
+        }
+
+        // 3) If user gave us nothing at all, don't return empty → preview must have some font
+        if (parts.Count == 0)
+        {
+            // pick a default web font so the preview always looks okay
+            parts.Add("'Arimo'");
+            // and final generic fallback
+            parts.Add("sans-serif");
+        }
+
+        // Join into valid CSS: 'Roboto', 'Roboto Condensed', Arial, sans-serif
+        return string.Join(", ", parts);
+    }
+
+    // Toggle editor panel visibility and reset messages when opening !
+    private void TogglePanel()
+    {
+        if (!_isPanelOpen)
+        {
+            _statusMessage = null;
+            _errorMessage = null;
+        }
+
+        _isPanelOpen = !_isPanelOpen;
+
+        if (!_isPanelOpen)
+        {
+            // Hide suggestions when panel closes
+            _showFontSuggestions = false;
+        }
+    }
+
+    // Persist current model to the service; shows success or error message
+    private async Task SaveAsync()
+    {
+        _errorMessage = null;
+        _statusMessage = null;
+        _isSaving = true;
+
+        try
+        {
+            await FontSettingsService.SaveAsync(new FontSettings
+            {
+                FontFamily = _model.FontFamily,
+                GoogleFontUrl = _model.GoogleFontUrl,
+                FallbackFontFamily = _model.FallbackFontFamily
+            });
+
+            _statusMessage = "Font byl úspěšně aktualizován.";
+
+            // We need to refresh *.css, beacuse of reload fonts on web
+            await RefreshCustomFontStylesheetAsync();
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = ex.Message;
+        }
+        finally
+        {
+            _isSaving = false;
+            UpdatePreview();
+            StateHasChanged();
+        }
+    }
+
+    // Sync the text input with the model and recompute suggestion data
+    private void SyncFontPickerWithModel()
+    {
+        _fontPickerValue = _model.FontFamily ?? string.Empty;
+        ResetSuggestionLimit();
+        UpdateActiveFontIndex();
+        UpdateFilteredFontOptions();
+    }
+
+    // Handle typing/changes in the picker input  !
+    private void OnFontPickerChanged(ChangeEventArgs args)
+    {
+        // Get coming value, when null, use string empty
+        var newValue = args.Value?.ToString() ?? string.Empty;
+
+        // Check if value was changed (from old value) aftery typing
+        var searchChanged = !string.Equals(newValue, _fontPickerValue, StringComparison.Ordinal);
+
+        // Save to picker input value
+        _fontPickerValue = newValue;
+
+        // Re-enable filtering on new input
+        _ignoreSearchFilter = false;
+
+        // If value changed after typing...
+        if (searchChanged)
+        {
+            // Reset to default. Original default limit was 60.
+            // We can rise limit further in code, when we click on load more... (thats we we set it here to default)
+            ResetSuggestionLimit();
+        }
+
+        // Update google font list
+        UpdateFilteredFontOptions();
+
+        // Find index of typing value
+        var matchIndex = FindFontIndex(_fontPickerValue);
+
+        if (matchIndex >= 0)
+        {
+            // Found in catalog -> apply selection
+            ApplyFontSelection(_fontOptions[matchIndex]);
+        }
+        else
+        {
+            // Otherwise treat as free text (user may paste custom family)
+            _activeFontIndex = -1;
+            _model.FontFamily = _fontPickerValue;
+        }
+
+        UpdatePreview();
+        StateHasChanged();
+    }
+
+    // Keyboard navigation: up/down arrows to traverse catalog entries !
+    private void OnFontPickerKeyDown(KeyboardEventArgs args)
+    {
+        if (args.Key == "ArrowDown")
+        {
+            NavigateFont(1);
+        }
+        else if (args.Key == "ArrowUp")
+        {
+            NavigateFont(-1);
+        }
+    }
+
+    // Apply a catalog selection to the model and update related UI state !
+    private void ApplyFontSelection(GoogleFontDefinition selection)
+    {
+        _model.FontFamily = selection.Family;
+        _model.GoogleFontUrl = selection.CssImportUrl;
+        _model.FallbackFontFamily = selection.FallbackFontFamily;
+        _fontPickerValue = selection.Family;
+        _activeFontIndex = FindFontIndex(selection.Family);
+        _ignoreSearchFilter = true; // keep the selected item visible even if text doesn't filter to it
+        UpdateFilteredFontOptions();
+    }
+
+    // Convenience handlers for prev/next buttons
+    private void NavigateToPreviousFont() => NavigateFont(-1);
+    private void NavigateToNextFont() => NavigateFont(1);
+
+    // Navigate to the font pre or next !
+    private void NavigateFont(int direction)
+    {
+        // If there are no fonts to navigate OR we're in the middle of save/load, do nothing
+        if (_fontOptions.Count == 0 || _isSaving || _isLoading)
+        {
+            return;
+        }
+
+        // Start from the current active index
+        var nextIndex = _activeFontIndex;
+
+        // If nothing is currently selected (index < 0)...
+        if (nextIndex < 0)
+        {
+            // ...and user goes forward (direction > 0), pick the first font
+            // ...otherwise (direction < 0), pick the last font
+            nextIndex = direction > 0 ? 0 : _fontOptions.Count - 1;
+        }
+        else
+        {
+            // Otherwise move by "direction" (usually +1 or -1) and wrap around
+            // the "+ _fontOptions.Count" ensures we don't go negative before mod
+            nextIndex = (nextIndex + direction + _fontOptions.Count) % _fontOptions.Count;
+        }
+
+        // Get the font at the computed index
+        var selection = _fontOptions[nextIndex];
+
+        // Apply it to the model/view
+        ApplyFontSelection(selection);
+
+        // refresh preview with the newly selected font
+        UpdatePreview();
+
+        // tell the UI to re-render
+        StateHasChanged();
+    }
+
+    // Sets _activeFontIndex based on current model family
+    private void UpdateActiveFontIndex()
+    {
+        _activeFontIndex = FindFontIndex(_model.FontFamily);
+    }
+
+    // Compute filtered/limited suggestion list + ensure preview styles for items !
+    private void UpdateFilteredFontOptions()
+    {
+        // If google font list is empty...
+        if (_fontOptions.Count == 0)
+        {
+            // Create new empty filtered list
+            _filteredFontOptions = Array.Empty<GoogleFontDefinition>();
+
+            // We want font suggestion popup to be invisible now 
+            _showFontSuggestions = false;
+
+            // More suggestions are also invisible
+            _hasMoreFontSuggestions = false;
+
+            // not continue
+            return;
+        }
+
+        // If google font list is not empty...
+
+        // Create query list from _fontOptions...
+        IEnumerable<GoogleFontDefinition> fontOptions_query = _fontOptions;
+
+        // Check if input value is not null, if not trim it
+        var search = _fontPickerValue?.Trim() ?? string.Empty;
+
+        // If value is not empty and we dont want to ignore search filter...
+        if (!string.IsNullOrEmpty(search) && !_ignoreSearchFilter)
+        {
+            // Want ot found seacrh fontOption in list
+            fontOptions_query = fontOptions_query.Where(fo => fo.Family.Contains(search, StringComparison.OrdinalIgnoreCase));
+        }
+        
+        // Give result to GoogleDefinitions List called candidates
+        var candidates = fontOptions_query.ToList();
+
+        // Ensure active item is present at top even if it doesn't match filter
+        // if (_activeFontIndex >= 0 && _activeFontIndex < _fontOptions.Count)
+        // {
+        //     var activeOption = _fontOptions[_activeFontIndex];
+        //     if (!candidates.Any(option => string.Equals(option.Family, activeOption.Family, StringComparison.OrdinalIgnoreCase)))
+        //     {
+        //         candidates.Insert(0, activeOption);
+        //     }
+        // }
+
+        // E.g. get our 60 items...
+        var limited = LimitFontCandidates(candidates);
+
+        // Save to variable
+        _filteredFontOptions = limited;
+
+        // Visibility of more font button...
+        _hasMoreFontSuggestions = limited.Count < candidates.Count;
+
+        // Check urls of stylesheets
+        EnsureSuggestionStylesheets();
+    }
+
+    // Limit the number of suggestion items !
+    private IReadOnlyList<GoogleFontDefinition> LimitFontCandidates(List<GoogleFontDefinition> candidates)
+    {
+        // if the number of candidates is within the limit, return all of them
+        if (candidates.Count <= _suggestionLimit)
+        {
+            return candidates;
+        }
+
+        // Take the first _suggestionLimit items (e.g. 60)
+        var limited = candidates.Take(_suggestionLimit).ToList();
+
+        // If for some reason we got an empty list, just return it
+        if (limited.Count == 0)
+        {
+            return limited;
+        }
+
+        // Return the final list
+        return limited;
+    }
+
+
+    // Returns the uppercase initial letter used for grouping; non-letters -> '#' !
+    private char GetInitial(GoogleFontDefinition option)
+    {
+        // If the font family is null, empty, or whitespace, return '#'
+        if (string.IsNullOrWhiteSpace(option.Family))
+        {
+            return '#';
+        }
+
+        // Take the first character after trimming leading spaces
+        var firstChar = option.Family.TrimStart()[0];
+
+        // If it's a letter, return it as uppercase; otherwise return '#'
+        return char.IsLetter(firstChar)
+            ? char.ToUpperInvariant(firstChar)
+            : '#';
+    }
+
+    // Recompute preview font-family string and verify the stylesheet URL !
+    private void UpdatePreview()
+    {
+        _previewFontFamily = BuildPreviewFontFamily(_model);
+        _previewStylesheetUrl = TryBuildPreviewStylesheetUrl(_model.GoogleFontUrl, out var normalized)
+            ? normalized
+            : null;
+    }
+
+    // Find exact index of a family in the catalog; -1 if not present !
+    private int FindFontIndex(string family)
+    {
+        if (string.IsNullOrWhiteSpace(family))
+        {
+            return -1;
+        }
+
+        for (var i = 0; i < _fontOptions.Count; i++)
+        {
+            if (string.Equals(_fontOptions[i].Family, family, StringComparison.OrdinalIgnoreCase))
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    // Validates that a given URL is a safe Google Fonts CSS endpoint and normalizes it !
+    private bool TryBuildPreviewStylesheetUrl(string url, out string normalizedUrl)
+    {
+        normalizedUrl = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            return false;
+        }
+
+        // Try create Uri
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
+        {
+            return false;
+        }
+
+        // Check http, htpps
+        if (!string.Equals(uri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        // Check font address
+        if (!string.Equals(uri.Host, "fonts.googleapis.com", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        // Check postfix
+        if (!uri.AbsolutePath.StartsWith("/css2", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        // Only scheme+host+path+query are needed for a safe <link href>
+        normalizedUrl = uri.GetComponents(UriComponents.SchemeAndServer | UriComponents.PathAndQuery, UriFormat.UriEscaped);
+        return true;
+    }
+
+    // Ensure that for visible suggestions we also preload their stylesheets (once) !
+    private void EnsureSuggestionStylesheets()
+    {
+        var updated = false;
+
+        foreach (var option in _filteredFontOptions)
+        {
+            // Try to build/normalize the CSS import URL for this option
+            // if it succeeds AND we haven't loaded this stylesheet before, add it
+            if (TryBuildPreviewStylesheetUrl(option.CssImportUrl, out var normalized)
+                && _loadedSuggestionStylesheetUrls.Add(normalized))
+            {
+                // mark that something changed (we added a new stylesheet)
+                updated = true;
+            }
+        }
+
+        if (updated)
+        {
+            // Recreate the list to trigger re-render of <link> tags
+            _suggestionStylesheetLinks = _loadedSuggestionStylesheetUrls.ToList();
+        }
+    }
+
+    // Click handler for a suggestion item !
+    private void OnFontOptionClicked(GoogleFontDefinition option)
+    {
+        ApplyFontSelection(option);
+        UpdatePreview();
+        StateHasChanged();
+    }
+
+    // Load more suggestions (pagination) and keep the input focused !
+    private async Task LoadMoreFontSuggestionsAsync()
+    {
+        if (_fontOptions.Count == 0)
+        {
+            return;
+        }
+
+        // Increase suggestion limit, because of raise more fonts
+        _suggestionLimit = Math.Min(_suggestionLimit + SuggestionIncrement, _fontOptions.Count);
+
+        UpdateFilteredFontOptions();
+
+        _showFontSuggestions = true;
+        _suppressNextBlur = true; // prevent blur closing the dropdown right after click
+
+        // Immidiately return control to UI main thread (beacuse we dont want freeze)
+        // Run other things
+        // Rest of code we done later
+        await Task.Yield();
+
+        // Focus on input again
+        await _fontPickerInputRef.FocusAsync();
+    }
+
+    // Show suggestions when input gains focus; optionally ignore filter for the exact selection !
+    private void OnFontPickerFocus(FocusEventArgs _)
+    {
+        // Decide whether we should ignore the search filter:
+        // if we already have an active font selected AND
+        // the text in the input (_fontPickerValue) matches the current model font family,
+        // then show the full list (don't filter it away)
+        _ignoreSearchFilter = _activeFontIndex >= 0
+            && string.Equals(_fontPickerValue, _model.FontFamily, StringComparison.OrdinalIgnoreCase);
+
+        // Make the suggestion dropdown visible
+        _showFontSuggestions = true;
+
+        // Refresh the list of suggestions according to current filter/ignore state
+        UpdateFilteredFontOptions();
+    }
+
+    // Hide suggestions on blur (lose focus on input), with a small delay to allow click events to register !
+    private async Task OnFontPickerBlur(FocusEventArgs _)
+    {
+        await Task.Delay(100);
+
+        if (_suppressNextBlur)
+        {
+            _suppressNextBlur = false;
+            return;
+        }
+
+        _showFontSuggestions = false;
+        StateHasChanged();
+    }
+
+    // Inline style builder for suggestion buttons using the font family + fallbacks !
+    private static string BuildSuggestionButtonStyle(GoogleFontDefinition option)
+    {
+        // Build a prioritized list of font families, starting with the selected Google font,
+        // and then falling back to either the user-provided fallback fonts or a generic family.
+        var families = new List<string> { $"'{option.Family}'" };
+
+        if (!string.IsNullOrWhiteSpace(option.FallbackFontFamily))
+        {
+            // Add all user-specified fallback fonts to the end of the list.
+            families.AddRange(option.FallbackFontFamily
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+        }
+        else
+        {
+            // If no fallback is provided, use a safe generic fallback.
+            families.Add("sans-serif");
+        }
+
+        // Return the inline CSS style string with properly joined font families.
+        return $"font-family: {string.Join(", ", families)};";
+    }
+
+    // Returns true if the given option is the currently active selection !
+    private bool IsOptionActive(GoogleFontDefinition option)
+    {
+        // Non sense, return false
+        if (_activeFontIndex < 0 || _activeFontIndex >= _fontOptions.Count)
+        {
+            return false;
+        }
+
+        return string.Equals(_fontOptions[_activeFontIndex].Family, option.Family, StringComparison.OrdinalIgnoreCase);
+    }
+
+    // Reset suggestion list page size back to default !
+    private void ResetSuggestionLimit()
+    {
+        _suggestionLimit = DefaultSuggestionLimit;
+    }
+
+    // React to global edit mode toggles; lazily reload catalog if it was empty, refresh settings
+    private void HandleEditModeChanged()
+    {
+        _ = InvokeAsync(async () =>
+        {
+            if (EditModeService.IsEditing)
+            {
+                if (!_isFontCatalogLoading && _fontOptions.Count == 0)
+                {
+                    _isFontCatalogLoading = true;
+                    _fontCatalogError = null;
+                    await LoadFontCatalogAsync();
+                    StateHasChanged();
+                }
+
+                await LoadSettingsAsync();
+            }
+            else
+            {
+                // Close and clear UI when leaving edit mode
+                _isPanelOpen = false;
+                _statusMessage = null;
+                _errorMessage = null;
+            }
+
+            StateHasChanged();
+        });
+    }
+
+    // React to external changes in font settings (other component saved)
+    private void HandleFontSettingsChanged()
+    {
+        _ = InvokeAsync(async () =>
+        {
+            var settings = await FontSettingsService.GetSettingsAsync();
+            UpdateModel(settings);
+            await RefreshCustomFontStylesheetAsync();
+            StateHasChanged();
+        });
+    }
+    #endregion
+
+    #region Refresh *.css via JS interop
+    // Forces the browser to reload the dynamically generated CustomFont.css file via JS interop
+    private async ValueTask RefreshCustomFontStylesheetAsync()
+    {
+        try
+        {
+            // Get js module
+            var module = await GetJsModuleAsync();
+            
+            // Check again
+            if (module is null)
+            {
+                return;
+            }
+
+            // Raise method in module
+            await module.InvokeVoidAsync("refreshCustomFontStylesheet");
+        }
+        catch (JSException)
+        {
+            // JS runtime errors – ignore in that case.
+        }
+        catch (InvalidOperationException)
+        {
+            // JS runtime may be unavailable during prerendering; ignore in that case.
+        }
+    }
+
+    // Loads the JS module that manipulates the CustomFont.css <link /> element
+    private async ValueTask<IJSObjectReference> GetJsModuleAsync()
+    {
+        // We already have js module
+        if (_jsModule is not null)
+        {
+            return _jsModule;
+        }
+
+        // JS Runtime is null
+        if (JSRuntime is null)
+        {
+            return null;
+        }
+
+        // Get js module if we dont have any yet
+        try
+        {
+            _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./_content/OP_Razor_Components_Library/Components/FontSettingsEditor/FontSettingsEditor.razor.js");
+        }
+        catch (JSException)
+        {
+            return null;
+        }
+        catch (InvalidOperationException)
+        {
+            return null;
+        }
+
+        return _jsModule;
+    }
+
+    // Cleanup event subscriptions when component is disposed
+    public async ValueTask DisposeAsync()
+    {
+        EditModeService.OnEditModeChanged -= HandleEditModeChanged;
+        FontSettingsService.OnFontSettingsChange -= HandleFontSettingsChanged;
+
+        if (_jsModule is not null)
+        {
+            try
+            {
+                await _jsModule.DisposeAsync();
+            }
+            catch (JSException)
+            {
+                // Ignore disposal errors – module might already be gone when circuit shuts down.
+            }
+        }
+    }
+    #endregion
+}

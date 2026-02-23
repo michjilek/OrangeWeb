@@ -1,0 +1,26 @@
+﻿@using OP_Pages_Library.Shared;
+
+<CascadingAuthenticationState>
+<Router AppAssembly="@typeof(App).Assembly"
+        AdditionalAssemblies="@_extraAssemblies">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <p role="alert">Sorry, there's nothing at this address.</p>
+        </LayoutView>
+    </NotFound>
+</Router>
+</CascadingAuthenticationState>
+
+@code {
+    //Create List of extra Assemblies
+    public List<System.Reflection.Assembly> _extraAssemblies = new List<System.Reflection.Assembly>
+    {
+        //Open MainLayout from OP_Pages_Library.dll
+        typeof(MainLayout).Assembly
+    };
+}

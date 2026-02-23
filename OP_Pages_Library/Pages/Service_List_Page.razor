@@ -1,0 +1,13 @@
+﻿@page "/service_list"
+@using OP_Razor_Components_Library.Components.ServiceList
+@using OP_Razor_Components_Library.Components.EditableText
+@inject TranslationsService TranslationsService
+
+@if (isLoaded)
+{
+    <h1 class="uppercase-text mb"><EditableText Id="Services_Title_1" EditMode="@EditModeService.IsEditing" /></h1>
+}
+
+<div class="container">
+    <ServiceList />
+</div>

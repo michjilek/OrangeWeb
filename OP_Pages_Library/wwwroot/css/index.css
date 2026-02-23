@@ -1,0 +1,38 @@
+﻿
+@font-face {
+    font-family: 'Arimo';
+    src: url('../fonts/Arimo/Arimo-Regular.ttf');
+    font-display: swap;
+}
+
+/* Reset + normalizace */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    color: #333;
+    width: 100%;
+    min-width: 320px;
+    overflow-x: hidden;
+}
+
+body {
+    background-color: #f5f5f5;
+    padding: 0 8px;
+    margin: 0 auto;
+}
+
+/* 2560px – 2K
+ */
+@media (min-width: 2560px) {
+    body {
+        max-width: 2560px;
+    }
+}

@@ -1,0 +1,97 @@
+﻿/* GENERAL */
+.centered {
+    margin: 0 auto;
+}
+
+.mt {
+    margin-top: 10px;
+}
+
+.mt_less {
+    margin-top: 10px;
+}
+
+.mb {
+    margin-bottom: 20px;
+}
+
+.pt {
+    padding-top: 20px;
+}
+
+.pb {
+    padding-bottom: 20px;
+}
+
+.pl {
+    padding-left: 20px;
+}
+
+.pr {
+    padding-right: 20px;
+}
+
+.color_dark {
+    color: #333 !important;
+}
+
+.uppercase-text {
+    text-transform: uppercase;
+}
+
+/* FONTS */
+h1, h2, p, th, td {
+    font-family: var(--MainFont);
+    font-weight: normal;
+}
+
+h1 {
+    letter-spacing: 4px;
+    /*line-height: 1.58;*/
+    outline: none;
+}
+
+
+/* MEDIA */
+/* 320px – Mobilní telefony (malé displeje)
+*/
+@media (min-width: 320px) {
+    .mt {
+        margin-top: 16px;
+    }
+}
+
+/* 480px – Mobilní telefony (větší displeje)
+*/
+@media (min-width: 480px) {
+    .mt {
+        margin-top: 20px;
+    }
+}
+/* 768px – Tablety (portrét)
+    */
+@media (min-width: 768px) {
+}
+/* 1024px – Tablety (na šířku), malé notebooky
+    */
+@media (min-width: 1024px) {
+}
+/* 1280px – Středně velké obrazovky (notebooky)
+    */
+@media (min-width: 1280px) {
+}
+/* 1440px a více – Velké monitory
+    */
+@media (min-width: 1440px) {
+}
+/* 1600px – Vyšší rozlišení
+ */
+
+/* 1920px – Full HD
+ */
+@media (min-width: 1920px) {
+}
+/* 2560px – 2K
+ */
+@media (min-width: 2560px) {
+}

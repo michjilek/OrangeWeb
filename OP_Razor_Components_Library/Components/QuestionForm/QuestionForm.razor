@@ -1,0 +1,242 @@
+﻿@using OP_Razor_Components_Library.Components.EditableText
+@using OP_Shared_Library.Services
+@using OP_Razor_Image_Library.Icons.Contacts
+@using Microsoft.AspNetCore.Components.Forms
+@using System.ComponentModel.DataAnnotations
+@using System.Threading.Tasks
+@inject EditModeService EditModeService
+@inject TranslationsService TranslationsService
+
+@namespace OP_Razor_Components_Library.Components.QuestionForm
+
+@* <EditForm Model="_formModel"
+          OnValidSubmit="HandleValidSubmit"
+          OnInvalidSubmit="HandleInvalidSubmit"> *@
+<EditForm EditContext="_editContext"
+          OnValidSubmit="HandleValidSubmit"
+          OnInvalidSubmit="HandleInvalidSubmit">
+    <DataAnnotationsValidator />
+    @if (_showValidation)
+    {
+        <div class="val_summary">
+            <ValidationSummary />
+        </div>
+    }
+    <div class="panel">
+        <div class="item_component">
+            <div class="panel_item">
+                <div class="border">
+                    <Svg_person />
+                    <div class="text_placeholder">
+                        <EditableText Id="Contacts_fullName_placeholder"
+                                      EditMode="@EditModeService.IsEditing"
+                                      IsPlaceholder="true"
+                                      ValueChanged="OnFullNameValueChanged"
+                                      Value="@_formModel.FullName" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="item_component">
+            <div class="panel_item">
+                <div class="border">
+                    <Svg_phone_2 />
+                    <div class="text_placeholder">
+                        <EditableText Id="Contacts_phone_placeholder"
+                                      EditMode="@EditModeService.IsEditing"
+                                      IsPlaceholder="true"
+                                      ValueChanged="OnPhoneValueChanged"
+                                      Value="@_formModel.Phone" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="item_component">
+            <div class="panel_item">
+                <div class="border">
+                    <Svg_mail />
+                    <div class="text_placeholder">
+                        <EditableText Id="Contacts_mail_placeholder"
+                                      EditMode="@EditModeService.IsEditing"
+                                      IsPlaceholder="true"
+                                      ValueChanged="OnEmailValueChanged"
+                                      Value="@_formModel.Email" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="item_component message">
+            <div class="panel_item">
+                <div class="border">
+                    <Svg_message />
+                    <div class="text_placeholder">
+                        <EditableText Id="Contacts_message_placeholder"
+                                      EditMode="@EditModeService.IsEditing"
+                                      IsPlaceholder="true"
+                                      ValueChanged="OnMessageValueChanged"
+                                      Value="@_formModel.Message" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form_actions">
+        <button type="submit" class="send_button">
+            <EditableText Id="Contacts_submit_button" EditMode="@EditModeService.IsEditing" />
+        </button>
+    </div>
+</EditForm>
+
+@code {
+    #region Parameters
+    [Parameter] public EventCallback<ContactFormModel> ValidSubmitClicked { get; set; }
+    #endregion
+
+    #region Public Methods
+    // Set New Edit Context
+    public void SetNewEditContext()
+    {
+        //  Clear the form model
+        _formModel.Clear();
+
+        // Create a new Edit Context
+        _editContext = new EditContext(_formModel);
+    }
+    #endregion
+
+    #region Private Properties
+    // Form Model
+    private readonly ContactFormModel _formModel = new();
+    // Flag to show validation messages
+    private bool _showValidation;
+    #endregion
+
+    #region Properties for Form Validation
+    // Edit Context for the form
+    private EditContext _editContext = default!;
+    private FieldIdentifier _fullNameField, _phoneField, _emailField, _messageField;
+    #endregion
+
+    #region Ctor
+    // On Initialized Async
+    protected override async Task OnInitializedAsync()
+    {
+        // Initialize Edit Context
+        _editContext = new EditContext(_formModel);
+
+        // Validation  - Initialize Field Identifiers
+        _fullNameField = FieldIdentifier.Create(() => _formModel.FullName);
+        _phoneField = FieldIdentifier.Create(() => _formModel.Phone);
+        _emailField = FieldIdentifier.Create(() => _formModel.Email);
+        _messageField = FieldIdentifier.Create(() => _formModel.Message);
+
+        // Load Translations
+        await TranslationsService.LoadAsync();
+
+        // Register On Edit Change Title
+        EditModeService.OnEditModeChanged += HandleEditModeChanged;
+    }
+    #endregion
+
+    #region Private Methods
+    // Handle Valid Submit
+    private async Task HandleValidSubmit()
+    {
+        SolveShowValidation();
+
+        // If validation is ok...
+        // Invoke the callback
+        await ValidSubmitClicked.InvokeAsync(_formModel);
+    }
+    // Handle Invalid Submit
+    private void HandleInvalidSubmit(EditContext _) => SolveShowValidation();
+    private void SolveShowValidation()
+    {
+        // Show validation only if not in edit mode
+        _showValidation = EditModeService.IsEditing ? false : true;
+    }
+    #endregion
+
+    #region Event Handlers
+    // Placeholder Click Handler
+    private void OnPlaceholderClick()
+    {
+
+    }
+    // Handle Edit Mode Changed
+    private void HandleEditModeChanged()
+    {
+        // Update validation display based on edit mode
+        SolveShowValidation();
+
+        // Redraw the component when the edit mode changes
+        InvokeAsync(StateHasChanged);
+    }
+    // General method for fill changes from input to model
+    private void SetAndNotify(string newValue, Action<string> setter, FieldIdentifier filed)
+    {
+        // Update the model property
+        setter(newValue);
+
+        // Notify the EditContext about the field change
+        _editContext.NotifyFieldChanged(filed);
+
+        // Re-validate the form if validation messages are shown
+        if (_showValidation) _editContext.Validate();
+
+    }
+    // Specific methods for input fill changes
+    private void OnFullNameValueChanged(string v) => SetAndNotify(v, x => _formModel.FullName = x, _fullNameField);
+    private void OnPhoneValueChanged(string v) => SetAndNotify(v, x => _formModel.Phone = x, _phoneField);
+    private void OnEmailValueChanged(string v) => SetAndNotify(v, x => _formModel.Email = x, _emailField);
+    private void OnMessageValueChanged(string v) => SetAndNotify(v, x => _formModel.Message = x, _messageField);
+    #endregion
+
+    #region Private Classses
+    // Contact Form Model with validation
+    public class ContactFormModel
+    {
+        #region Privtae Properties
+        [Required(
+            ErrorMessageResourceType = typeof(QuestionFormResources),
+            ErrorMessageResourceName = "FullName_Required")]
+        public string FullName { get; set; } = string.Empty;
+
+        [Required(
+            ErrorMessageResourceType = typeof(QuestionFormResources),
+            ErrorMessageResourceName = "Phone_Required")]
+        [Phone(
+            ErrorMessageResourceType = typeof(QuestionFormResources),
+            ErrorMessageResourceName = "Phone_Phone")]
+        public string Phone { get; set; } = string.Empty;
+
+        [Required(
+            ErrorMessageResourceType = typeof(QuestionFormResources),
+            ErrorMessageResourceName = "Email_Required")]
+        [EmailAddress(
+            ErrorMessageResourceType = typeof(QuestionFormResources),
+            ErrorMessageResourceName = "Email_EmailAddress")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(
+            ErrorMessageResourceType = typeof(QuestionFormResources),
+            ErrorMessageResourceName = "Message_Required")]
+        [MinLength(5,
+            ErrorMessageResourceType = typeof(QuestionFormResources),
+            ErrorMessageResourceName = "Message_MinLength")]
+        public string Message { get; set; } = string.Empty;
+        #endregion
+
+        #region Public Methods
+        // Clear all fields
+        public void Clear()
+        {
+            FullName = string.Empty;
+            Phone = string.Empty;
+            Email = string.Empty;
+            Message = string.Empty;
+        }
+        #endregion
+    }
+    #endregion
+}

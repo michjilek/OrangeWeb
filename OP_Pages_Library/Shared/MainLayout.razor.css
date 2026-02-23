@@ -1,0 +1,264 @@
+﻿
+.main_container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 8px 0px 0px 0px !important;
+}
+
+.outline_1, .outline_2, .outline_3 {
+    width: 100%;
+}
+
+.outline_1 {
+    height: 36.2vh;
+}
+
+.outline_2 {
+    height: 13vh;
+}
+
+.outline_3 {
+    height: 70px;
+}
+
+.top-bar {
+    display: flex;
+    position: relative;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    height: 75px;
+    margin: 0px 0px 8px 0px;
+}
+
+.cosmetics-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    z-index: -2;
+}
+
+.gradient-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(white, var(--SilverColor));
+    z-index: -1;
+}
+
+.logo {
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 10px 0px;
+    box-sizing: border-box;
+}
+
+    .logo a {
+        display: flex;
+        align-items: center;
+        height: 100%;
+        width: auto;
+    }
+
+    .logo img {
+        max-width: 200px;
+        max-height: 26px;
+        width: auto;
+        height: auto;
+        display: block;
+    }
+
+
+.social-media {
+    display: flex;
+    justify-content: end;
+    padding: 10px;
+    border-bottom: 1px solid var(--SilverColor);
+    height: 39px;
+    align-items: center;
+    gap: 12px;
+    align-items: center;
+}
+
+    .social-media a {
+        text-decoration: none;
+    }
+
+    .social-media .social-divider {
+        width: 1px;
+        height: 18px;
+        background-color: var(--GrayColor);
+        display: inline-block;
+        align-self: center;
+    }
+
+/* LOGIN BUTTON start */
+.icon-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: transparent;
+    transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.login-icon {
+    fill: #C7C7C7;
+    transition: fill 0.3s ease;
+}
+
+    .login-icon:active {
+        fill: #444;
+    }
+/* LOGIN BUTTON end */
+
+#facebook_div, #instagram_div, #seznam_div, #google_div {
+    margin: 0 5px;
+    vertical-align: middle;
+}
+
+#facebook_div {
+    width: 17px;
+    
+}
+
+#instagram_div {
+    width: 25px;
+}
+
+#seznam_div, #google_div {
+    width: 17px;
+}
+
+/* Edit Toggle Button */
+.edit-toggle-button {
+    padding: 5px 10px;
+    /*margin: 14px 10px 10px 10px;*/
+    margin: 14px 8px 10px 0;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    /*    min-width: 140px;*/
+    background-color: #444; /* default: dark gray */
+}
+
+    .edit-toggle-button:hover {
+        background-color: #333;
+    }
+
+    .edit-toggle-button.active {
+        background-color: #d9534f; /* red wh;en active */
+    }
+
+        .edit-toggle-button.active:hover {
+            background-color: #c9302c;
+        }
+
+.logo-edit-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.admin-tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.circle-button {
+    background-color: white;
+    color: #007BFF;
+    border: 2px solid #007BFF;
+    border-radius: 50px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+    .circle-button:hover {
+        background-color: #007BFF;
+        color: white;
+    }
+
+    .circle-button.logout {
+        color: #dc3545;
+        border-color: #dc3545;
+    }
+
+        .circle-button.logout:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+
+
+
+/* MEDIA */
+/* 320px – Mobilní telefony (malé displeje) */
+@media (min-width: 320px) {
+    .top-bar {
+        padding-left: 10px;
+    }
+}
+
+/* 480px – Mobilní telefony (větší displeje) */
+/*@media (min-width: 480px) {
+    .top-bar {
+        background-image: linear-gradient(#00000099, #00000099), url('images/sminky/sminky_1024.webp');
+    }
+}*/
+/* 768px – Tablety (portrét) */
+@media (min-width: 768px) {
+    .top-bar {
+        padding: 20px;
+    }
+}
+/* 1024px – Tablety (na šířku), malé notebooky */
+@media (min-width: 1024px) {
+    .top-bar {
+        /*    background-image: linear-gradient(#00000099, #00000099), url('images/sminky/sminky_1920.webp');*/
+        margin-top: 8px;
+        height: 82px;
+        padding: 30px;
+    }
+}
+/* 1280px – Středně velké obrazovky (notebooky) */
+@media (min-width: 1280px) {
+}
+/* 1440px a více – Velké monitory */
+@media (min-width: 1440px) {
+}
+/* 1600px – Vyšší rozlišení
+ */
+
+/* 1920px – Full HD
+ */
+/*@media (min-width: 1920px) {
+    .top-bar {
+        background-image: linear-gradient(#00000099, #00000099), url('images/sminky/sminky_2560.webp');
+    }
+}*/
+/* 2560px – 2K
+ */
+@media (min-width: 2560px) {
+}

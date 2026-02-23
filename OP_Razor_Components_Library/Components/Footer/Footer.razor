@@ -1,0 +1,74 @@
+﻿@using OP_Razor_Components_Library.Components.EditableText
+@using OP_Shared_Library.Services
+@using Microsoft.JSInterop
+@inject TranslationsService TranslationsService
+@inject EditModeService EditModeService
+@inject NavigationManager NavigationManager
+@inject IHttpClientFactory HttpClientFactory
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
+@if (isLoaded)
+{
+    <div class="footer centered">
+        <p class="subtitle mt"><EditableText Id="Street" EditMode="@EditModeService.IsEditing" /></p>
+        <p class="mt_less pb"><EditableText Id="City" EditMode="@EditModeService.IsEditing" /></p>
+        <p class="text mt_less">Tel.: <EditableText Id="Mobile" EditMode="@EditModeService.IsEditing" /></p>
+        <p class="text">Email: <EditableText Id="Email" EditMode="@EditModeService.IsEditing" /></p>
+        <hr class="footer_hr mt">
+        <p class="footer_p mt">© <EditableText Id="Company_Name" EditMode="@EditModeService.IsEditing" /></p>
+        <p class="footer-year mt_less"><EditableText Id="Actual_Year" EditMode="@EditModeService.IsEditing" /></p>
+        <p class="footer-year mt_less pb">Version: @_version</p>
+    </div>
+}
+
+@code {
+    #region Private Properties
+    private bool isLoaded = false;
+    private string _version = string.Empty;
+    #endregion
+
+    #region Constants
+    // Name of key in Local Storage
+    private const string AppVersionStorageKey = "appVersion";
+    #endregion
+
+    #region Ctor
+    protected override async Task OnInitializedAsync()
+    {
+        await TranslationsService.LoadAsync();
+
+        EditModeService.OnEditModeChanged += HandleEditModeChanged;
+
+        isLoaded = true;
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        EditModeService.OnEditModeChanged -= HandleEditModeChanged;
+
+        if (!firstRender)
+        {
+            return;
+        }
+
+        // Get version from Local Storage
+        _version = await JSRuntime.InvokeAsync<string>("localStorage.getItem", AppVersionStorageKey);
+
+        if (!string.IsNullOrWhiteSpace(_version))
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+    public void Dispose()
+    {
+        EditModeService.OnEditModeChanged -= HandleEditModeChanged;
+    }
+    #endregion
+
+    #region Handle
+    private void HandleEditModeChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+    #endregion
+}

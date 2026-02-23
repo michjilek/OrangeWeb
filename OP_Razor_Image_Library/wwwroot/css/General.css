@@ -1,0 +1,5 @@
+﻿
+/* For remove extra 5px on bottom of Image*/
+svg{
+    display:block;
+}

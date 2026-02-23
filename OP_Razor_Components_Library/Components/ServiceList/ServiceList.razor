@@ -1,0 +1,100 @@
+﻿@using OP_Razor_Components_Library.Components.EditableText
+
+<div class="container">
+    @if (ServicesService.Items == null)
+    {
+        <div class="d-flex align-items-center gap-2">
+            <div class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></div>
+            <span>Načítám…</span>
+        </div>
+    }
+    else
+    {
+        @if (EditModeService.IsEditing)
+        {
+            <!-- Přidat službu -->
+            <button class="btn btn-dark" @onclick="AddService" disabled="@isSaving">
+                @TranslationsService.GetText("Services_AddService")
+            </button>
+        }
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th><EditableText Id="Services_Service" EditMode="@EditModeService.IsEditing" /></th>
+                    <th><EditableText Id="Services_Description" EditMode="@EditModeService.IsEditing" /></th>
+                    @if (EditModeService.IsEditing)
+                    {
+                        <th style="width:1%"></th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in ServicesService.Items)
+                {
+                    <tr>
+                        <td>
+                            @if (EditModeService.IsEditing)
+                            {
+                                <input class="form-control" @bind="item.Name" disabled="@isSaving" />
+                            }
+                            else
+                            {
+                                @item.Name
+                            }
+                        </td>
+                        <td>
+                            @if (EditModeService.IsEditing)
+                            {
+                                <textarea class="form-control" @bind="item.Description" disabled="@isSaving"></textarea>
+                            }
+                            else
+                            {
+                                <div style="white-space: pre-line;">@item.Description</div>
+                            }
+                        </td>
+                        @if (EditModeService.IsEditing)
+                        {
+                            <td class="text-end">
+                                <button class="btn btn-outline-danger"
+                                        @onclick="() => RemoveService(item)"
+                                        disabled="@isSaving">
+                                    @TranslationsService.GetText("Services_Delete")
+                                </button>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        @if (EditModeService.IsEditing)
+        {
+            <!-- Uložit -->
+            <button class="btn btn-dark" @onclick="Save" disabled="@isSaving">
+                @if (isSaving)
+                {
+                    <span class="spinner me-2"></span>
+                    <span>@TranslationsService.GetText("Services_Saving")</span>
+                }
+                else
+                {
+                    <span>@TranslationsService.GetText("Services_Save")</span>
+                }
+            </button>
+        }
+    }
+</div>
+
+@if (showToast)
+{
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index:1080;">
+        <div class="toast show align-items-center @ToastBgClass border-0" role="status" aria-live="polite">
+            <div class="d-flex">
+                <div class="toast-body">
+                    @toastMessage
+                </div>
+            </div>
+        </div>
+    </div>
+}

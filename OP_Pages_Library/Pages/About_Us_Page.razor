@@ -1,0 +1,61 @@
+﻿@page "/about_us"
+@using OP_Razor_Components_Library.Components.EditableImage
+@using OP_Razor_Components_Library.Components.EditableText
+@using OP_Razor_Components_Library.Components.Footer
+@using OP_Shared_Library.Services
+@inject TranslationsService TranslationsService
+@inject EditModeService EditModeService
+@implements IDisposable
+
+@if (isLoaded)
+{
+    <h1 class="uppercase-text mb"><EditableText Id="About_us_title" EditMode="@EditModeService.IsEditing" /></h1>
+
+    <div class="container_about">
+        <div class="content_about">
+            <div class="image_about">
+                <EditableImage Key="Img_about_us_1">
+                    <ImageContent Context="image">
+                        <img src=@image.Src srcset="@image.SrcSet" sizes="@image.Sizes" alt="@image.Alt" />
+                    </ImageContent>
+                </EditableImage>
+            </div>
+            <div class="text_about">
+                <p><EditableText Id="About_us_text_1" EditMode="@EditModeService.IsEditing" /></p>
+                <p><EditableText Id="About_us_text_2" EditMode="@EditModeService.IsEditing" /></p>
+                <p><EditableText Id="About_us_text_3" EditMode="@EditModeService.IsEditing" /></p>
+                <p><EditableText Id="About_us_text_4" EditMode="@EditModeService.IsEditing" /></p>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    #region Private Properties
+    private bool isLoaded = false;
+    #endregion
+
+    #region Ctor
+    protected override async Task OnInitializedAsync()
+    {
+        await TranslationsService.LoadAsync();
+
+        // Register On Edit Change Title
+        EditModeService.OnEditModeChanged += HandleEditModeChanged;
+
+        isLoaded = true;
+    }
+    public void Dispose()
+    {
+        EditModeService.OnEditModeChanged -= HandleEditModeChanged;
+    }
+    #endregion
+
+    #region Handle
+    private void HandleEditModeChanged()
+    {
+        // Redraw the component when the edit mode changes
+        InvokeAsync(StateHasChanged);
+    }
+    #endregion
+}

@@ -1,0 +1,45 @@
+﻿@page "/photo_gallery"
+@using OP_Razor_Components_Library.Components.Photo_Gallery
+@using OP_Razor_Components_Library.Components.Footer
+@using OP_Razor_Components_Library.Components.EditableText
+@using OP_Shared_Library.Services
+@inject TranslationsService TranslationsService
+@inject EditModeService EditModeService
+@implements IDisposable
+
+@if (isLoaded)
+{
+    <h1 class="uppercase-text mt mb"><EditableText Id="Photo_Gallery_Title" EditMode="@EditModeService.IsEditing" /></h1>
+}
+
+<div class="container">
+    <Photo_Gallery />
+</div>
+
+@code {
+    #region Private Properties
+    private bool isLoaded = false;
+    #endregion
+
+    #region Ctor
+    protected override async Task OnInitializedAsync()
+    {
+        await TranslationsService.LoadAsync();
+
+        EditModeService.OnEditModeChanged += HandleEditModeChanged;
+
+        isLoaded = true;
+    }
+    public void Dispose()
+    {
+        EditModeService.OnEditModeChanged -= HandleEditModeChanged;
+    }
+    #endregion
+
+    #region Handle
+    private void HandleEditModeChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+    #endregion
+}

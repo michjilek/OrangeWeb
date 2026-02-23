@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>9a14bc04-4222-4275-89e6-a6c0195084df</UserSecretsId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Logs\**" />
+    <Compile Remove="Op_LP.AppHost\**" />
+    <Compile Remove="Op_LP.ServiceDefaults\**" />
+    <Content Remove="Logs\**" />
+    <Content Remove="Op_LP.AppHost\**" />
+    <Content Remove="Op_LP.ServiceDefaults\**" />
+    <EmbeddedResource Remove="Logs\**" />
+    <EmbeddedResource Remove="Op_LP.AppHost\**" />
+    <EmbeddedResource Remove="Op_LP.ServiceDefaults\**" />
+    <None Remove="Logs\**" />
+    <None Remove="Op_LP.AppHost\**" />
+    <None Remove="Op_LP.ServiceDefaults\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="Pages\Index_DEL.razor" />
+    <Content Remove="wwwroot\Index.html" />
+	  <Content Update="wwwroot\data\**\*">
+		  <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+	  </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.8" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OP_Db\OP_Db.csproj" />
+    <ProjectReference Include="..\OP_Pages_Library\OP_Pages_Library.csproj" />
+    <ProjectReference Include="..\OP_Shared_Library\OP_Shared_Library.csproj" />
+  </ItemGroup>
+</Project>

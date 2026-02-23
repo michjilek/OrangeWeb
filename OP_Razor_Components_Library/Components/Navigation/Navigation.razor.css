@@ -1,0 +1,88 @@
+﻿
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    position: relative;
+    z-index: 10;
+    font-family: var(--MainFont) !important;
+    margin-top: 6px;
+}
+
+::deep .navbar a, ::deep .nav-item {
+    color: var(--DarkGrayColor) !important;
+    text-decoration: none;
+    padding: 20px;
+}
+
+.navbar-right {
+    display: none;
+    gap: 10px;
+}
+
+.navbar-toggler {
+    display: block;
+    font-size: 24px;
+    background: none;
+    border: none;
+    color: var(--DarkGrayColor) !important;
+    cursor: pointer;
+    margin: 0;
+}
+
+/* Backdrop for mobile-menu close, when we clicked outside */
+.menu-backdrop {
+    position: fixed;
+    inset: 0;
+    background: transparent;
+    z-index: 1;
+}
+
+.mobile-menu {
+    display: none;
+    position: absolute;
+    flex-direction: column;
+    top: 124%;
+    right: -10px;
+    background: linear-gradient(var(--SilverColor), white);
+    padding: 0px 10px;
+    z-index: 2;
+}
+
+::deep .mobile-menu .nav-item {
+    display: flex;
+    flex: 1;
+    padding: 20px 50px;
+    border-bottom: 1px solid #444;
+    text-align: center; /* ← tohle nestačí u flexboxu */
+    justify-content: center; /* ← tohle vystředí obsah horizontálně */
+    align-items: center; /* ← tohle vystředí obsah vertikálně */
+}
+
+        ::deep .mobile-menu .nav-item:last-child {
+            border: none;
+        }
+
+/* MEDIA */
+/* 768px – Tablety (portrét) */
+@media (min-width: 768px) {
+    .mobile-menu {
+        right: -20px;
+    }
+}
+/* 1024px – Tablety (na šířku), malé notebooky */
+@media (min-width: 1024px) {
+    .mobile-menu {
+        right: -30px;
+        margin-top: 4px;
+    }
+
+    .navbar-right {
+        display: inline;
+    }
+
+    .navbar-toggler {
+        display: none;
+    }
+}

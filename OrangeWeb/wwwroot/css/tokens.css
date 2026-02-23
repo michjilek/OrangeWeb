@@ -1,0 +1,9 @@
+﻿/* Auto-generated from token.json */
+
+/* Default theme (GlobalTheme) */
+:root,
+[data-theme="GlobalTheme"]{
+  --btn_icon_svg_fill: #406280;
+  --btn_label_text_fill: #e41aff;
+}
+

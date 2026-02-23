@@ -1,0 +1,129 @@
+﻿@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.WebUtilities
+@using Op_LP.Services.Admin
+@inject NavigationManager Navigation
+@inject CustomAuthenticationStateProvider AuthProvider
+@inject IAdminCredentialValidator AdminCredentialValidator
+
+<div class="login-container">
+    @if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div class="error-message">@ErrorMessage</div>
+    }
+
+    <EditForm class="login-form" Model="loginModel" OnValidSubmit="HandleLogin">
+        <DataAnnotationsValidator />
+        <div class="form-group">
+            <input type="text" @bind="loginModel.Username" class="login-input" placeholder="Uživatelské jméno" />
+        </div>
+        <div class="form-group">
+            <input type="password" @bind="loginModel.Password" class="login-input" placeholder="Heslo" />
+        </div>
+        <div class="form-group">
+            <button type="submit" class="login-button">Přihlásit</button>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    #region Parameters
+    // Optional parameter from parent, if it comes
+    [Parameter] public string? ReturnUrl { get; set; }
+    #endregion
+
+    #region Private Properties
+    private LoginModel loginModel = new();
+    private string? ErrorMessage;
+    private string? _resolvedReturnUrl;
+    #endregion
+
+    #region Ctor
+    protected override void OnInitialized()
+    {
+        // Take ReturnUrl from parameter, or from query ?returnUrl=...
+        var candidate = ReturnUrl;
+        if (string.IsNullOrWhiteSpace(candidate))
+        {
+            var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+            var q = QueryHelpers.ParseQuery(uri.Query);
+            if (q.TryGetValue("returnUrl", out var rv))
+            {
+                candidate = rv.ToString();
+            }
+        }
+        _resolvedReturnUrl = GetSafeReturnUrl(candidate);
+    }
+    #endregion
+
+    #region Private Methods
+    private async Task HandleLogin()
+    {
+        // if (loginModel.Username?.ToLower() == "admin" && loginModel.Password == "Lukasjepitka007")
+
+        ErrorMessage = null;
+
+        // Use user inputs and validate it
+        var validationResult = await AdminCredentialValidator.ValidateCredentialsAsync(loginModel.Username, loginModel.Password);
+
+        // For safety?
+        loginModel.Password = string.Empty;
+
+        // If validation was passed...
+        if (validationResult.Succeeded)
+
+        {
+            //await AuthProvider.MarkUserAsAuthenticated(loginModel.Username!);
+
+            // If canonical username is null, use loginModel.Username
+            var canonicalUsername = validationResult.CanonicalUsername ?? loginModel.Username?.Trim();
+
+            // Another username check
+            if (string.IsNullOrWhiteSpace(canonicalUsername))
+            {
+                ErrorMessage = "Přihlašování administrátora není nakonfigurováno. Kontaktujte správce systému.";
+                return;
+            }
+
+            // Username je autentifikován
+            await AuthProvider.MarkUserAsAuthenticated(canonicalUsername);
+
+            // Go to ReturnUrl or on /, if we dont have it
+            Navigation.NavigateTo(_resolvedReturnUrl ?? "/", forceLoad: true);
+        }
+        else
+        {
+            // TODO: translate it...
+            //ErrorMessage = "Neplatné přihlašovací údaje.";
+
+            ErrorMessage = validationResult.IsConfigured
+         ? "Neplatné přihlašovací údaje."
+         : "Přihlašování administrátora není nakonfigurováno. Kontaktujte správce systému.";
+        }
+    }
+    private static bool IsLocalUrl(Uri baseUri, Uri abs) => abs.Scheme == baseUri.Scheme && abs.Host == baseUri.Host && abs.Port == baseUri.Port;
+    private string? GetSafeReturnUrl(string? candidate)
+    {
+        if (string.IsNullOrWhiteSpace(candidate)) return null;
+
+        // Absolute URl on the same origin -> allow (return only path+query+fragment)
+        if (Uri.TryCreate(candidate, UriKind.Absolute, out var abs))
+        {
+            var baseUri = new Uri(Navigation.BaseUri);
+            return IsLocalUrl(baseUri, abs) ? abs.PathAndQuery + abs.Fragment : null;
+        }
+
+        // Relative -> allow, but block relative protocol
+        if (candidate.StartsWith("//")) return null;
+        if (!candidate.StartsWith("/")) candidate = "/" + candidate;
+        return candidate;
+    }
+    #endregion
+
+    #region Other Classes
+    public class LoginModel
+    {
+        public string? Username { get; set; }
+        public string? Password { get; set; }
+    }
+    #endregion
+}

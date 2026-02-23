@@ -1,0 +1,83 @@
+﻿@page "/"
+@using OP_Razor_Components_Library.Components.EditableImage
+@using OP_Razor_Components_Library.Components.EditableText
+@using OP_Shared_Library.Services
+@inject TranslationsService TranslationsService
+@inject EditModeService EditModeService
+
+@using OP_Razor_Components_Library.Components.Footer
+@using OP_Razor_Components_Library.Components.News
+
+@if (isLoaded)
+{
+    <section class="main_picture_section pb"> 
+        <div class="overlay">
+            <EditableImage Key="Img_1">
+                <ImageContent Context="image">
+                    <img src="@image.Src"
+                         class="main-image"
+                         srcset="@image.SrcSet"
+                         sizes="@image.Sizes"
+                         alt="@image.Alt"
+                         fetchpriority="high"
+                         loading="eager"
+                         decoding="async" />
+                </ImageContent>
+            </EditableImage>
+            <div class="content">
+                <h1 class="mt"><EditableText Id="Intro_Title_1" EditMode="@EditModeService.IsEditing" /></h1>
+                <hr class="line-below mt">
+                <h2 class="mt"><EditableText Id="Intro_Title_2" EditMode="@EditModeService.IsEditing" /></h2>
+                <hr class="line-below mt">
+                <p class="mt mb">
+                    <EditableText Id="Intro_Title_3" EditMode="@EditModeService.IsEditing" />
+                    <br>
+                    <br>
+                    <EditableText Id="Intro_Title_4" EditMode="@EditModeService.IsEditing" />
+                </p>
+            </div>
+            <News />
+        </div>
+    </section>
+    <section class="service centered">
+        <p class="subtitle mt"><EditableText Id="Topic_1_Title_1" EditMode="@EditModeService.IsEditing" /></p>
+        <h1 class="title mt uppercase-text"><EditableText Id="Topic_1_Title_2" EditMode="@EditModeService.IsEditing" /></h1>
+        <p class="description mt"><EditableText Id="Topic_1_Title_3" EditMode="@EditModeService.IsEditing" /></p>
+        <p class="text mt centered"><EditableText Id="Topic_1_Text_1" EditMode="@EditModeService.IsEditing" /></p>
+        <p class="text mt_less centered"><EditableText Id="Topic_1_Text_2" EditMode="@EditModeService.IsEditing" /></p>
+    </section>
+    <div class="service_image mt">
+        <EditableImage Key="Img_2">
+            <ImageContent Context="image">
+                <img src="@image.Src" srcset="@image.SrcSet" sizes="@image.Sizes" alt="@image.Alt" />
+            </ImageContent>
+        </EditableImage>
+    </div>
+    <div class="half_services">
+        <div class="half_service">
+            <p class="subtitle mt"><EditableText Id="Topic_2_Title_1" EditMode="@EditModeService.IsEditing" /></p>
+            <h1 class="title mt"><EditableText Id="Topic_2_Title_2" EditMode="@EditModeService.IsEditing" /></h1>
+            <p class="text mt centered"><EditableText Id="Topic_2_Text_1" EditMode="@EditModeService.IsEditing" /></p>
+            <p class="text mt_less centered"><EditableText Id="Topic_2_Text_2" EditMode="@EditModeService.IsEditing" /></p>
+            <p class="text mt_less centered"><EditableText Id="Topic_2_Text_3" EditMode="@EditModeService.IsEditing" /></p>
+        </div>
+        <div class="half_service">
+            <p class="subtitle mt"><EditableText Id="Topic_3_Title_1" EditMode="@EditModeService.IsEditing" /></p>
+            <h1 class="title mt"><EditableText Id="Topic_3_Title_2" EditMode="@EditModeService.IsEditing" /></h1>
+            <p class="text mt centered"><EditableText Id="Topic_3_Text_1" EditMode="@EditModeService.IsEditing" /></p>
+            <p class="text mt_less centered"><EditableText Id="Topic_3_Text_2" EditMode="@EditModeService.IsEditing" /></p>
+            <p class="text mt_less centered"><EditableText Id="Topic_3_Text_3" EditMode="@EditModeService.IsEditing" /></p>
+        </div>
+    </div>
+    <!-- This is solution because of definition css style in parent -->
+    <!-- Img is already styled and is inserted to EditableImage component-->
+    <!-- But we need to work with Src Inside and thats why we insert url via EditableImage -->
+    <!-- Img needs to take Context from EditableImage to work properly -->
+    <div class="service_image mt">
+        <EditableImage Key="Img_3">
+            <ImageContent Context="image">
+                <img src="@image.Src" srcset="@image.SrcSet" sizes="@image.Sizes" alt="@image.Alt" />
+            </ImageContent>
+    </EditableImage>
+    </div>
+}

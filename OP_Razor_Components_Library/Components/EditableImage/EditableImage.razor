@@ -1,0 +1,337 @@
+﻿@using Microsoft.AspNetCore.Components.Forms
+@using OP_Razor_Components_Library.Components.EditableImage.Services
+@using OP_Shared_Library.Services
+@inject EditModeService EditModeService
+@inject EditImageService EditImageService
+@inject Microsoft.Extensions.Hosting.IHostEnvironment Env
+@inject TranslationsService TranslationsService
+@inject IMinIoService MinIoService
+
+@* Show edit button only when the app is in "editing" mode *@
+@if (EditModeService.IsEditing)
+{
+    <button class="edit-btn" @onclick="OpenEditor" title="Edit news">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04
+                                                                             a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003
+                                                                             1.003 0 0 0-1.42 0l-1.83 1.83
+                                                                             3.75 3.75 1.84-1.82z" />
+        </svg>
+    </button>
+}
+
+@* We pass the current public-signed URL (Src). *@
+@ImageContent(new ResponsiveImageData(Src: Src, SrcSet: BuildSrcSet(), Sizes: Sizes, Alt: Src))
+
+@* Busy overlay (uploading/progress, or awaiting file picker). *@
+@if (isBusy)
+{
+    <div class="busy-overlay" role="alert" aria-live="assertive" aria-busy="true">
+        <div class="busy-card">
+            <div class="busy-spinner"></div>
+
+            @* Show linear progress bar only while uploading (0–100). *@
+            @if (uploadProgress > 0 && uploadProgress < 100)
+            {
+                <div class="busy-progress">
+                    <div class="busy-progress-bar" style="width:@($"{uploadProgress}%")"></div>
+                </div>
+            }
+
+            @* When we're simply waiting for the user to choose a file, allow closing the overlay. *@
+            @if (isAwaitingFile)
+            {
+                <button class="btn" @onclick="CancelBusy">Close</button>
+            }
+        </div>
+    </div>
+}
+
+@* Inline modal editor: preview current image, upload a new one, save/cancel. *@
+@if (EditModeService.IsEditing && IsEditorOpen)
+{
+    <div class="modal-backdrop">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>CHANGE PICTURE</h2>
+            </div>
+
+            <label>Current Image:</label>
+            @* Use local data-URL preview if available. *@
+            @if (!string.IsNullOrEmpty(draftImageUrl))
+            {
+                <img src="@draftImageUrl" alt="Current Image" class="preview-img"/>
+            }
+
+            @* Clicking the label triggers hidden <InputFile>. We also show the loader immediately. *@
+            <label class="btn" for="news-upload" @onclick="BeginUpload" disabled="@isBusy">
+                Upload New Image
+            </label>
+
+            @* Hidden file input – actual OS file picker. *@
+            <InputFile id="news-upload"
+                       hidden
+                       OnChange="HandleImageChange" />
+
+            <div class="modal-actions">
+                <button class="btn" @onclick="SaveEdit">Save</button>
+                <button class="btn" @onclick="CancelEdit">Cancel</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    #region Parameters
+    // Consumer-provided RenderFragment to render the image.
+    [Parameter] public RenderFragment<ResponsiveImageData> ImageContent { get; set; } = default!;
+
+    // Holds URL fo the image
+    [Parameter] public string Src { get; set; } = "";
+
+    // Optional alt text (not used directly here, but kept for completeness/extensibility).
+    [Parameter] public string Alt { get; set; } = "";
+
+    // Logical key used to resolve the object key in YAML and request a URL.
+    [Parameter] public string Key { get; set; } = default!;
+
+    // Sizes attribute for responsive images.
+    [Parameter] public string Sizes { get; set; } = "50vw";
+    #endregion
+
+    #region Constants
+    // Max width for client-side preview generation.
+    private const int PreviewMaxWidth = 1600;
+    #endregion
+
+    #region Private Properties
+    private string _objectKey;
+    #endregion
+
+    #region State
+    // Modal state + local preview data URL generated after selecting a file.
+    private bool IsEditorOpen = false;
+    private string draftImageUrl;
+
+    // File selected by the user (not yet uploaded until SaveEdit).
+    private IBrowserFile uploadedImage;
+
+    // "Busy" overlay and progress indicator state.
+    private bool isBusy;
+    private int uploadProgress = 0;
+    private bool isAwaitingFile;
+
+    // Pre-signed URL auto-refresh control.
+    private CancellationTokenSource _refreshCts;
+
+    // How long before expiry to refresh.
+    private readonly TimeSpan _refreshAhead = TimeSpan.FromMinutes(1);
+    #endregion
+
+    #region Lifecycle
+    protected override async Task OnInitializedAsync()
+    {
+        // Ensure translations are ready (affects which YAML mapping is loaded by the service).
+        await TranslationsService.LoadAsync();
+
+        // Load the language-specific YAML mapping (logical key -> object key).
+        await EditImageService.LoadAsync(TranslationsService.GetLanguage());
+
+        // Re-load mappings when language changes (e.g., user switches UI language).
+        TranslationsService.OnChange += TranslationChanged;
+
+        // Get the initial pre-signed URL for the provided Key.
+        await RefreshSignedUrlAsync();
+
+        // Begin background renewal so the <img> doesn't break when the URL expires.
+        StartAutoRefresh();
+    }
+
+    public void Dispose()
+    {
+        // Stop any running refresh loop and unsubscribe from events.
+        _refreshCts?.Cancel();
+        TranslationsService.OnChange -= TranslationChanged;
+    }
+    #endregion
+
+    #region UI Actions
+    // Open the modal and show the currently displayed image via its existing pre-signed URL.
+    private void OpenEditor()
+    {
+        draftImageUrl = Src; // purely for preview in the modal
+        IsEditorOpen = true;
+    }
+
+    // Close the modal and discard any selected-but-unsaved file/preview.
+    private void CancelEdit()
+    {
+        IsEditorOpen = false;
+        uploadedImage = null;
+        draftImageUrl = null;
+        StateHasChanged();
+    }
+
+    // Save the selected file to MinIO (via service), update YAML mapping,
+    // then request a fresh pre-signed URL for the new object.
+    private async Task SaveEdit()
+    {
+        if (uploadedImage != null)
+        {
+            _objectKey = await EditImageService.SaveImageAndMapAsync(
+                key: Key,
+                file: uploadedImage,
+                // relativeFolder: "gallery",
+                maxBytes: 10_000_000
+            );
+
+            // Replace Src with a new pre-signed URL that points to the new object.
+            await RefreshSignedUrlAsync();
+        }
+
+        // Reset modal and temporary state.
+        IsEditorOpen = false;
+        uploadedImage = null;
+        draftImageUrl = null;
+
+        StateHasChanged();
+    }
+
+    // Show busy overlay right before opening the OS file picker for a smoother UX.
+    private void BeginUpload()
+    {
+        isBusy = true;
+        isAwaitingFile = true;
+        uploadProgress = 0;
+        StateHasChanged();
+    }
+
+    // Hide the busy overlay if the user cancels the file picker.
+    private void CancelBusy()
+    {
+        isBusy = false;
+        isAwaitingFile = false;
+        uploadProgress = 0;
+    }
+    #endregion
+
+    #region Helpers
+    // Ask the service for a new public URL for the current logical Key.
+    // If the mapping is missing, leave Src empty to avoid broken images.
+    private async Task RefreshSignedUrlAsync()
+    {
+        try
+        {
+            _objectKey = EditImageService.GetObjectKey(Key);
+            Src = await EditImageService.GetSignedUrlAsync(Key);
+            StateHasChanged();
+        }
+        catch
+        {
+            _objectKey = null;
+            Src = ""; // nothing mapped => nothing to display
+            StateHasChanged();
+        }
+    }
+
+    // Start a background loop that refreshes the pre-signed URL shortly before it expires.
+    // This prevents <img> from breaking during long-lived page sessions.
+    private void StartAutoRefresh()
+    {
+        _refreshCts?.Cancel();
+        _refreshCts = new CancellationTokenSource();
+
+        _ = Task.Run(async () =>
+        {
+            // Refresh a bit before expiry; enforce a reasonable minimum delay.
+            var delay = TimeSpan.FromMinutes(10) - _refreshAhead;
+            if (delay < TimeSpan.FromSeconds(30))
+            {
+                delay = TimeSpan.FromSeconds(30);
+            }
+
+            try
+            {
+                while (!_refreshCts.IsCancellationRequested)
+                {
+                    await Task.Delay(delay, _refreshCts.Token);
+                    await RefreshSignedUrlAsync();
+                }
+            }
+            catch (TaskCanceledException) { /* normal shutdown */ }
+        });
+    }
+
+    // Build the srcset attribute value for responsive images.
+    private string BuildSrcSet()
+    {
+        var srcset = ResponsiveImageHelper.BuildSrcSet(MinIoService, _objectKey);
+
+        return srcset;
+    }
+    #endregion
+
+    #region Handlers
+    // Handle file selection:
+    // - generate a local data-URL preview
+    // - update a simple progress indicator while reading the stream
+    private async Task HandleImageChange(InputFileChangeEventArgs e)
+    {
+        uploadedImage = e.File;
+
+        isAwaitingFile = false;
+        isBusy = true;
+        uploadProgress = 0;
+        StateHasChanged();
+
+        // Small delay so the UI shows the overlay before heavy work starts.
+        await Task.Delay(1);
+
+        try
+        {
+            // // Request a resized version from the browser for preview purposes (client-side).
+            var preview = await uploadedImage.RequestImageFileAsync(uploadedImage.ContentType, PreviewMaxWidth, ResponsiveImageHelper.MaxUploadedHeight);
+            await using var stream = preview.OpenReadStream(maxAllowedSize: 10_000_000);
+            using var ms = new MemoryStream();
+
+            var buffer = new byte[80 * 1024];
+            long readTotal = 0;
+            int read;
+            while ((read = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+            {
+                await ms.WriteAsync(buffer, 0, read);
+                readTotal += read;
+                uploadProgress = (int)(readTotal * 100 / preview.Size);
+
+                // Throttle re-rendering to avoid excessive UI updates.
+                if (readTotal % (512 * 1024) == 0)
+                    StateHasChanged();
+            }
+
+            // Convert the preview bytes to a data URL for immediate display in the modal.
+            draftImageUrl = $"data:{preview.ContentType};base64,{Convert.ToBase64String(ms.ToArray())}";
+            uploadProgress = 100;
+        }
+        finally
+        {
+            // Hide the busy overlay regardless of success or failure.
+            isBusy = false;
+            isAwaitingFile = false;
+            StateHasChanged();
+        }
+    }
+
+    // Re-load YAML on language change and refresh the pre-signed URL accordingly.
+    private async void TranslationChanged()
+    {
+        await EditImageService.LoadAsync(TranslationsService.GetLanguage());
+        await RefreshSignedUrlAsync();
+        StateHasChanged();
+    }
+    #endregion
+
+    #region Records
+    // Holds responsive image attributes for the consumer RenderFragment.
+    public record ResponsiveImageData(string Src, string SrcSet, string Sizes, string Alt);
+    #endregion
+}

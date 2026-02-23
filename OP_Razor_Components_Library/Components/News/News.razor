@@ -1,0 +1,626 @@
+﻿@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.Extensions.Hosting
+@using OP_Razor_Components_Library.Components.EditableText
+@using OP_Razor_Components_Library.Components.News.Services
+@using OP_Shared_Library.Services
+@using System.Linq;
+@inject EditModeService EditModeService
+@inject EditNewsService EditNewsService
+@inject TranslationsService TranslationsService
+@inject IHostEnvironment Env
+@inject IMinIoService MinIoService
+@implements IDisposable
+
+<div class="news centered mt pt pl pr pb"
+     tabindex="0"
+     @onkeydown="HandleKey"
+     @onpointerdown="OnPointerDown"
+     @onpointerup="OnPointerUp">
+
+    <!-- Get Small Title from Current Item -->
+    <p class="subtitle color_dark mb"><EditableText Id="News" EditMode="@EditModeService.IsEditing" /></p>
+
+    @if (EditNewsService.Items.Count > 0)
+    {
+        <!-- Get Current Item From List -->
+        var item = EditNewsService.Items[CurrentIndex];
+
+        <!-- Image and Arrows container -->
+        <div class="news-media">
+            <button class="news-nav prev"
+                    @onclick="Prev"
+                    aria-label="Previous new"
+                    disabled="@(!CanPrev)">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M15.5 19l-7-7 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
+            <!-- Image -->
+            <div class="news-image-container">
+                @{
+                    var srcSet = GetResponsiveSrcSet(item);
+                    var sizes = GetResponsiveSizes(srcSet);
+                }
+                <img src="@GetDisplayUrl(item)" alt="@item.Title" class="news_1" srcset="@srcSet" sizes="@sizes" />
+
+                @if (EditModeService.IsEditing)
+                {
+                    <!-- Move one position to the left (earlier) -->
+                    <button class="reorder-btn move-left"
+                            @onclick="MoveEarlier"
+                            disabled="@(!CanMoveEarlier)"
+                            title="Move earlier">
+                        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                            <path d="M15.5 19l-7-7 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+
+                    <!-- Move one position to the rigth (later) -->
+                    <button class="reorder-btn move-right"
+                            @onclick="MoveLater"
+                            disabled="@(!CanMoveLater)"
+                            title="Move later">
+                        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                            <path d="M8.5 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+
+                    <!-- Edit Button -->
+                    <button class="edit-btn" @onclick="OpenEditor" title="Edit news">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z" />
+                        </svg>
+                    </button>
+                }
+
+            </div>
+
+            <button class="news-nav next"
+                    @onclick="Next"
+                    aria-label="Next new"
+                    disabled="@(!CanNext)">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M8.5 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="news-content">
+            <!-- Get Title From Current Item -->
+            <p class="title color_dark uppercase-text">@item.Title</p>
+
+            <!-- Get Text 1 From Current Item -->
+            @if (!string.IsNullOrWhiteSpace(item.Text1))
+            {
+                <p class="text mt_less color_dark centered">@item.Text1</p>
+            }
+
+            <!-- Get Text 2 From Current Item -->
+            @if (!string.IsNullOrWhiteSpace(item.Text2))
+            {
+                <p class="text mt_less color_dark centered">@item.Text2</p>
+            }
+
+            <!-- Create Dots -->
+            <div class="news-dots mt">
+                @for (int i = 0; i < EditNewsService.Items.Count; i++)
+                {
+                    <!-- We need to create local copy because of iteration and lambda expression -->
+                    var index = i;
+                    <button class="news-dot @(i == CurrentIndex ? "active" : null)"
+                            @onclick="(() => GoTo(index))"
+                            aria-label="Goto to news @(i + 1)"></button>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        @if (EditModeService.IsEditing)
+        {
+            <div class="mt">
+                <button class="btn" @onclick="OpenNew">+ Add first news</button>
+            </div>
+        }
+    }
+</div>
+
+@if (isBusy)
+{
+    <div class="busy-overlay" role="alert" aria-live="assertive" aria-busy="true">
+        <div class="busy-card">
+            <div class="busy-spinner"></div>
+
+            @if (uploadProgress > 0 && uploadProgress < 100)
+            {
+                <div class="busy-progress">
+                    <div class="busy-progress-bar" style="width:@($"{uploadProgress}%")"></div>
+                </div>
+            }
+
+            @if (isAwaitingFile)
+            {
+                <button class="btn" @onclick="CancelBusy">Close</button>
+            }
+        </div>
+    </div>
+}
+
+@if (EditModeService.IsEditing && IsEditorOpen)
+{
+    <div class="modal-backdrop">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>@(IsNew ? "Add News" : "Edit News")</h2>
+            </div>
+
+            <label>Title:</label>
+            <input @bind="draftTitle" />
+
+            <label>Text 1:</label>
+            <textarea @bind="draftText1"></textarea>
+
+            <label>Text 2:</label>
+            <textarea @bind="draftText2"></textarea>
+
+            <label>Current Image:</label>
+            @if (!string.IsNullOrEmpty(draftImageUrl))
+            {
+                <img src="@draftImageUrl" alt="Current image" class="preview-img" />
+            }
+
+            <label class="btn" for="news-upload" @onclick="BeginUpload" disabled="@isBusy">
+                Upload New Image
+            </label>
+
+            <InputFile id="news-upload"
+                       hidden
+                       OnChange="HandleImageChange" />
+
+            <div class="modal-actions">
+                <button class="btn" @onclick="CancelEdit">Cancel</button>
+                <button class="btn" @onclick="DeleteNews">Delete</button>
+                <button class="btn" @onclick="SaveAsNew">+ Save New</button>
+                <button class="btn" @onclick="SaveEdit">Save</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    #region Private Properties
+    // Actual index
+    private int CurrentIndex = 0;
+    // Behaviour in the end - go to start again
+    private bool WrapAround { get; set; } = true;
+    // If is Editor for News Open
+    private bool IsEditorOpen = false;
+    private IBrowserFile uploadedImage;
+    private bool IsNew = false;
+    // Busy state
+    private bool isBusy;
+    private int uploadProgress = 0;
+    private bool isAwaitingFile;
+    #endregion
+
+    #region Constants
+    // Image preview max width
+    private const int PreviewMaxWidth = 1600;
+    #endregion
+
+    #region Draft
+    // local draft values
+    private string draftTitle;
+    private string draftText1;
+    private string draftText2;
+    private string draftImageUrl;
+    private string draftImageObjectKey;
+    #endregion
+
+    #region Quick Methods
+    private bool CanPrev => WrapAround || CurrentIndex > 0;
+    private bool CanNext => WrapAround || CurrentIndex < (EditNewsService.Items.Count - 1);
+    private bool CanMoveEarlier => EditModeService.IsEditing && EditNewsService.Items.Count > 1 && CurrentIndex > 0;
+    private bool CanMoveLater => EditModeService.IsEditing && EditNewsService.Items.Count > 1 && CurrentIndex < EditNewsService.Items.Count - 1;
+    #endregion
+
+    #region Ctor
+    protected override async Task OnInitializedAsync()
+    {
+        await TranslationsService.LoadAsync();
+        await EditNewsService.LoadAsync(TranslationsService.GetLanguage());
+
+        TranslationsService.OnChange += TranslationChanged;
+        EditModeService.OnEditModeChanged += HandleEditModeChanged;
+    }
+    public void Dispose()
+    {
+        EditModeService.OnEditModeChanged -= HandleEditModeChanged;
+        TranslationsService.OnChange -= TranslationChanged;
+    }
+    #endregion
+
+    #region Private Methods
+    private void Next()
+    {
+        // Solve empty list
+        if (EditNewsService.Items.Count == 0) return;
+
+        // If we are not at the end, move next
+        if (CurrentIndex < EditNewsService.Items.Count - 1)
+        {
+            CurrentIndex++;
+        }
+        // If we are at the end, set start index
+        else if (WrapAround)
+        {
+            CurrentIndex = 0;
+        }
+    }
+    private void Prev()
+    {
+        // Solve emty list
+        if (EditNewsService.Items.Count == 0) return;
+
+        // We dont want negative numbers, go prev
+        if (CurrentIndex > 0)
+        {
+            CurrentIndex--;
+        }
+        // If we are at start aand move prev, go to the end index of List
+        else if (WrapAround)
+        {
+            CurrentIndex = EditNewsService.Items.Count - 1;
+        }
+    }
+    private void GoTo(int index)
+    {
+        if (index >= 0 && index < EditNewsService.Items.Count)
+        {
+            CurrentIndex = index;
+        }
+    }
+    private void OpenEditor()
+    {
+        if (CurrentIndex < 0 || CurrentIndex >= EditNewsService.Items.Count) return;
+
+        var item = EditNewsService.Items[CurrentIndex];
+        draftTitle = item.Title;
+        draftText1 = item.Text1;
+        draftText2 = item.Text2;
+        draftImageUrl = GetDisplayUrl(item);
+        draftImageObjectKey = item.ImageUrl;
+
+        IsNew = false;
+        IsEditorOpen = true;
+    }
+    private void OpenNew()
+    {
+        draftTitle = "";
+        draftText1 = "";
+        draftText2 = "";
+        draftImageUrl = "";
+        draftImageObjectKey = "";
+        uploadedImage = null;
+
+        IsNew = true;
+        IsEditorOpen = true;
+    }
+    private async Task SaveEdit()
+    {
+        if (CurrentIndex < 0 || CurrentIndex >= EditNewsService.Items.Count)
+            return;
+
+        isBusy = true;
+        uploadProgress = 0;
+        StateHasChanged();
+
+        try
+        {
+            var item = EditNewsService.Items[CurrentIndex];
+
+            // Draft
+            item.Title = draftTitle ?? string.Empty;
+            item.Text1 = draftText1 ?? string.Empty;
+            item.Text2 = draftText2 ?? string.Empty;
+
+            if (uploadedImage != null)
+            {
+                var (objectKey, signedUrl) = await UploadImageToMinIoAsync(uploadedImage);
+                if (!string.IsNullOrWhiteSpace(objectKey))
+                {
+                    item.ImageUrl = objectKey;
+                    item.ImageSignedUrl = signedUrl;
+                    draftImageObjectKey = objectKey;
+                    draftImageUrl = signedUrl ?? string.Empty;
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(draftImageObjectKey))
+                {
+                    item.ImageUrl = draftImageObjectKey!;
+                    item.ImageSignedUrl = await EditNewsService.ResolveImageUrlAsync(draftImageObjectKey);
+                }
+                else
+                {
+                    item.ImageUrl = string.Empty;
+                    item.ImageSignedUrl = null;
+                    draftImageUrl = string.Empty;
+                }
+                // in other case leave original item.ImageUlr without change
+            }
+
+            // Save via EditNewsService to YAML
+            await EditNewsService.SaveAsync(Env.ContentRootPath);
+
+            // Close Editor, clean
+            IsEditorOpen = false;
+            uploadedImage = null;
+        }
+        finally
+        {
+            isBusy = false;
+            StateHasChanged();
+        }
+    }
+    private void CancelEdit()
+    {
+        IsEditorOpen = false;
+    }
+    private async Task SaveAsNew()
+    {
+        // Easy validation
+        if (string.IsNullOrWhiteSpace(draftTitle)) { return; }
+
+        // Create draft item
+        var newItem = new NewsItem
+        {
+            Id = Guid.NewGuid(),
+            Title = draftTitle ?? string.Empty,
+            Text1 = draftText1 ?? string.Empty,
+            Text2 = draftText2 ?? string.Empty,
+            ImageUrl = string.Empty
+        };
+
+        // If we have uploaded image, save it
+        if (uploadedImage != null)
+        {
+            var (objectKey, signedUrl) = await UploadImageToMinIoAsync(uploadedImage);
+            if (!string.IsNullOrWhiteSpace(objectKey))
+            {
+                newItem.ImageUrl = objectKey;
+                newItem.ImageSignedUrl = signedUrl;
+                draftImageObjectKey = objectKey;
+                draftImageUrl = signedUrl ?? string.Empty;
+            }
+        }
+        else if (!string.IsNullOrWhiteSpace(draftImageObjectKey))
+        {
+            newItem.ImageUrl = draftImageObjectKey!;
+            newItem.ImageSignedUrl = await EditNewsService.ResolveImageUrlAsync(draftImageObjectKey);
+        }
+
+        // Add and Save
+        EditNewsService.Items.Add(newItem);
+        CurrentIndex = EditNewsService.Items.Count - 1;
+
+        // Save with service
+        await EditNewsService.SaveAsync(Env.ContentRootPath);
+
+        // Close modal and clean temporary variables
+        IsEditorOpen = false;
+        uploadedImage = null;
+        draftTitle = draftText1 = draftText2 = draftImageUrl = null;
+        draftImageObjectKey = null;
+    }
+    private async Task DeleteNews()
+    {
+        // Check items
+        if (EditNewsService.Items.Count == 0) { return; }
+
+        // Get Item and remove via Service
+        var item = EditNewsService.Items[CurrentIndex];
+        EditNewsService.RemoveItem(item);
+
+        // Set Current Index
+        if (EditNewsService.Items.Count == 0)
+        {
+            CurrentIndex = 0;
+        }
+        else if (CurrentIndex >= EditNewsService.Items.Count)
+        {
+            CurrentIndex = EditNewsService.Items.Count - 1;
+        }
+
+        // Save via EditNewsService to yaml
+        await EditNewsService.SaveAsync(Env.ContentRootPath);
+
+        // Close Editor
+        IsEditorOpen = false;
+    }
+    private async Task MoveEarlier()
+    {
+        if (!CanMoveEarlier) return;
+
+        var i = CurrentIndex;
+        var item = EditNewsService.Items[i];
+        EditNewsService.Items.RemoveAt(i);
+        EditNewsService.Items.Insert(i - 1, item);
+        CurrentIndex = i - 1;
+
+        // Save new order
+        await EditNewsService.SaveAsync(Env.ContentRootPath);
+    }
+    private async Task MoveLater()
+    {
+        if (!CanMoveLater) return;
+
+        var i = CurrentIndex;
+        var item = EditNewsService.Items[i];
+        EditNewsService.Items.RemoveAt(i);
+        EditNewsService.Items.Insert(i + 1, item);
+        CurrentIndex = i + 1;
+
+        await EditNewsService.SaveAsync(Env.ContentRootPath);
+    }
+    private void BeginUpload()
+    {
+        // Show loader before dialog is open
+        isBusy = true;
+        isAwaitingFile = true;
+        uploadProgress = 0;
+        StateHasChanged();
+    }
+    private void CancelBusy()
+    {
+        isBusy = false;
+        isAwaitingFile = false;
+        uploadProgress = 0;
+    }
+    private string GetDisplayUrl(NewsItem item) =>
+        item?.ImageSignedUrl ?? item?.ImageUrl ?? string.Empty;
+    private string GetResponsiveSrcSet(NewsItem item)
+    {
+        return ResponsiveImageHelper.BuildSrcSet(MinIoService, item.ImageUrl);
+    }
+    private string GetResponsiveSizes(string srcSet)
+    {
+         return string.IsNullOrWhiteSpace(srcSet)
+            ? null
+            : "(min-width: 1440px) 992px," +
+              "(min-width: 1024px)  54vw," +
+              "(min-width: 768px)   72vw," +
+                                   "50vw";
+    }
+    private async Task UploadResponsiveVariantAsync(IBrowserFile file, string objectKey)
+    {
+        var maxWidth = ResponsiveImageHelper.VariantWidths.Max();
+
+        foreach (var width in ResponsiveImageHelper.VariantWidths)
+        {
+            var resized = await file.RequestImageFileAsync(file.ContentType, width, ResponsiveImageHelper.MaxUploadedHeight);
+            await using var readStream = resized.OpenReadStream(maxAllowedSize: 10_000_000);
+            using var ms = new MemoryStream();
+            await readStream.CopyToAsync(ms);
+            ms.Position = 0;
+
+            var key = width == maxWidth ? objectKey : ResponsiveImageHelper.BuildVariantKey(objectKey, width);
+
+            await MinIoService.PutObjectAsync(key, ms, resized);
+        }
+    }
+    private async Task<(string ObjectKey, string SignedUrl)> UploadImageToMinIoAsync(IBrowserFile file)
+    {
+        if (file is null)
+        {
+            return (string.Empty, null);
+        }
+
+        var ext = Path.GetExtension(file.Name);
+        if (string.IsNullOrWhiteSpace(ext) || !MinIoService.AllowedImageExtensions.Contains(ext))
+        {
+            return (string.Empty, null);
+        }
+
+        await MinIoService.EnsureBucketAsync();
+
+        // Build Object Key
+        var objectKey = ResponsiveImageHelper.BuildResponsiveObjectKey(EditNewsService.MinIoFolder, ext);
+
+        // Upload original + variants
+        await UploadResponsiveVariantAsync(file, objectKey);
+
+        // Get signed URL
+        var signedUrl = await EditNewsService.ResolveImageUrlAsync(objectKey);
+
+        // Return
+        return (objectKey, signedUrl);
+    }
+    #endregion
+
+    #region Handlers
+    // Keys ←/→ handle
+    private void HandleKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "ArrowRight")
+        {
+            Next();
+        }
+        else if (e.Key == "ArrowLeft")
+        {
+            Prev();
+        }
+    }
+    private async Task HandleImageChange(InputFileChangeEventArgs e)
+    {
+        uploadedImage = e.File;
+        draftImageObjectKey = null;
+
+        isAwaitingFile = false;
+        isBusy = true;
+        uploadProgress = 0;
+        StateHasChanged();
+        // To draw overlay
+        await Task.Delay(1);
+
+        try
+        {
+            // Create preview
+            var preview = await uploadedImage.RequestImageFileAsync(uploadedImage.ContentType, PreviewMaxWidth, ResponsiveImageHelper.MaxUploadedHeight);
+            await using var stream = preview.OpenReadStream(maxAllowedSize: 10_000_000);
+            using var ms = new MemoryStream();
+
+            var buffer = new byte[80 * 1024];
+            long readTotal = 0;
+            int read;
+            while ((read = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+            {
+                await ms.WriteAsync(buffer, 0, read);
+                readTotal += read;
+                uploadProgress = (int)(readTotal * 100 / preview.Size);
+
+                if (readTotal % (512 * 1024) == 0)
+                    StateHasChanged();
+            }
+
+            draftImageUrl = $"data:{preview.ContentType};base64,{Convert.ToBase64String(ms.ToArray())}";
+            uploadProgress = 100;
+        }
+        finally
+        {
+            isBusy = false;
+            isAwaitingFile = false;
+            StateHasChanged();
+        }
+    }
+
+    private void HandleEditModeChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+    private async void TranslationChanged()
+    {
+        await EditNewsService.LoadAsync(TranslationsService.GetLanguage());
+        StateHasChanged();
+    }
+    #endregion
+
+    #region Touch
+    // Swipe (touch)
+    private double? _swipeStartX;
+    private void OnPointerDown(PointerEventArgs e) => _swipeStartX = e.ClientX;
+    private void OnPointerUp(PointerEventArgs e)
+    {
+        if (_swipeStartX is null) return;
+
+        var delta = e.ClientX - _swipeStartX.Value;
+        _swipeStartX = null;
+
+        const double threshold = 40; // px
+        if (delta <= -threshold) Next();     // swipe to the left → next
+        else if (delta >= threshold) Prev(); // swipe to the right → prev
+    }
+    #endregion
+}

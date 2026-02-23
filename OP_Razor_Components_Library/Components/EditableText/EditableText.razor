@@ -1,0 +1,137 @@
+﻿@using Microsoft.Extensions.Hosting;
+@inject IHostEnvironment env;
+@inject TranslationsService TranslationsService;
+@implements IDisposable
+
+@if (EditMode)
+{
+    @if (_editing)
+    {
+        <div class="overlay">
+            <div class="edit_area">
+                <textarea class="text-area" @bind="_translation"></textarea>
+                <div class="button-group">
+                    <button class="btn" @onclick="SaveAsync">Save</button>
+                    <button class="btn" @onclick="CancelEdit">Cancel</button>
+                </div>
+            </div>
+        </div>
+    }
+    <span @onclick="() => _editing = true"
+          class="editable-span">@_translation</span>
+}
+else
+{
+    if (IsPlaceholder)
+    {
+        <textarea class="user_text_area"
+                  placeholder="@_translation"
+                  value="@Value"
+                  @oninput="OnUserInput"                   
+                  >
+        </textarea>
+    }
+    else
+    {
+        <span>@_translation</span>
+    }
+}
+
+@code {
+    #region Parameters
+    // Unique identifier for the text
+    [Parameter] public string Id { get; set; } = string.Empty;
+    // Flag to indicate if edit mode is enabled
+    [Parameter] public bool EditMode { get; set; } = false;
+    // Flag to indicate if this is a placeholder text
+    [Parameter] public bool IsPlaceholder { get; set; } = false;
+    // Event callback for value changes
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    #endregion
+
+    #region Properties For Form Validation
+    // Bound value for form validation
+    [Parameter] public string Value { get; set; } = string.Empty;
+    #endregion
+
+    #region Private Properties
+    // Current translation value
+    private string _translation;
+    // For cancel edit
+    private string _originalTranslation;
+    // Edit mode flag
+    private bool _editing = false;
+    // To avoid multiple subscription
+    private bool _subscribed;
+    #endregion
+
+    #region Ctor
+    // OnInitialized method to subscribe to events
+    protected override void OnInitialized()
+    {
+        if (!_subscribed)
+        {
+            TranslationsService.OnChange += TranslationChanged;
+            _subscribed = true;
+        }
+    }
+    // Dispose method to unsubscribe from events
+    public void Dispose()
+    {
+        if (_subscribed)
+        {
+            TranslationsService.OnChange -= TranslationChanged;
+        }
+    }
+    // Method raised when parameters were set
+    protected override void OnParametersSet()
+    {
+        ReloadValue();
+    }
+    #endregion
+
+    #region Private Methods
+    // Load current value from Translation service
+    private void ReloadValue()
+    {
+        _translation = TranslationsService.GetText(Id);
+        _originalTranslation = _translation;
+    }
+    // Save edited value
+    private async Task SaveAsync()
+    {
+        await TranslationsService.UpdateTranslationAsync(Id, _translation, env.ContentRootPath);
+
+        // Update original value after insert
+        _originalTranslation = _translation;
+        _editing = false;
+    }
+    // Cancel edit and return original value
+    private void CancelEdit()
+    {
+        // Return original text
+        _translation = _originalTranslation;
+        _editing = false;
+    }
+    #endregion
+
+    #region Handlers
+    // Handler for translation changes
+    private void TranslationChanged()
+    {
+        // Realod Value
+        ReloadValue();
+
+        // Tell UI that something has changed
+        InvokeAsync(StateHasChanged);
+    }
+    // Handler for user input in placeholder mode
+    private async Task OnUserInput(ChangeEventArgs e)
+    {
+        var newValue = e.Value?.ToString() ?? string.Empty;
+
+        // Push value to parent (@bind-Value)
+        await ValueChanged.InvokeAsync(newValue);
+    }
+    #endregion
+}

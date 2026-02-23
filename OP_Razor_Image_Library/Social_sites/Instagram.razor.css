@@ -1,0 +1,22 @@
+﻿
+/* Social Sites Group */
+#Social_sites:hover {
+    cursor: pointer;
+}
+
+/* Circle remove*/
+#insta_Circle circle,
+#Social_sites:active #circle,
+#Social_sites:active #circle_border {
+    fill: var(--TransparentColor) !important;
+    stroke: var(--TransparentColor) !important;
+}
+
+/* Path */
+#insta_logo path {
+    fill: var(--GrayColor) !important;
+}
+
+#Social_sites:active #insta_logo path {
+    fill: var(--Dark--GrayColor) !important;
+}

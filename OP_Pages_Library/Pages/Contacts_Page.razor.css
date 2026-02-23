@@ -1,0 +1,137 @@
+﻿* {
+    --contacts_border_color: #C3C3C3;
+    --contacts_text_dark_color: #333333FF;
+    --contacts_placeholder_color: #aaaaaaFF;
+    --contacts_border_radius: 20px;
+    --contacts_row_gap_big: 30px;
+    --contacts_row_gap_middle: 20px;
+    --contacts_row_gap_small: 13.33px;
+    --contacts_gap: 15px;
+    --contacts_border_width: 1px;
+    --contacts_item_height: 45px;
+    --contacts-font: var(--MainFont);
+    --contacts_border_max_width: 700px;
+    --contacts_left_panel_min_width: 293px;
+    --contacts_font_size: 14px;
+    --contacts_font_weight: 500;
+    --contacts_line_height: 1.2;
+    --contacts_right_panel_paddinf_top: 13.5px;
+}
+
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+h1 {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.contacts_border {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-width: var(--contacts_border_max_width);
+    width: 100%;
+    border-radius: var(--contacts_border_radius);
+    border-style: solid;
+    border-width: var(--contacts_border_width);
+    border-color: var(--contacts_border_color);
+    align-items: start;
+    align-content: start;
+    justify-content: space-between;
+    row-gap: var(--contacts_row_gap_big);
+    column-gap: var(--contacts_row_gap_middle);
+    margin: 35px auto;
+
+    .left_border {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        width: 328px;
+        align-items: start;
+        align-content: space-between;
+        justify-content: start;
+        row-gap: var(--contacts_row_gap_middle);
+        min-height: 405.5px;
+
+        .contacts_svg_board {
+            display: grid;
+            grid-template-rows: 1fr;
+            grid-template-columns: 1fr;
+            align-items: start;
+            align-content: stretch;
+            justify-items: center;
+            justify-content: stretch;
+            min-height: 172px;
+            max-width: var(--contacts_left_panel_min_width);
+            align-self: start;
+            flex: 1;
+        }
+
+        .left_panel {
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+            width: auto;
+            align-items: start;
+            align-content: start;
+            justify-content: start;
+            row-gap: var(--contacts_row_gap_middle);
+            min-width: var(--contacts_left_panel_min_width);
+
+            .left_panel_item_component {
+                width: var(--contacts_left_panel_min_width);
+                flex-shrink: 0;
+
+                .left_panel_item {
+                    display: flex;
+                    align-items: center;
+                    width: var(--contacts_left_panel_min_width);
+                    min-height: var(--contacts_item_height);
+                    gap: var(--contacts_gap);
+
+                    .icon {
+                        width: var(--contacts_item_height);
+                        height: var(--contacts_item_height);
+
+                        .border {
+                            display: grid;
+                            place-items: center;
+                            width: var(--contacts_item_height);
+                            height: var(--contacts_item_height);
+                            border-radius: 50%;
+                            border-style: solid;
+                            border-width: var(--contacts_border_width);
+                            border-color: var(--contacts_border_color);
+                        }
+                    }
+
+                    .text {
+                        width: 100%;
+                        color: var(--contacts_text_dark_color);
+                        font-family: var(--contacts-font);
+                        font-style: normal;
+                        font-size: var(--contacts_font_size);
+                        font-weight: var(--contacts_font_weight);
+                        line-height: var(--contacts_line_height);
+                        letter-spacing: 0px;
+                        text-decoration: none;
+                        text-transform: none;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.contacts_border {
+    padding: var(--contacts_right_panel_paddinf_top) var(--contacts_gap);
+}
+
+@media (max-width: 700px) {
+    .contacts_border {
+        justify-content: center;
+    }
+}

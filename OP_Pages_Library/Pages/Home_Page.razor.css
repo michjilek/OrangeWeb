@@ -1,0 +1,326 @@
+﻿/* MAKE UP SECTION*/
+.main_picture_section {
+    position: relative;
+    text-align: center;
+}
+
+.main-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+
+.overlay {
+    background-color: rgba(0, 0, 0, 0.2);
+    width: 100%;
+    justify-content: center;
+}
+
+.content {
+    color: white;
+    padding: 0px 10px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: flex-start;
+    margin: 0px auto;
+    max-width: 71.25em;
+}
+
+    .content h1, .content h2, .content p {
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    /* ZÁKLADNÍ TYPOGRAFIE – MOBIL */
+    .content h1 {
+        font-size: 2.0rem;
+        letter-spacing: 2px;
+    }
+
+    .content h2 {
+        font-size: 1.4rem;
+        letter-spacing: 2px;
+    }
+
+.line-below {
+    border: none;
+    border-top: 1px solid white;
+}
+
+.content p {
+    font-weight: normal;
+    letter-spacing: 1.5px;
+    font-size: 1.0rem;
+}
+
+/* SERVICE*/
+.service {
+    max-width: 600px;
+    text-align: center;
+}
+
+.subtitle, .title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.subtitle {
+    letter-spacing: 3px;
+    font-size: 0.8rem;
+    color: #aaa;
+}
+
+.title {
+    font-size: 1.5rem;
+    color: black;
+    letter-spacing: 6px;
+    line-height: 1.43;
+}
+
+.description {
+    font-size: 1.0rem;
+    line-height: 1.43;
+    font-style: italic;
+}
+
+.text {
+    font-size: 0.95rem;
+    line-height: 1.8;
+}
+
+    .text a {
+        text-decoration: none;
+        color: #333;
+    }
+
+/* SECOND IMAGE*/
+.service_image {
+    position: relative;
+    min-height: 52vh; /* holds height in layout */
+    width: 100%;
+    overflow: hidden;
+}
+
+    .service_image img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 30%;
+        display: block;
+        z-index: 1;
+    }
+
+/* HALF SERVICES*/
+.half_services {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.half_service {
+    width: 100%;
+    text-align: center;
+}
+
+/* MEDIA */
+
+/* 320+ – malé mobily */
+@media (min-width: 320px) {
+    .content h1 {
+        font-size: 2.1rem;
+    }
+
+    .content h2 {
+        font-size: 1.6rem;
+    }
+
+    .content p {
+        font-size: 1.05rem;
+    }
+
+    .title {
+        font-size: 1.6rem;
+    }
+}
+
+/* 480+ – větší mobily */
+@media (min-width: 480px) {
+    .content h1 {
+        font-size: 2.4rem;
+    }
+
+    .content h2 {
+        font-size: 1.7rem;
+    }
+
+    .content p {
+        font-size: 1.1rem;
+    }
+
+    .content {
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+
+    .service, .half_service {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .subtitle {
+        font-size: 0.9rem;
+    }
+
+    .title {
+        font-size: 1.8rem;
+    }
+
+    .description {
+        font-size: 1.1rem;
+    }
+
+    .text {
+        font-size: 1.0rem;
+    }
+}
+
+/* 768+ – tablet / menší notebook */
+@media (min-width: 768px) {
+    .content h1 {
+        font-size: 2.8rem;
+        letter-spacing: 8px;
+    }
+
+    .content h2 {
+        font-size: 2.0rem;
+    }
+
+    .content p {
+        font-size: 1.15rem;
+        margin-top: 40px;
+    }
+
+    .content {
+        padding-left: 80px;
+        padding-right: 80px;
+    }
+
+    .service {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .title {
+        font-size: 2.0rem;
+    }
+
+    .text {
+        font-size: 1.05rem;
+    }
+
+    .half_services {
+        display: flex;
+        flex-direction: unset;
+        justify-content: space-between;
+        margin-top: 20px;
+        max-width: 100%;
+    }
+
+    .half_service {
+        width: 45%;
+        text-align: center;
+    }
+
+        .half_service .title {
+            font-size: 1.8rem;
+        }
+}
+
+/* 1024+ – běžný desktop */
+@media (min-width: 1024px) {
+    .content h1 {
+        font-size: 3.2rem;
+    }
+
+    .content h2 {
+        font-size: 2.3rem;
+        margin-top: 40px;
+    }
+
+    .content p {
+        font-size: 1.2rem;
+    }
+
+    .text {
+        font-size: 1.1rem;
+        max-width: 80%;
+    }
+
+    .main_picture_section {
+        margin: 15px 0px;
+    }
+
+    .service {
+        max-width: 70%;
+    }
+}
+
+/* 1280+ – větší notebooky */
+@media (min-width: 1280px) {
+    .content h1 {
+        font-size: 3.4rem;
+    }
+
+    .content h2 {
+        font-size: 2.5rem;
+    }
+
+    .content p {
+        font-size: 1.25rem;
+    }
+}
+
+/* 1440+ – velké monitory */
+@media (min-width: 1440px) {
+    .content h1 {
+        font-size: 3.6rem;
+    }
+
+    .content h2 {
+        font-size: 2.7rem;
+    }
+
+    .content p {
+        font-size: 1.3rem;
+        margin-top: 60px;
+    }
+
+    .service {
+        max-width: 66%;
+    }
+}
+
+/* 2560+ – 2K a víc */
+@media (min-width: 2560px) {
+    .text {
+        max-width: 60%;
+    }
+
+    .service {
+        max-width: 44%;
+    }
+
+    .half_services {
+        max-width: 60%;
+    }
+}

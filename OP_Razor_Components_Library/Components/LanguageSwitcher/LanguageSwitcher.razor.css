@@ -1,0 +1,60 @@
+﻿.language-switcher {
+    position: relative;
+    display: inline-block;
+}
+
+    .language-switcher .icon-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 32px;
+        text-align: center;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .language-switcher .lang-icon {
+        width: 18px;
+        height: 18px;
+        stroke: #C7C7C7;
+    }
+
+.lang-menu {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,.15);
+    border-radius: 6px;
+    list-style: none;
+    margin: 0;
+    padding: 4px 0;
+    min-width: 120px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.15);
+    z-index: 999;
+}
+
+    .lang-menu li {
+        margin: 0;
+    }
+
+    .lang-menu button {
+        width: 100%;
+        background: none;
+        border: none;
+        padding: 8px 12px;
+        text-align: left;
+        font-size: 14px;
+        cursor: pointer;
+        color: #2C2C2C;
+    }
+
+        .lang-menu button:hover {
+            background: #f0f0f0;
+        }

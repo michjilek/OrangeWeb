@@ -1,0 +1,93 @@
+﻿@page "/login"
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.WebUtilities
+@using OrangeWeb.Components.Login
+@inject NavigationManager Navigation
+@inject CustomAuthenticationStateProvider AuthProvider
+@inject OP_Shared_Library.Services.EditModeService EditModeService
+@inject IJSRuntime JS
+
+<h1 class="uppercase-text mb">Přihlášení</h1>
+
+<AuthorizeView>
+    <NotAuthorized>
+        <!-- Give to Login Component return Url (after Login component know, where to go back after login) -->
+        <Login ReturnUrl="@_returnUrl" />
+    </NotAuthorized>
+    <Authorized>
+        <p>Přihlášen jako: @context.User.Identity?.Name</p>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+
+    #region Private Properties
+    private string? _returnUrl;
+    #endregion
+
+    #region Ctor
+    protected override async Task OnInitializedAsync()
+    {
+        EditModeService.SetEditMode(false);
+
+        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+
+        // Take Return Url from query (we use return url to logout and can give it to Login.razor)
+        if (query.TryGetValue("returnUrl", out var rv))
+        {
+            _returnUrl = GetSafeReturnUrl(rv!);
+        }
+
+        // Only for Logout
+        if (query.TryGetValue("logout", out var logoutFlag) && logoutFlag == "true")
+        {
+            await AuthProvider.MarkUserAsLoggedOut();
+
+            // Back to Return URL
+            await RedirectBackAsync();
+
+            return;
+        }
+    }
+    #endregion
+
+    #region Private Methods
+    private async Task RedirectBackAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(_returnUrl))
+        {
+            Navigation.NavigateTo(_returnUrl, forceLoad: true);
+        }
+        else
+        {
+            try { await JS.InvokeVoidAsync("history.back"); }
+            catch { Navigation.NavigateTo("/", forceLoad: true); }
+        }
+    }
+    private string? GetSafeReturnUrl(string? candidate)
+    {
+        // We dont want empty things
+        if (string.IsNullOrWhiteSpace(candidate)) return null;
+
+        // Allow only relative or absolute with same origin
+        if (Uri.TryCreate(candidate, UriKind.Absolute, out var abs))
+        {
+            var baseUri = new Uri(Navigation.BaseUri);
+            if (abs.Scheme == baseUri.Scheme && abs.Host == baseUri.Host && abs.Port == baseUri.Port)
+            {
+                // Cut origin
+                return abs.PathAndQuery + abs.Fragment;
+            }
+            return null;
+        }
+
+        // Block relative protocol
+        if (candidate.StartsWith("//")) return null;
+
+        if (!candidate.StartsWith("/")) candidate = "/" + candidate;
+
+        return candidate;
+    }
+    #endregion
+}

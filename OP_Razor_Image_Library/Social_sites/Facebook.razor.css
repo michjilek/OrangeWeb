@@ -1,0 +1,26 @@
+﻿
+/* Social Sites Group */
+#Social_sites:hover {
+    cursor: pointer;
+}
+
+/* Circle border remove*/
+#Social_sites #circle_border,
+#Social_sites:active #circle_border {
+    fill: var(--TransparentColor) !important;
+    stroke: var(--TransparentColor) !important;
+}
+
+/* Circle */
+#fb_Circle circle {
+    fill: var(--GrayColor) !important;
+}
+
+/* Path */
+path {
+    fill: var(--ForegroundColor) !important;
+}
+
+#Social_sites:active #fb_Circle circle {
+    fill: var(--Dark--GrayColor) !important;
+}

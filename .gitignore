@@ -1,0 +1,11 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/OP_Db/obj
+/OP_Pages_Library/obj
+/OP_Razor_Components_Library/obj
+/OP_Razor_Image_Library/obj
+/OP_Shared_Library/obj
+/PasswordChangeApp/obj

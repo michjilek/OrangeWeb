@@ -1,0 +1,139 @@
+﻿@using OP_Pages_Library.Pages;
+@using OP_Razor_Components_Library.Components.LanguageSwitcher
+@using OP_Razor_Components_Library.Components.OnlineStatusIndicator
+@using OP_Razor_Components_Library.Components.Navigation
+@using OP_Razor_Components_Library.Components.FontSettingsEditor
+@using OP_Razor_Components_Library.Components.Footer
+@using OP_Razor_Components_Library.Components.EditableImage
+@using OP_Razor_Image_Library.Social_sites
+@using Serilog;
+@using OP_Shared_Library.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+@inject EditModeService EditModeService
+
+<div class="main_container">
+    <div id="header_div_right">
+        @*  <OnlineStatusIndicator IsOnlineChanged="isOnline => OnlineStatusChanged(isOnline)" /> *@
+    </div>
+    <div class="social-media">
+        <div id="google_div">
+            <a href="@Branding.SocialLinks.Google"
+               target="_blank"
+               rel="noopener noreferrer"
+               aria-label="@($"Google firmy {Branding.CompanyName}")">
+                <Google />
+            </a>
+        </div>
+        <div id="seznam_div">
+            <a href="@Branding.SocialLinks.Seznam"
+               target="_blank"
+               rel="noopener noreferrer"
+               aria-label="@($"Seznam Firmy.cz {Branding.CompanyName}")">
+                <Seznam />
+            </a>
+        </div>
+        <div id="facebook_div">
+            <a href="@Branding.SocialLinks.Facebook"
+               target="_blank"
+               rel="noopener noreferrer"
+               aria-label="@($"Facebook {Branding.CompanyName}")">
+                <Facebook />
+            </a>
+        </div>
+        @* Aria-label - text description for for screen readers *@
+        @* Rel -> because of target="_blank" -> noopener: beacuse of hacks (new page cant manipulate with original)
+           noreferrer: doesnt send referer header, so hacker dont know, from where the user is coming
+        *@
+        <div id="instagram_div">
+            <a href="@Branding.SocialLinks.Instagram"
+               target="_blank"
+               rel="noopener noreferrer"
+               aria-label="@($"Instagram {Branding.CompanyName}")">
+                <Instagram />
+            </a>
+        </div>
+        <span class="social-divider" aria-hidden="true"></span>
+        <LanguageSwitcher CurrentLanguage="@currentLang" LanguageChanged="OnLanguageChanged" />
+        <div id="login_div">
+            <AuthorizeView>
+                <NotAuthorized>
+                    <a href="@($"/login?returnUrl={Uri.EscapeDataString(NavigationManager.Uri)}")"
+                       class="icon-circle"
+                       title="Přihlásit">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="login-icon" viewBox="0 0 24 24" width="24" height="24">
+                            <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
+                        </svg>
+                    </a>
+                </NotAuthorized>
+                <Authorized>
+                    <a href="@($"/login?logout=true&returnUrl={Uri.EscapeDataString(NavigationManager.Uri)}")"
+                       class="icon-circle logout"
+                       title="Odhlásit">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon-circle" viewBox="0 0 24 24" width="24" height="24">
+                            <path d="M16 13v-2H7V8l-5 4 5 4v-3zM20 3h-8c-1.1 0-2 .9-2 2v4h2V5h8v14h-8v-4h-2v4c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" />
+                        </svg>
+                    </a>
+                </Authorized>
+            </AuthorizeView>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="top-bar">
+            <div class="gradient-overlay"></div>
+            <div class="logo-edit-wrapper">
+                <div class="logo">
+                    @* Here we have to recognize, if it is in edit mode or not. We cant work with "a" in editMode. It causes issues. *@
+                    @if (EditModeService.IsEditing)
+                    {
+                        <EditableImage Key="Img_logo" Sizes="240px">
+                            <ImageContent Context="image">
+                                <img src="@image.Src"
+                                     srcset="@image.SrcSet"
+                                     sizes="@image.Sizes"
+                                     alt="@($"Logo {Branding.CompanyName}")"
+                                     class="site-logo-image"
+                                     decoding="async" />
+                            </ImageContent>
+                        </EditableImage>
+                    }
+                    else
+                    {
+                        <a href="/"
+                           aria-label="Home">
+                            <EditableImage Key="Img_logo" Sizes="240px">
+                                <ImageContent Context="image">
+                                    <img src="@image.Src"
+                                         srcset="@image.SrcSet"
+                                         sizes="@image.Sizes"
+                                         alt="@($"Logo {Branding.CompanyName}")"
+                                         class="site-logo-image"
+                                         decoding="async" />
+                                </ImageContent>
+                            </EditableImage>
+                        </a>
+                    }
+
+                </div>
+                <div id="header_div_right">
+                    <AuthorizeView Roles="Admin">
+                        <div class="admin-tools">
+                            <button @onclick="ToggleEditMode"
+                                    class="edit-toggle-button @(EditModeService.IsEditing ? "active" : "")">
+                                @(EditModeService.IsEditing ? "EDITACE" : "EDITACE")
+                            </button>
+                            <FontSettingsEditor />
+                        </div>
+                    </AuthorizeView>
+                </div>
+            </div>
+            <Navigation />
+        </div>
+    </div>
+    <article class="mb">
+        @Body
+    </article>
+    <Footer />
+</div>

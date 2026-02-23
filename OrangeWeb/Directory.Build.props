@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <!-- kam se budou dávat bin/obj mimo OneDrive -->
+    <BaseIntermediateOutputPath>D:\VSCache\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <BaseOutputPath>D:\VSCache\bin\</BaseOutputPath>
+
+    <!-- volitelné: zrychlení, méně bordelu -->
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+</Project>

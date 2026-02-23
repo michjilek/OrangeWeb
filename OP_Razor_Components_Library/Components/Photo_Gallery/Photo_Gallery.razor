@@ -1,0 +1,108 @@
+﻿@using Microsoft.AspNetCore.Components.Forms
+@using OP_Shared_Library.Services
+@inject EditModeService EditModeService
+
+@if (EditPhotoGalleryService.Items.Count > 0)
+{
+    @* IMAGE GALLERY *@
+    <div class="gallery">
+        @foreach (var image in EditPhotoGalleryService.Items)
+        {
+            <div class="gallery-item" @onclick="() => OpenImage(image)">
+                @{
+                    var srcSet = GetImageSrcSet(image);
+                    var sizes = GetResponsiveSizes(srcSet);
+                }
+                
+                <img src="@GetImageSource(image)" alt="Gallery Image" srcset="@srcSet" sizes="@sizes" />
+            </div>
+        }
+    </div>
+}
+else
+{
+    @if (EditModeService.IsEditing)
+    {
+        <div class="mt">
+            <button class="btn_first" @onclick="OpenNew">+ Add first photo</button>
+        </div>
+    }
+}
+
+@if (isBusy)
+{
+    <div class="busy-overlay" role="alert" aria-live="assertive" aria-busy="true">
+        <div class="busy-card">
+            <div class="busy-spinner"></div>
+
+            @if (uploadProgress > 0 && uploadProgress < 100)
+            {
+                <div class="busy-progress">
+                    <div class="busy-progress-bar" style="width:@($"{uploadProgress}%")"></div>
+                </div>
+            }
+
+            @if (isAwaitingFile)
+            {
+                <button class="btn" @onclick="CancelBusy">Close</button>
+            }
+        </div>
+    </div>
+}
+
+@if (IsModalOpen)
+{@* MODAL WINDOW *@
+    if (!EditModeService.IsEditing)
+    {
+        <div class="modal-overlay" @onclick="CloseModal">
+            <div class="modal-content" tabindex="0"
+                 @onkeydown="Move"
+                 @ontouchstart="HandleTouchStart"
+                 @ontouchend="HandleTouchEnd">
+                @if (SelectedImage is not null)
+                {                  
+                   var srcSet = GetImageSrcSet(SelectedImage);
+                   var sizes = GetResponsiveSizes(srcSet);
+                                     
+                    <img src="@GetImageSource(SelectedImage)" alt="Full Image" class="full-image" srcset="@srcSet" sizes="@sizes" />
+                    <p class="image-caption mt_less">@SelectedImage.ImageTitle</p>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        @* EDIT MODAL WINDOW *@
+        <div class="modal-backdrop">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2>EDIT PHOTO GALLERY</h2>
+                </div>
+
+                <label>Title:</label>
+                <input @bind="draft.ImageTitle" />
+
+                <label>Current Image:</label>
+                @if (!string.IsNullOrEmpty(draft.ImagePath))
+                {
+                    <img src="@draftPreview" alt="Current image" class="preview-img" />
+                }
+
+                <label class="btn" for="news-upload" @onclick="BeginUpload" disabled="@isBusy">
+                    Upload New Image
+                </label>
+
+                <InputFile id="news-upload"
+                           hidden
+                           OnChange="HandleImageChange" />
+
+                <div class="modal-actions">
+                    <button class="btn" @onclick="CloseModal">Cancel</button>
+                    <button class="btn" @onclick="Delete" disabled="@(SelectedImage is null)">Delete</button>
+                    <button class="btn" @onclick="SaveAsNew">+ Save New</button>
+                    <button class="btn" @onclick="SaveEdit" disabled="@(SelectedImage is null)">Save</button>
+                </div>
+            </div>
+        </div>
+    }
+}

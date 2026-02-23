@@ -1,0 +1,51 @@
+﻿@inject TranslationsService TranslationsService
+
+<div class="language-switcher">
+    <button class="icon-btn" @onclick="ToggleMenu" aria-label="Language">
+        <svg class="lang-icon" xmlns="http://www.w3.org/2000/svg"
+             viewBox="0 0 24 24"
+             fill="none"
+             stroke-width="2"
+             stroke-linecap="round"
+             stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+    </button>
+
+    @if (isMenuOpen)
+    {
+        <ul class="lang-menu">
+            <li>
+                <button @onclick="@(() => SetLanguage("cs"))">Čeština</button>
+            </li>
+            <li>
+                <button @onclick="@(() => SetLanguage("en"))">English</button>
+            </li>
+        </ul>
+    }
+</div>
+
+@code {
+    [Parameter] public EventCallback<string> LanguageChanged { get; set; }
+    [Parameter] public string CurrentLanguage { get; set; } = "cs";
+
+    private bool isMenuOpen;
+
+    private void ToggleMenu()
+    {
+        isMenuOpen = !isMenuOpen;
+    }
+
+    private async Task SetLanguage(string lang)
+    {
+        isMenuOpen = false;
+        if (lang == CurrentLanguage) return;
+
+        await LanguageChanged.InvokeAsync(lang);
+        await TranslationsService.ChangeLanguageAsync(lang);
+        CurrentLanguage = lang;
+        StateHasChanged();
+    }
+}

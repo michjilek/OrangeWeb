@@ -1,0 +1,127 @@
+﻿- Id: Photogallery_menu_item
+  Translation: >
+    Fotogalerie
+- Id: Services_menu_item
+  Translation: >
+    Služby
+- Id: About_us_menu_item
+  Translation: >
+    O nás
+- Id: Contacts_menu_item
+  Translation: >
+    Kontakty
+- Id: Intro_Title_1
+  Translation: Zabýváme se obráběním běžných a speciálních materiálů pomocí CNC technologie
+- Id: Intro_Title_2
+  Translation: Zajistíme tepelné zpracování, povrchovou úpravu a další technologie kooperačním způsobem
+- Id: Intro_Title_3
+  Translation: Přesné CNC soustružení a frézování na zakázku
+- Id: Intro_Title_4
+  Translation: Rychlé dodací termíny a férová domluva
+- Id: News
+  Translation: >
+    Novinky
+- Id: News_Title_1
+  Translation: >
+    Novinky nadpis 1
+- Id: News_Text_1
+  Translation: >
+    Novinky text 1
+- Id: News_Text_2
+  Translation: >
+    Novinky text 2
+- Id: Topic_1_Title_1
+  Translation: Ukázka naší práce
+- Id: Topic_1_Title_2
+  Translation: „Kvalita bez kompromisů, dodání bez prodlení.“
+- Id: Topic_1_Title_3
+  Translation: Všechny hrany jsou čistě sražené, bez otřepů a stop po obrábění, závit je souměrný, s rovnoměrnou hloubkou po celé délce. Lesklý povrch ukazuje na kvalitní nástrojové obrábění a správně zvolenou technologii – díl je připravený k okamžitému použití v provozu
+- Id: Topic_1_Text_1
+  Translation: Dílec je vhodný pro použití například ve strojírenství, hydraulice, pneumatice nebo v oblasti zakázkové výroby, kde je potřeba spolehlivé a přesné závitové spojení
+- Id: Topic_1_Text_2
+  Translation: Kdo hledá poctivě vyrobený díl s důrazem na detail, u nás ho určitě najde
+- Id: Topic_2_Title_1
+  Translation: Služby
+- Id: Topic_2_Title_2
+  Translation: Soustružení
+- Id: Topic_2_Text_1
+  Translation: Výroba ozubení
+- Id: Topic_2_Text_2
+  Translation: Řetězová kola
+- Id: Topic_2_Text_3
+  Translation: Zakázkové díly
+- Id: Topic_3_Title_1
+  Translation: Přednosti
+- Id: Topic_3_Title_2
+  Translation: Kusová výroba
+- Id: Topic_3_Text_1
+  Translation: Malé série
+- Id: Topic_3_Text_2
+  Translation: Rychlé termíny
+- Id: Topic_3_Text_3
+  Translation: Kontrola kvality
+- Id: Services_Title_1
+  Translation: >
+    Jaké služby nabízíme:
+- Id: Services_AddService
+  Translation: >
+    Přidat Službu
+- Id: Services_Save
+  Translation: >
+    Uložit
+- Id: Services_Delete
+  Translation: >
+    Smazat Službu
+- Id: Services_Service
+  Translation: >
+    Služba
+- Id: Services_Description
+  Translation: >
+    Popis
+- Id: About_us_title
+  Translation: >
+    O nás
+- Id: Contacts_title
+  Translation: >
+    Kontakty
+- Id: Contacts_submit_button
+  Translation: >
+    Odeslat
+- Id: About_us_text_1
+  Translation: >2-
+
+    Jsem zkušený CNC programátor a operátor specializující se na soustružení a frézování. Nabízím precizní a kvalitní obráběné dílce dle výkresové dokumentace.
+- Id: About_us_text_2
+  Translation: 'Díky mým dlouholetým zkušenostem a moderním technologiím garantuji vysokou přesnost a spolehlivost. '
+- Id: About_us_text_3
+  Translation: Pokud hledáte partnera malokusové výroby v oblasti CNC soustružení a frézování, neváhejte mě kontaktovat.
+- Id: About_us_text_4
+  Translation: Ozvěte se, rád s vámi proberu váš projekt osobně.
+- Id: Street
+  Translation: Příborská 259
+- Id: City
+  Translation: 739 42 Frýdek-Místek 8 - Chlebovice
+- Id: Mobile
+  Translation: +420 608 619 301
+- Id: Email
+  Translation: l.pruka@lpobrabeni.cz
+- Id: Company_Name
+  Translation: LP Obrábění
+- Id: Actual_Year
+  Translation: 2026 - info@orangeprogrammer.com
+- Id: Photo_Gallery_Title
+  Translation: Fotogalerie
+- Id: Contacts_place
+  Translation: Příborská 259 739 42 Frýdek-Místek 8 - Chlebovice
+- Id: Contacts_phone
+  Translation: +420 608 619 301
+- Id: Contacts_mail
+  Translation: l.pruka@lpobrabeni.cz
+- Id: Contacts_fullName_placeholder
+  Translation: Celé jméno
+- Id: Contacts_phone_placeholder
+  Translation: Telefon
+- Id: Contacts_mail_placeholder
+  Translation: Email
+- Id: Contacts_message_placeholder
+  Translation: Vaše zpráva

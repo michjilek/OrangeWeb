@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+	<!--<EnableDefaultRazorGenerateCssIsolation>true</EnableDefaultRazorGenerateCssIsolation>-->
+  </PropertyGroup>
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+  <ItemGroup>
+	<PackageReference Include="MetadataExtractor" Version="2.8.1" />
+	<PackageReference Include="Microsoft.AspNetCore.Components" Version="10.0.0" />
+	<PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="10.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.0" />
+	<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.0" />
+	<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.7" />
+	<PackageReference Include="Minio" Version="7.0.0" />
+	<PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+	<PackageReference Include="YamlDotNet" Version="16.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OP_Razor_Image_Library\OP_Razor_Image_Library.csproj" />
+    <ProjectReference Include="..\OP_Shared_Library\OP_Shared_Library.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Components\QuestionForm\QuestionFormResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>QuestionFormResources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Components\QuestionForm\QuestionFormResources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>QuestionFormResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

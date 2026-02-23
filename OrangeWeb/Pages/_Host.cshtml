@@ -1,0 +1,102 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Web
+@namespace OrangeWeb.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.Extensions.Options
+@using OP_Shared_Library.Configurations
+@inject IOptions<CompanyBrandingOptions> BrandingOptions
+
+@* Get braning values to fill *@
+@{
+    var branding = BrandingOptions.Value;
+}
+
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="@branding.SeoDescription">
+    <title>@branding.WebSiteTitle</title>
+    <base href="/" />
+
+    <!-- OpenGraph and Twitter Card meta tags -->
+    @* OpenGraph is a protocol created by Facebook that determines how a page is displayed when someone shares it on social media *@
+    <meta property="og:title" content="@branding.WebSiteTitle">
+    <meta property="og:description" content="@branding.SeoDescription">
+    <meta property="og:url" content="@branding.CanonicalUrl">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="@branding.AppleMobileWebAppTitle" />
+
+    <!-- Others -->
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="canonical" href="@branding.CanonicalUrl" />
+    <link href="~/css/site.css" rel="preload" as="style"
+          onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript>
+        <link href="~/css/site.css" rel="stylesheet" />
+    </noscript>
+    <link href="_content/OP_Pages_Library/css/app.css" rel="preload" as="style"
+          onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript>
+        <link href="_content/OP_Pages_Library/css/app.css" rel="stylesheet" />
+    </noscript>
+    <link href="_content/OP_Pages_Library/css/index.css" rel="preload" as="style"
+          onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript>
+        <link href="_content/OP_Pages_Library/css/index.css" rel="stylesheet" />
+    </noscript>
+    @* - add preload to non-critical css files
+       - before these css had to be downloaded, before site was rendered and this causes slow render
+       - these css file is now preload and doesnt block rendering
+       - after the site is rendered, these css files are applied
+       - nonscript is fallback for browsers with disabled javascript
+    *@
+    <link href="_content/OP_Pages_Library/css/general.css" rel="preload" as="style" asp-append-version="true"
+          onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript>
+        <link href="_content/OP_Pages_Library/css/general.css" rel="stylesheet" asp-append-version="true" />
+    </noscript>
+    <link href="~/css/Themes.css" rel="preload" as="style" asp-append-version="true"
+          onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript>
+        <link href="~/css/Themes.css" rel="stylesheet" asp-append-version="true" />
+    </noscript>
+    <link id="custom-font-stylesheet"
+          href="~/css/CustomFont.css"
+          rel="preload"
+          as="style"
+          onload="this.onload=null;this.rel='stylesheet'"
+          data-base-href='@Url.Content("~/css/CustomFont.css")' />
+    <noscript>
+        <link href="~/css/CustomFont.css" rel="stylesheet" />
+    </noscript>
+
+    <!-- Isolated CSS file -->
+    <!-- V OrangeWeb.styles.css jsou naimporotvány všechna styles.css připojenýžch projektů, proto přidáváme zde pouze soubor styles.css hlavního projektu -->
+    <link href="OrangeWeb.styles.css" rel="preload" as="style"
+          onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript>
+        <link href="OrangeWeb.styles.css" rel="stylesheet" />
+    </noscript>
+
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+</head>
+<body>
+    <main>
+        <component type="typeof(App)" render-mode="Server" />
+    </main>
+
+    <!-- Blazor -->
+    <script src="_framework/blazor.server.js"></script>
+
+    @* Version update checker and Cache kicker *@
+    <script src="~/js/update-checker.js" asp-append-version="true" defer></script>
+</body>
+</html>

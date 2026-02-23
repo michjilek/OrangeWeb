@@ -1,0 +1,11 @@
+﻿.h3_online, .h3_offline {
+    font-size: 24px;
+    color: black;
+    font-weight: 500 !important;
+    text-transform: uppercase;
+    margin-top: -7px !important;
+}
+
+.h3_offline {
+    color: palevioletred;
+}

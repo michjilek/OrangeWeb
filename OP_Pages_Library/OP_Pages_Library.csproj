@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+	<!--<EnableDefaultRazorGenerateCssIsolation>true</EnableDefaultRazorGenerateCssIsolation>-->
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="wwwroot\css\bootstrap\**" />
+    <Compile Remove="wwwroot\css\open-iconic\**" />
+    <Content Remove="wwwroot\css\bootstrap\**" />
+    <Content Remove="wwwroot\css\open-iconic\**" />
+    <EmbeddedResource Remove="wwwroot\css\bootstrap\**" />
+    <EmbeddedResource Remove="wwwroot\css\open-iconic\**" />
+    <None Remove="wwwroot\css\bootstrap\**" />
+    <None Remove="wwwroot\css\open-iconic\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="Pages\EditYaml.razor" />
+    <Content Remove="wwwroot\index.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Pages\EditYaml.razor.css" />
+    <None Remove="wwwroot\css\app.css" />
+  </ItemGroup>
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+    <PackageReference Include="YamlDotNet" Version="16.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="wwwroot\fonts\Arimo\" />
+    <Folder Include="wwwroot\images\main_photo\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OP_Razor_Components_Library\OP_Razor_Components_Library.csproj" />
+    <ProjectReference Include="..\OP_Razor_Image_Library\OP_Razor_Image_Library.csproj" />
+  </ItemGroup>
+</Project>
