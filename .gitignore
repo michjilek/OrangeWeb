@@ -9,3 +9,9 @@
 /OP_Razor_Image_Library/obj
 /OP_Shared_Library/obj
 /PasswordChangeApp/obj
+/OP_Db/bin/Debug/net10.0
+/OP_Pages_Library/bin/Debug/net10.0
+/OP_Razor_Components_Library/bin/Debug/net10.0
+/OP_Razor_Image_Library/bin/Debug/net10.0
+/OP_Shared_Library/bin/Debug/net10.0
+/PasswordChangeApp/bin/Debug/net10.0
