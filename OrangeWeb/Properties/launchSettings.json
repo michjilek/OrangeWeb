@@ -30,7 +30,7 @@
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "lp_development",
+        "ASPNETCORE_ENVIRONMENT": "Development",
         "ContactFormEmail__Password": "",
         "Minio__SecretKey": "dhX@kH667ZHhsdp!7BsDuZmt",
         "OP_CONFIG_DIR": "D:\\OneDrive\\OP\\OP_projects\\OrangeWeb\\Configs\\LP"
