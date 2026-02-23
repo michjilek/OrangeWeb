@@ -179,10 +179,23 @@
 }
 
 .admin-tools {
-    display: flex;
+    position: absolute;
+    left: clamp(40px, 22vw, 240px);
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
+    padding-left: 14px;
+    padding-right: 4px;
+    padding-bottom: 1px;
+    z-index: 50;
+    border-radius: 6px;
+    background: rgba(255,255,255,.75);
+    box-shadow: 0 10px 22px rgba(0,0,0,.22);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
 }
+
 
 .circle-button {
     background-color: white;

@@ -8,29 +8,32 @@
     }
   },
   "profiles": {
-    "http": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": true,
-      "applicationUrl": "http://localhost:5245",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
-    },
-    "https": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": true,
-      "applicationUrl": "https://localhost:7266;http://localhost:5245",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
-    },
-    "IIS Express Local Development": {
+    //"http": {
+    //  "commandName": "Project",
+    //  "dotnetRunMessages": true,
+    //  "launchBrowser": true,
+    //  "applicationUrl": "http://localhost:5245",
+    //  "environmentVariables": {
+    //    "ASPNETCORE_ENVIRONMENT": "lp_development"
+    //  }
+    //},
+    //"https": {
+    //  "commandName": "Project",
+    //  "dotnetRunMessages": true,
+    //  "launchBrowser": true,
+    //  "applicationUrl": "https://localhost:7266;http://localhost:5245",
+    //  "environmentVariables": {
+    //    "ASPNETCORE_ENVIRONMENT": "lp_development"
+    //  }
+    //},
+    "IIS Express LP Development": {
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "lp_development",
+        "ContactFormEmail__Password": "",
+        "Minio__SecretKey": "dhX@kH667ZHhsdp!7BsDuZmt",
+        "OP_CONFIG_DIR": "D:\\OneDrive\\OP\\OP_projects\\OrangeWeb\\Configs\\LP"
       }
     }
   }

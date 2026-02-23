@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Minio;
 using OP_Db.Server;
 using Op_LP.Services;
@@ -16,12 +14,12 @@ using OP_Shared_Library.Interfaces;
 using OP_Shared_Library.Notify;
 using OP_Shared_Library.Notify.Interface;
 using OP_Shared_Library.Services;
-{
-    
-}
 
 // Create Builder (Dependency Injection)
 var builder = WebApplication.CreateBuilder(args);
+
+// ? EXTERNAL APPSETTINGS (outside of project)
+builder.AddExternalAppSettings();
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -58,7 +56,7 @@ builder.Services.AddSingleton<IYamlService, YamlService>();
 builder.Services.AddScoped<NavigationService>();
 builder.Services.AddSingleton<IMinioClient>(sp =>
 {
-    // Get Configuration from appsettings.json
+    // Get Configuration from appsettings.json (teï už mùže být externí)
     var cfg = sp.GetRequiredService<IConfiguration>().GetSection("Minio");
     var env = sp.GetRequiredService<IHostEnvironment>();
 
@@ -87,8 +85,6 @@ builder.Services.AddScoped<EditPhotoGalleryService>();
 builder.Services.AddScoped<FontSettingsService>();
 builder.Services.AddScoped<IContactFormSender, ContactFormEmailService>();
 
-//builder.WebHost.UseStaticWebAssets();
-//builder.WebHost.UseWebRoot("wwwroot").UseStaticWebAssets();
 var app = builder.Build();
 
 // Log App START
@@ -110,20 +106,11 @@ using (var scope = scopeFactory.CreateScope())
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 
-// Tady je tøeba vydefinovat pøímo .yaml, protože jinak ho ve wwroot po pøekladu nenajdeme (json ano, i bez definice) 
-//app.UseStaticFiles(new StaticFileOptions
-//{
-//    ContentTypeProvider = new FileExtensionContentTypeProvider
-//    {
-//        Mappings = { [".yaml"] = "application/x-yaml" }
-//    }
-//});
 app.UseStaticFiles(new StaticFileOptions
 {
     ContentTypeProvider = new FileExtensionContentTypeProvider
@@ -135,7 +122,6 @@ app.UseStaticFiles(new StaticFileOptions
     {
         var path = ctx.Context.Request.Path.Value ?? "";
 
-        // “Fingerprinted” assets (safe for 1 year)
         var isFingerprinted =
                path.Contains(".bundle.scp.", StringComparison.OrdinalIgnoreCase)
             || path.StartsWith("/_content/", StringComparison.OrdinalIgnoreCase);
@@ -146,29 +132,18 @@ app.UseStaticFiles(new StaticFileOptions
             return;
         }
 
-        // When URL ends with /app-version.json, do not cache at all
         if (path.EndsWith("/app-version.json", StringComparison.OrdinalIgnoreCase))
         {
             ctx.Context.Response.Headers["Cache-Control"] = "no-store, must-revalidate";
             return;
         }
 
-        //if (path.EndsWith("/app-version.json", StringComparison.OrdinalIgnoreCase))
-        //{
-        //    ctx.Context.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
-        //    ctx.Context.Response.Headers["Pragma"] = "no-cache";
-        //    ctx.Context.Response.Headers["Expires"] = "0";
-        //    return;
-        //}
-
-        // Blazor framework assets  keep a reasonable cache window for repeat visits
         if (path.StartsWith("/_framework/", StringComparison.OrdinalIgnoreCase))
         {
             ctx.Context.Response.Headers["Cache-Control"] = "public, max-age=2592000"; // 30 days
             return;
         }
 
-        // Your plain css/js (if you don’t version them)
         if (path.EndsWith(".css", StringComparison.OrdinalIgnoreCase) ||
             path.EndsWith(".js", StringComparison.OrdinalIgnoreCase))
         {
