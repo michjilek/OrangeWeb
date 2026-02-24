@@ -36,7 +36,6 @@
   <ItemGroup>
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="wwwroot\fonts\Arimo\" />
-    <Folder Include="wwwroot\images\main_photo\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OP_Razor_Components_Library\OP_Razor_Components_Library.csproj" />
