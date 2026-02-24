@@ -34,21 +34,12 @@
     <PackageReference Include="YamlDotNet" Version="16.3.0" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="wwwroot\fonts\Arimo\" />
     <Folder Include="wwwroot\images\main_photo\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OP_Razor_Components_Library\OP_Razor_Components_Library.csproj" />
     <ProjectReference Include="..\OP_Razor_Image_Library\OP_Razor_Image_Library.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Properties\PublishProfiles\OP_Web_Server.pubxml">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-    </None>
-    <None Update="Properties\PublishProfiles\WebServer_test.pubxml">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-    </None>
   </ItemGroup>
 </Project>
