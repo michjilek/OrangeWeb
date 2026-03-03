@@ -9,6 +9,7 @@
 @* Get braning values to fill *@
 @{
     var branding = BrandingOptions.Value;
+    var configuredTheme = branding.ThemeCssFile;
 }
 
 <!DOCTYPE html>
@@ -18,7 +19,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="@branding.SeoDescription">
     <title>@branding.WebSiteTitle</title>
-  @*   <base href="/" /> *@
+    @*   <base href="/" /> *@
 
     <!-- OpenGraph and Twitter Card meta tags -->
     @* OpenGraph is a protocol created by Facebook that determines how a page is displayed when someone shares it on social media *@
@@ -32,7 +33,7 @@
     <meta property="og:description" content="@branding.SeoDescription">
     <meta property="og:url" content="@branding.CanonicalUrl">
     <meta name="twitter:card" content="summary_large_image">
-@* 
+    @* 
     @if (!string.IsNullOrWhiteSpace(branding.OgImageUrl))
     {
         <meta property="og:image" content="@branding.OgImageUrl">
@@ -87,11 +88,15 @@
     <noscript>
         <link href="_content/OP_Pages_Library/css/general.css" rel="stylesheet" asp-append-version="true" />
     </noscript>
-    <link href="~/css/Themes.css" rel="preload" as="style" asp-append-version="true"
-          onload="this.onload=null;this.rel='stylesheet'" />
-    <noscript>
-        <link href="~/css/Themes.css" rel="stylesheet" asp-append-version="true" />
-    </noscript>
+    @*  - this link _branding... is fake adress used only for theme read
+        - it is used in program.cs, where we load right theme for brand
+    *@
+    <link 
+          href="~/_branding/theme.css"
+          rel="preload"
+          as="style"
+          onload="this.onload=null;this.rel='stylesheet'"
+          data-base-href='@Url.Content("~/_branding/theme.css")' />
     <link id="custom-font-stylesheet"
           href="~/css/CustomFont.css"
           rel="preload"

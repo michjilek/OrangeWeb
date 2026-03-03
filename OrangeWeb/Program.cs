@@ -152,6 +152,8 @@ app.UseStaticFiles(new StaticFileOptions
     }
 });
 
+// Custom function for theme mapping from external folder
+app.ResolveThemeMapping();
 
 app.UseRouting();
 app.UseAuthentication();

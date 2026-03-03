@@ -1,5 +1,4 @@
-﻿
-namespace OP_Shared_Library.Configurations
+﻿namespace OP_Shared_Library.Configurations
 {
     /// <summary>
     /// Loads appsettings from an external folder (outside the project/output).
@@ -8,76 +7,124 @@ namespace OP_Shared_Library.Configurations
     public static class ExternalConfigurationExtensions
     {
         /// <summary>
+        /// Resolves external config folder path from environment variables.
+        /// 1) OP_CONFIG_DIR
+        /// 2) OP_CONFIG_ROOT + OP_COMPANY
+        /// </summary>
+        public static string? ResolveConfigDir()
+        {
+            var direct = Environment.GetEnvironmentVariable("OP_CONFIG_DIR");
+            if (!string.IsNullOrWhiteSpace(direct))
+            {
+                return direct;
+            }
+
+            var root = Environment.GetEnvironmentVariable("OP_CONFIG_ROOT");
+            var company = Environment.GetEnvironmentVariable("OP_COMPANY");
+
+            if (!string.IsNullOrWhiteSpace(root) && !string.IsNullOrWhiteSpace(company))
+            {
+                return Path.Combine(root, company);
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Adds external appsettings.json + appsettings.{ENV}.json to the configuration pipeline.
         /// ENV = builder.Environment.EnvironmentName (e.g. "lp_development").
-        ///
-        /// Folder resolution priority:
-        /// 1) OP_CONFIG_DIR                       -> explicit full path to config folder
-        /// 2) OP_CONFIG_ROOT + OP_COMPANY         -> folder = {root}\{company}
-        ///
-        /// Expected files in the resolved folder:
-        /// - appsettings.json
-        /// - appsettings.{ENV}.json
-        ///
-        /// Note: Environment variables are added last so they override JSON settings (good for secrets).
         /// </summary>
         public static WebApplicationBuilder AddExternalAppSettings(this WebApplicationBuilder builder)
         {
-            // Resolves the external configuration folder path.
-            // Prefer OP_CONFIG_DIR if set, otherwise build it from OP_CONFIG_ROOT + OP_COMPANY.
-            static string? ResolveConfigDir()
-            {
-                // 1) Direct explicit folder
-                var direct = Environment.GetEnvironmentVariable("OP_CONFIG_DIR");
-                if (!string.IsNullOrWhiteSpace(direct))
-                {
-                    return direct;
-                }
-
-                // 2) Root + company folder
-                var root = Environment.GetEnvironmentVariable("OP_CONFIG_ROOT");
-                var company = Environment.GetEnvironmentVariable("OP_COMPANY");
-
-                if (!string.IsNullOrWhiteSpace(root) && !string.IsNullOrWhiteSpace(company))
-                {
-                    return Path.Combine(root, company);
-                }
-
-                // 3) No external folder configured
-                return null;
-            }
-
-            // The ASP.NET Core environment name (e.g. "Development", "Production", or your custom "lp_development")
             var envName = builder.Environment.EnvironmentName;
-
-            // Resolve external config folder (if any)
             var configDir = ResolveConfigDir();
 
-            // If a config directory is configured, load JSON files from there
             if (!string.IsNullOrWhiteSpace(configDir))
             {
-                // Fail fast if the folder path is wrong (helps catch misconfigured IIS/launchSettings)
                 if (!Directory.Exists(configDir))
                 {
                     throw new DirectoryNotFoundException($"OP config folder not found: '{configDir}'");
                 }
 
-                // Base + environment-specific config
                 var baseFile = Path.Combine(configDir, "appsettings.json");
                 var envFile = Path.Combine(configDir, $"appsettings.{envName}.json");
 
-                // Add external JSON files to configuration.
-                // optional:true -> app can still start even if a file is missing (you can change to false if you want strict mode)
-                // reloadOnChange:true -> changes on disk can be picked up at runtime for some config patterns
                 builder.Configuration
                     .AddJsonFile(baseFile, optional: true, reloadOnChange: true)
                     .AddJsonFile(envFile, optional: true, reloadOnChange: true);
             }
 
-            // Add environment variables last so they override JSON (recommended for secrets / IIS web.config)
             builder.Configuration.AddEnvironmentVariables();
 
             return builder;
+        }
+
+        // Function for theme mapping
+        public static WebApplication ResolveThemeMapping(this WebApplication app)
+        {
+            // Register endpoint for GET requests (we need to read themes from external folder)
+            // for example: GET https://my-domain.cz/_branding/theme.css
+            app.MapGet("/_branding/theme.css", (Microsoft.Extensions.Options.IOptions<CompanyBrandingOptions> brandingOptions) =>
+            {
+                // Find folder, where we have config (we have here also whatever_theme.css file too)
+                var configDir = ExternalConfigurationExtensions.ResolveConfigDir();
+                if (string.IsNullOrWhiteSpace(configDir) || !Directory.Exists(configDir))
+                {
+                    // If folder doesnt exists, we cant continue
+                    return Results.NotFound();
+                }
+
+                // Read value from branding (ThemeCssFile item in appsettings.json)
+                var configuredTheme = brandingOptions.Value.ThemeCssFile;
+
+                // If nothing is set, use default theme file name in config folder (orange-tehem is always there)
+                var themeFileName = string.IsNullOrWhiteSpace(configuredTheme) ? "orange-theme.css" : configuredTheme.Trim();
+
+                // Security: if config points to a public URL/path (~/, /, or absolute URL),
+                // we DO NOT treat it as an external file in configDir.
+                // This endpoint is meant only to read a file from external folder.
+                if (themeFileName.StartsWith("~/", StringComparison.Ordinal) ||
+                    themeFileName.StartsWith("/", StringComparison.Ordinal) ||
+                    Uri.IsWellFormedUriString(themeFileName, UriKind.Absolute))
+                {
+                    return Results.BadRequest("Branding.ThemeCssFile points to a public URL, not an external file.");
+                }
+
+                // Helper: builds a safe absolute path inside configDir and blocks path traversal (../)
+                static string? TryBuildSafePath(string rootDir, string fileName)
+                {
+                    var candidatePath = Path.GetFullPath(Path.Combine(rootDir, fileName));
+                    var rootPath = Path.GetFullPath(rootDir);
+
+                    return candidatePath.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase) ? candidatePath : null;
+                }
+
+                // 1) try requested theme file
+                var candidatePath = TryBuildSafePath(configDir, themeFileName);
+                if (candidatePath is null)
+                {
+                    return Results.BadRequest("Invalid theme file path.");
+                }
+
+                // 2) if requested file does not exist, fallback to orange-theme.css (it should always exist)
+                if (!File.Exists(candidatePath))
+                {
+                    var fallbackPath = TryBuildSafePath(configDir, "orange-theme.css");
+                    if (fallbackPath is null || !File.Exists(fallbackPath))
+                    {
+                        // Just in case (even though you said it always exists)
+                        return Results.NotFound();
+                    }
+
+                    candidatePath = fallbackPath;
+                }
+
+                // Return CSS file content (UTF-8)
+                var test = Results.File(candidatePath, "text/css; charset=utf-8");
+                return Results.File(candidatePath, "text/css; charset=utf-8");
+            });
+
+            return app;
         }
     }
 }

@@ -8,6 +8,7 @@ public sealed class CompanyBrandingOptions
     public string SeoDescription { get; set; } = string.Empty;
     public string CanonicalUrl { get; set; } = string.Empty;
     public string ContactFormSource { get; set; } = string.Empty;
+    public string ThemeCssFile { get; set; } = string.Empty;
     public CompanySocialLinks SocialLinks { get; set; } = new();
 }
 
