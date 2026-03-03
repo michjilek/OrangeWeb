@@ -7,20 +7,20 @@
 /* Circle border remove*/
 #Social_sites #circle_border,
 #Social_sites:active #circle_border {
-    fill: var(--TransparentColor) !important;
-    stroke: var(--TransparentColor) !important;
+    fill: #FFFFFF00 !important;
+    stroke: #FFFFFF00 !important;
 }
 
 /* Circle */
 #seznam_Circle circle {
-    fill: var(--GrayColor) !important;
+    fill: var(--Social_sites_circle_border_color) !important;
 }
 
 /* Path */
 path {
-    fill: var(--ForegroundColor) !important;
+    fill: var(--Social_sites_font_color) !important;
 }
 
 #Social_sites:active #seznam_Circle circle {
-    fill: var(--Dark--GrayColor) !important;
+    fill: var(--Social_sites_cricle_border_color_active) !important;
 }

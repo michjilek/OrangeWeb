@@ -20,7 +20,7 @@
     }
 
     .table th {
-        background-color: var(--DarkGrayColor) !important;
+        background-color: var(--Service_list_table_th_color) !important;
         color: white;
     }
 
@@ -130,7 +130,7 @@
 /* === Toast === */
 .toast {
     background: transparent;
-    color: var(--DarkGrayColor) !important;
+    color: var(--Service_list_toast_color) !important;
     border-radius: 6px;
     padding: 10px 14px;
     font-size: 0.9rem;

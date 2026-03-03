@@ -8,15 +8,15 @@
 #insta_Circle circle,
 #Social_sites:active #circle,
 #Social_sites:active #circle_border {
-    fill: var(--TransparentColor) !important;
-    stroke: var(--TransparentColor) !important;
+    fill: #FFFFFF00 !important;
+    stroke: #FFFFFF00 !important;
 }
 
 /* Path */
 #insta_logo path {
-    fill: var(--GrayColor) !important;
+    fill: var(--Social_sites_circle_border_color) !important;
 }
 
 #Social_sites:active #insta_logo path {
-    fill: var(--Dark--GrayColor) !important;
+    fill: var(--Social_sites_cricle_border_color_active) !important;
 }

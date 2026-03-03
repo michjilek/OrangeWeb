@@ -9,7 +9,6 @@
     --question_form_font_weight: 500;
     --question_form_line_height: 1.2;
     --question_form_panel_padding_top: 13.5px;
-    --question_form_button_color: var(--DarkGrayColor);
     --question_form_row_gap_small: 13.33px;
 }
 
@@ -96,12 +95,12 @@
     font-family: var(--question_form-font);
     font-size: 14px;
     font-weight: 600;
-    color: var(--question_form_button_color);
-    -webkit-text-fill-color: var(--question_form_button_color);
+    color: var(--Question_form_button_font_color);
+    -webkit-text-fill-color: var(--Question_form_button_font_color);
 }
 
     .send_button span {
-        color: var(--question_form_button_color);
+        color: var(--Question_form_button_font_color);
     }
 
 @media (max-width: 688px) {

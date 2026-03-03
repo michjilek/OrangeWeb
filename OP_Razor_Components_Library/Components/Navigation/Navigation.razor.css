@@ -11,7 +11,7 @@
 }
 
 ::deep .navbar a, ::deep .nav-item {
-    color: var(--DarkGrayColor) !important;
+    color: var(--Navigation_item_font_color) !important;
     text-decoration: none;
     padding: 20px;
 }
@@ -26,7 +26,7 @@
     font-size: 24px;
     background: none;
     border: none;
-    color: var(--DarkGrayColor) !important;
+    color: var(--Navigation_toggler_color) !important;
     cursor: pointer;
     margin: 0;
 }
@@ -45,7 +45,7 @@
     flex-direction: column;
     top: 124%;
     right: -10px;
-    background: linear-gradient(var(--SilverColor), white);
+    background: linear-gradient(var(--Navigation_mobile_overlay_color_1), var(--Navigation_mobile_overlay_color_2));
     padding: 0px 10px;
     z-index: 2;
 }
