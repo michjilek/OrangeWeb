@@ -33,7 +33,7 @@
 }
 
     .font-settings-editor__panel p, label {
-        font-family: var(--SystemFont);
+        font-family: var(--MainFont);
         line-height: 1.5;
         font-size: 14px;
     }

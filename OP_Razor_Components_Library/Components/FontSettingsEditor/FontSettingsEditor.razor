@@ -983,9 +983,17 @@
             {
                 await _jsModule.DisposeAsync();
             }
-            catch (JSException)
+            catch (JSDisconnectedException)
             {
-                // Ignore disposal errors – module might already be gone when circuit shuts down.
+                // Blazor Server: klient už je pryč, JS nejde volat – v pořádku, ignoruj.
+            }
+            catch (ObjectDisposedException)
+            {
+                // Runtime / circuit už se uklízí – taky ok.
+            }
+            finally
+            {
+                _jsModule = null;
             }
         }
     }
