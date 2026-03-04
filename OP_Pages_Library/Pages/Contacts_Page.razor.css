@@ -1,7 +1,4 @@
 ﻿* {
-    --contacts_border_color: #C3C3C3;
-    --contacts_text_dark_color: #333333FF;
-    --contacts_placeholder_color: #aaaaaaFF;
     --contacts_border_radius: 20px;
     --contacts_row_gap_big: 30px;
     --contacts_row_gap_middle: 20px;
@@ -37,7 +34,7 @@ h1 {
     border-radius: var(--contacts_border_radius);
     border-style: solid;
     border-width: var(--contacts_border_width);
-    border-color: var(--contacts_border_color);
+    border-color: var(--Contacts_page_border_color);
     align-items: start;
     align-content: start;
     justify-content: space-between;
@@ -104,13 +101,13 @@ h1 {
                             border-radius: 50%;
                             border-style: solid;
                             border-width: var(--contacts_border_width);
-                            border-color: var(--contacts_border_color);
+                            border-color: var(--Contacts_page_border_color);
                         }
                     }
 
                     .text {
                         width: 100%;
-                        color: var(--contacts_text_dark_color);
+                        color: var(--Contacts_page_text_dark_color);
                         font-family: var(--contacts-font);
                         font-style: normal;
                         font-size: var(--contacts_font_size);

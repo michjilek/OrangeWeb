@@ -32,7 +32,7 @@
 }
 
 .color_dark {
-    color: #333 !important;
+    color: var(--General_color_dark) !important;
 }
 
 .uppercase-text {

@@ -84,8 +84,8 @@
     padding: 8px 16px;
     border-radius: 8px;
     border: none;
-    background-color: #343a40;
-    color: white;
+    background-color: var(--Editable_image_btn_background_color);
+    color: var(--Editable_image_btn_text_color);
     cursor: pointer;
 }
 
@@ -106,7 +106,7 @@
 
 .busy-card {
     background: #fff;
-    color: #222;
+    color: var(--Editable_image_busy_card_text-color);
     padding: 16px 20px;
     border-radius: 12px;
     min-width: 220px;
@@ -121,8 +121,8 @@
 .busy-spinner {
     width: 32px;
     height: 32px;
-    border: 3px solid rgba(0,0,0,.15);
-    border-top-color: #343a40;
+    border: 3px solid var(--Editable_image_busy_spinner_border_color);
+    border-top-color: var(--Editable_image_busy_spinner_border_top_color);
     border-radius: 50%;
     animation: busy-spin .8s linear infinite;
 }

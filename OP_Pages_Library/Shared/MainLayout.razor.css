@@ -149,27 +149,25 @@
 /* Edit Toggle Button */
 .edit-toggle-button {
     padding: 5px 10px;
-    /*margin: 14px 10px 10px 10px;*/
     margin: 14px 8px 10px 0;
-    color: white;
+    color: var(--Mainlayout_edit_toggle_button_text_color);
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
-    /*    min-width: 140px;*/
-    background-color: #444; /* default: dark gray */
+    background-color: var(--Mainlayout_edit_toggle_button_background_color)
 }
 
     .edit-toggle-button:hover {
-        background-color: #333;
+        background-color: var(--Mainlayout_edit_toggle_button_background_color_hover);
     }
 
     .edit-toggle-button.active {
-        background-color: #d9534f; /* red wh;en active */
+        background-color: var(--Mainlayout_edit_toggle_button_background_color_active);
     }
 
         .edit-toggle-button.active:hover {
-            background-color: #c9302c;
+            background-color: var(--Mainlayout_edit_toggle_button_background_color_active_hover);
         }
 
 .logo-edit-wrapper {
@@ -195,36 +193,6 @@
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
 }
-
-
-.circle-button {
-    background-color: white;
-    color: #007BFF;
-    border: 2px solid #007BFF;
-    border-radius: 50px;
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: 500;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    transition: all 0.3s ease;
-}
-
-    .circle-button:hover {
-        background-color: #007BFF;
-        color: white;
-    }
-
-    .circle-button.logout {
-        color: #dc3545;
-        border-color: #dc3545;
-    }
-
-        .circle-button.logout:hover {
-            background-color: #dc3545;
-            color: white;
-        }
-
-
 
 /* MEDIA */
 /* 320px – Mobilní telefony (malé displeje) */

@@ -1,5 +1,5 @@
 ﻿#blazor-error-ui {
-    background-color: lightgray;
+    background-color: var(--Blazor_error_background_color);
     top: 0;
     box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
     display: none;
@@ -15,13 +15,13 @@
         position: absolute;
         right: 0.75rem;
         top: 0.55rem;
-        color: black;
+        color: var(--Blazor_error_dismiss_text_color);
         text-decoration: none;
         font-weight: bold;
     }
 
 .reload {
-    color: black;
+    color: var(--Blazor_error_reload_text_color);
     text-decoration: none;
     font-weight: bold;
 }
