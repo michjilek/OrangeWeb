@@ -1,9 +1,9 @@
 * {
     --question_form_left_panel_min_width: 293px;
     --question_form_item_height: 45px;
-    --question_form_border_color: #C3C3C3;
+/*    --question_form_border_color: #C3C3C3;*/
     --question_form_gap: 15px;
-    --question_form_placeholder_color: #aaaaaaFF;
+/*    --question_form_placeholder_color: #aaaaaaFF;*/
     --question_form-font: var(--MainFont);
     --question_form_font_size: 14px;
     --question_form_font_weight: 500;
@@ -34,7 +34,7 @@
             min-height: var(--question_form_item_height);
             height: 100%;
             border-radius: 8px;
-            border: 1px solid var(--question_form_border_color);
+            border: 1px solid var(--Question_form_border_color);
             gap: var(--question_form_gap);
             align-items: start;
 
@@ -44,7 +44,7 @@
                 height: 100%;
                 min-height: 17px;
                 align-items: start;
-                color: var(--question_form_placeholder_color);
+                color: var(--Question_form_placeholder_color);
                 font-family: var(--question_form-font);
                 font-style: normal;
                 font-size: var(--question_form_font_size);
@@ -89,8 +89,8 @@
 .send_button {
     padding: 10px 22px;
     border-radius: 8px;
-    border: 1px solid var(--question_form_border_color);
-    background-color: #f7f7f7;
+    border: 1px solid var(--Question_form_border_color);
+    background-color: var(--Question_form_background_color);
     cursor: pointer;
     font-family: var(--question_form-font);
     font-size: 14px;

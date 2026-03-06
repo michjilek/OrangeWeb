@@ -8,11 +8,11 @@
 
 .footer_hr {
     border: none;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid var(--Footer_hr_color);
 }
 
 .footer_p {
-    color: #aaa;
+    color: var(--Footer_p_color);
     letter-spacing: 3px;
     font-size: var(--FirstFontSize);
     transform: scaleY(0.9);
@@ -20,7 +20,7 @@
 
 .footer-year {
     font-size: var(--SecondFontSize);
-    color: var(--DarkFontColor);
+    color: var(--Footer_year_text_color);
 }
 
 /* MEDIA */

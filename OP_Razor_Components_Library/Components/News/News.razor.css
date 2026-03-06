@@ -6,7 +6,7 @@
 
     .text a {
         text-decoration: none;
-        color: #333;
+        color: var(--News_text_a_text_color);
     }
 
 .subtitle, .title {
@@ -19,12 +19,12 @@
 .subtitle {
     letter-spacing: 3px;
     font-size: 0.8rem;
-    color: #aaa;
+    color: var(--News_subtitle_text_color);
 }
 
 .title {
     font-size: 1.4rem;
-    color: #000;
+    color: var(--News_title_text_color);
     letter-spacing: 6px;
     line-height: 1.43;
 }
@@ -125,12 +125,12 @@
     box-sizing: border-box;
     display: grid;
     place-items: center;
-    border: 1px solid rgba(0,0,0,0.12);
+    border: 1px solid var(--News_nav_border_color);
     border-radius: 9999px;
-    background: rgba(255,255,255,0.6);
+    background: var(--News_nav_background_color);
     backdrop-filter: blur(6px);
-    color: #111;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    color: var(--News_nav_text_color);
+    box-shadow: 0 8px 24px var(--News_nav_shadow_color);
     cursor: pointer;
     transition: transform .15s ease, box-shadow .15s ease, background .15s ease, opacity .15s ease;
     outline: none;
@@ -251,8 +251,8 @@
     padding: 8px 16px;
     border-radius: 8px;
     border: none;
-    background-color: #343a40;
-    color: white;
+    background-color: var(--News_button_background_color);
+    color: var(--News_button_text_color);
     cursor: pointer;
 }
 
@@ -309,8 +309,8 @@
     cursor: pointer;
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     transition: background .2s ease, box-shadow .2s ease, transform .1s ease;
-    color: #111; /* pro currentColor ve SVG */
-    z-index: 5; /* nad obrázkem */
+    color: var(--News_reorder_button_text_color);
+    z-index: 5;
 }
 
     .reorder-btn:hover {
@@ -359,8 +359,8 @@
 }
 
 .busy-card {
-    background: #fff;
-    color: #222;
+    background: var(--News_busy_card_background_color);
+    color: var(--News_busy_card_text_color);
     padding: 16px 20px;
     border-radius: 12px;
     min-width: 220px;
@@ -375,8 +375,8 @@
 .busy-spinner {
     width: 32px;
     height: 32px;
-    border: 3px solid rgba(0,0,0,.15);
-    border-top-color: #343a40;
+    border: 3px solid var(--News_busy_spinner_border_color);
+    border-top-color: var(--News_busy_spinner_border_top_color);
     border-radius: 50%;
     animation: busy-spin .8s linear infinite;
 }

@@ -46,7 +46,7 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: var(--Photo_gallery_modal_overlay_background_color);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -74,7 +74,7 @@
 }
 
 .image-caption {
-    color: #ffffff;
+    color: var(--Photo_gallery_image_caption_text_color);
     font-size: 16px;
     text-align: center;
     margin-top: 10px;
@@ -125,8 +125,8 @@
     padding: 8px 16px;
     border-radius: 8px;
     border: none;
-    background-color: #343a40;
-    color: white;
+    background-color: var(--Photo_gallery_btn_background_color);
+    color: var(--Photo_gallery_btn_text_color);
     cursor: pointer;
 }
 
@@ -159,13 +159,13 @@
 }
 
 .busy-card {
-    background: #fff;
-    color: #222;
+    background: var(--Photo_gallery_busy_card_background_color);
+    color: var(--Photo_gallery_busy_card_text_color);
     padding: 16px 20px;
     border-radius: 12px;
     min-width: 220px;
     max-width: 90vw;
-    box-shadow: 0 12px 30px rgba(0,0,0,.25);
+    box-shadow: 0 12px 30px var(--Photo_gallery_busy_card_shadow_color);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -175,8 +175,8 @@
 .busy-spinner {
     width: 32px;
     height: 32px;
-    border: 3px solid rgba(0,0,0,.15);
-    border-top-color: #343a40;
+    border: 3px solid var(--Photo_gallery_busy_spinner_border_color);
+    border-top-color: var(--Photo_gallery_busy_spinner_border_top_color);
     border-radius: 50%;
     animation: busy-spin .8s linear infinite;
 }

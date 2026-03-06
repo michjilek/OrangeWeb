@@ -4,7 +4,7 @@
     padding: 40px 20px;
     border-radius: 16px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
+    background-color: var(--Login_container_background);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -35,15 +35,15 @@
     font-size: 16px;
     width: 100%;
     max-width: 220px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--Login_input_border);
     border-radius: 8px;
     box-sizing: border-box;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
     .login-input:focus {
         outline: none;
-        border-color: #444;
-        box-shadow: 0 0 5px rgba(68, 68, 68, 0.3);
+        border-color: var(--Login_input_border_focus);
+        box-shadow: 0 0 5px var(--Login_input_border_shadow_color);
     }
 
 .login-button {
@@ -51,8 +51,8 @@
     padding: 12px 16px;
     font-size: 16px;
     font-weight: 600;
-    background-color: #444;
-    color: #fff;
+    background-color: var(--Login_button_background_color);
+    color: var(--Login_button_text_color);
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -60,12 +60,12 @@
 }
 
     .login-button:hover {
-        background-color: #222;
+        background-color: var(--Login_button_background_color_hover);
         transform: scale(1.02);
     }
 
 .error-message {
-    color: #d9534f;
+    color: var(--Login_error_message);
     margin-bottom: 10px;
     text-align: center;
 }

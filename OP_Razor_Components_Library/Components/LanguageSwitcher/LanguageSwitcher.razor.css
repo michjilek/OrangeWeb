@@ -52,7 +52,7 @@
         text-align: left;
         font-size: 14px;
         cursor: pointer;
-        color: #2C2C2C;
+        color: var(--Language_switcher_menu_button_text_color);
     }
 
         .lang-menu button:hover {

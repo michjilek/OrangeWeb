@@ -21,7 +21,7 @@
 
     .table th {
         background-color: var(--Service_list_table_th_color) !important;
-        color: white;
+        color: var(--Service_list_table_th_text_color);
     }
 
 /* MEDIA */
@@ -73,37 +73,37 @@
 
 /* Dark tlačítko */
 .btn-dark {
-    background-color: #212529;
-    color: #fff;
-    border-color: #212529;
+    background-color: var(--Service_list_button_dark_background_color);
+    color: var(--Service_list_button_dark_text_color);
+    border-color: var(--Service_list_button_dark_border_color);
     margin: 8px 8px 8px 0px;
     margin-left: auto;
 }
 
     .btn-dark:hover:not(:disabled) {
-        background-color: #343a40;
-        border-color: #343a40;
+        background-color: var(--Service_list_button_dark_background_color_hover);
+        border-color: var(--Service_list_button_dark_border_color_hover);
         transform: translateY(-1px);
-        box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+        box-shadow: 0 3px 8px var(--Service_list_button_dark_shadow_color_hover);
     }
 
     .btn-dark:disabled {
-        background-color: #6c757d;
-        border-color: #6c757d;
+        background-color: var(--Service_list_button_dark_border_color_disabled);
+        border-color: var(--Service_list_button_dark_shadow_color_disabled);
         opacity: 0.65;
         cursor: not-allowed;
     }
 
 /* Outline-danger (mazání) */
 .btn-outline-danger {
-    color: #dc3545;
-    background: transparent;
-    border: 1px solid #dc3545;
+    color: var(--Service_list_button_outline_danger_text_color);
+    background: var(--Service_list_button_outline_danger_background_color);
+    border: 1px solid var(--Service_list_button_outline_danger_border_color);
 }
 
     .btn-outline-danger:hover:not(:disabled) {
-        background: #dc3545;
-        color: #fff;
+        background: var(--Service_list_button_outline_danger_background_color_hover);
+        color: var(--Service_list_button_outline_danger_text_color_hover);
     }
 
     .btn-outline-danger:disabled {
@@ -115,8 +115,8 @@
 .spinner {
     width: 1rem;
     height: 1rem;
-    border: 2px solid rgba(255,255,255,0.3);
-    border-top-color: #fff;
+    border: 2px solid var(--Service_list_spinner_border_color);
+    border-top-color: var(--Service_list_spinner_border_top_color);
     border-radius: 50%;
     animation: spin .6s linear infinite;
 }

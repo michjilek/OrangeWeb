@@ -1,7 +1,6 @@
 ﻿* {
     --editableText_font_size: 14px;
     --editableText-font: var(--MainFont);
-    --editableText_placeholder_color: #aaaaaaFF;
     --editableText_font_weight: 500;
 }
 
@@ -17,7 +16,7 @@
     inset: 0 !important; /* ekvivalent top: 0; left: 0; right: 0; bottom: 0; */
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: var(--OverlayColor);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -27,7 +26,7 @@
 
 /* Vnitřní editační panel */
 .edit_area {
-    background-color: white;
+    background-color: var(--Editable_text_edit_area_background_color);
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -55,8 +54,8 @@
     resize: none;
     width: 100%;
     height: 100%;
-    background-color: transparent;
-    color: var(--editableText_placeholder_color);
+    background-color: var(--Editable_text_user_text_area_background_color);
+    color: var(--Editable_text_placeholder_text_color);
     font-family: var(--editableText-font);
     font-style: normal;
     font-size: var(--editableText_font_size);
@@ -64,7 +63,7 @@
 }
 
     .user_text_area:focus::placeholder {
-        color: transparent;
+        color: var(--Editable_text_user_area_placeholder_text_color);
     }
 
 .button-group {
@@ -77,13 +76,13 @@
     padding: 8px 16px;
     border-radius: 8px;
     border: none;
-    background-color: var(--DarkButtonBackgrondColor);
+    background-color: var(--Editable_text_btn_background_color);
     color: white;
     cursor: pointer;
 }
 
     .btn:hover {
-        background-color: var(--DarkButtonBackgrondColorHover);
+        background-color: var(--Editable_text_btn_background_color_hover);
     }
 
 

@@ -9,14 +9,14 @@
     font-size: 14px;
     border: none;
     border-radius: 4px;
-    background-color: #4a4a4a;
-    color: #fff;
+    background-color: var(--Font_settings_editor_toggle_background_color);
+    color: var(--Font_settings_editor_toggle_text_color);
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
 
     .font-settings-editor__toggle:hover {
-        background-color: var(--DarkButtonBackgrondColorHover);
+        background-color: var(--Font_settings_editor_toggle_background_color_hover);
     }
 
 .font-settings-editor__panel {
@@ -42,17 +42,17 @@
     font-size: 12px;
     font-size: 12px;
     margin-bottom: 12px;
-    color: #666;
+    color: var(--Font_settings_editor_hint_text_color);
 }
 
 .font-settings-editor__external-link {
     display: inline-block;
     margin: 5px 0 0 0;
-    color: white;
+    color: var(--Font_settings_editor_external_link_text_color);
     text-decoration: none;
     font-weight: bold;
     padding: 1px 6px;
-    background: var(--DarkButtonBackgrondColor);
+    background: var(--Font_settings_editor_external_link_background_color);
 }
 
     .font-settings-editor__external-link:hover,
@@ -89,9 +89,9 @@
 }
 
 .font-settings-editor__picker-button {
-    border: 1px solid #ccc;
-    background-color: #f0f0f0;
-    color: #333;
+    border: 1px solid var(--Font_settings_editor_picker_button_border_color);
+    background-color: var(--Font_settings_editor_picker_button_background_color);
+    color: var(--Font_settings_editor_picker_button_text_color);
     padding: 2px 6px;
     border-radius: 4px;
     cursor: pointer;
@@ -102,12 +102,12 @@
 
     .font-settings-editor__picker-button:disabled {
         cursor: not-allowed;
-        background-color: #f5f5f5;
-        color: #999;
+        background-color: var(--Font_settings_editor_picker_button_disabled_background_color);
+        color: var(--Font_settings_editor_picker_button_disabled_text_color);
     }
 
     .font-settings-editor__picker-button:not(:disabled):hover {
-        background-color: #e0e0e0;
+        background-color: var(--Font_settings_editor_picker_button_not_disabled_hover_background_color);
     }
 
 .font-settings-editor__suggestions {
@@ -118,10 +118,10 @@
     margin: 0;
     padding: 4px;
     list-style: none;
-    background-color: #fff;
-    border: 1px solid #ccc;
+    background-color: var(--Font_settings_editor_suggestions_background_color);
+    border: 1px solid var(--Font_settings_editor_suggestions_border_color);
     border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px var(--Font_settings_editor_suggestions_shadow_color);
     max-height: 240px;
     overflow-y: auto;
     z-index: 20;
@@ -151,35 +151,34 @@
 
     .font-settings-editor__suggestion-button:hover,
     .font-settings-editor__suggestion-button--active {
-        background-color: #eef4ff;
+        background-color: var(--Font_settings_editor_suggestions_button_background_color_active);
     }
 
 .font-settings-editor__suggestion-name {
     font-size: 13px;
     font-weight: 600;
-    color: #333;
+    color: var(--Font_settings_editor_suggestion_name_text_color);
 }
 
 .font-settings-editor__suggestion-sample {
     font-size: 13px;
-    color: #444;
+    color: var(--Font_settings_editor_suggestion_sample_text_color);
 }
 
 .font-settings-editor__suggestion-load-more {
     width: 100%;
     padding: 8px;
-    border: 1px dashed #c0c0c0;
+    border: 1px dashed var(--Font_settings_editor_suggestion_load_more_border_color);
     border-radius: 4px;
-    background-color: #fafafa;
-    color: #333;
+    background-color: var(--Font_settings_editor_suggestion_load_more_background_color);
+    color: var(--Font_settings_editor_suggestion_load_more_text_color);
     font-size: 12px;
     cursor: pointer;
     transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
     .font-settings-editor__suggestion-load-more:hover {
-        background-color: #f0f4ff;
-        border-color: #8aa7e0;
+        background-color: var(--Font_settings_editor_suggestion_load_nore_background_color_hover);
     }
 
 .font-settings-editor__field label {
@@ -187,7 +186,7 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #555;
+    color: var(--Font_settings_editor_field_label_text_color);
 }
 
 .font-settings-editor__input {
@@ -198,14 +197,14 @@
 }
 
     .font-settings-editor__input:disabled {
-        background-color: var(--FontEditInputDisabledColor);
+        background-color: var(--Font_settings_editor_input_disabled_background_color);
     }
 
 .font-settings-editor__preview {
-    border: 1px dashed var(--FontPreviewBorderColor);
+    border: 1px dashed var(--Font_settings_editor_preview_border_color);
     padding: 10px;
     border-radius: 4px;
-    background-color: var(--FontPreviewBackgroundColor);
+    background-color: var(--Font_settings_editor_preview_background_color);
     font-size: 14px;
     margin-bottom: 12px;
     height: 100px;
@@ -218,8 +217,8 @@
 
 .font-settings-editor__save {
     padding: 6px 14px;
-    background-color: var(--DarkButtonBackgrondColor);
-    color: #fff;
+    background-color: var(--Font_settings_editor_save_background_color);
+    color: var(--Font_settings_editor_save_text_color);
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -227,12 +226,12 @@
 }
 
     .font-settings-editor__save:disabled {
-        background-color: #8eb6d2;
+        background-color: var(--Font_settings_editor_save_disabled_background_color);
         cursor: not-allowed;
     }
 
     .font-settings-editor__save:not(:disabled):hover {
-        background-color: var(--DarkButtonBackgrondColorHover);
+        background-color: var(--Font_settings_editor_save_not_disabled_background_color);
     }
 
 .font-settings-editor__message {
@@ -243,25 +242,25 @@
 }
 
 .font-settings-editor__message--error {
-    background-color: var(--FontsEditErrorBackgroundColor);
-    color: #a94442;
-    border: 1px solid var(--FontsEditErrorBorderColor);
+    background-color: var(--Font_settings_editor_error_background_color);
+    color: var(--Font_settings_editor_error_text_color);
+    border: 1px solid var(--Font_settings_editor_error_border_color);
 }
 
 .font-settings-editor__message--success {
-    background-color: var(--FontsEditSuccessBackgroundColor);
-    color: #2f7a40;
-    border: 1px solid var(--FontsEditSuccessBorderColor);
+    background-color: var(--Font_settings_editor_success_background_color);
+    color: var(--Font_settings_editor_success_text_color);
+    border: 1px solid var(--Font_settings_editor_success_border_color);
 }
 
 .font-settings-editor__message--info {
-    background-color: var(--FontsEditInfoBackgroundColor);
-    color: #2b4c7e;
-    border: 1px solid var(--FontsEditInfoBorderColor);
+    background-color: var(--Font_settings_editor_info_background_color);
+    color: var(--Font_settings_editor_info_text_color);
+    border: 1px solid var(--Font_settings_editor_info_border_color);
 }
 
 .font-settings-editor__message--warning {
-    background-color: var(--FontsEditWarningBackgroundColor);
-    color: #8c5413;
-    border: 1px solid var(--FontsEditWarningBorderColor);
+    background-color: var(--Font_settings_editor_warning_background_color);
+    color: var(--Font_settings_editor_warning_text_color);
+    border: 1px solid var(--Font_settings_editor_warning_border_color);
 }

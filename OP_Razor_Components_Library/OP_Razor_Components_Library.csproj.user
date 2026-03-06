@@ -3,4 +3,9 @@
   <PropertyGroup>
     <_LastSelectedProfileId>D:\OneDrive\OP\OP_projects\OrangeWeb\VS_Project\OP_Razor_Components_Library\Properties\PublishProfiles\WebServer_test.pubxml</_LastSelectedProfileId>
   </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Components\QuestionForm\QuestionFormResources.cs.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
 </Project>
