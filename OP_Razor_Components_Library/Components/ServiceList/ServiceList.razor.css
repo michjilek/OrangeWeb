@@ -11,7 +11,7 @@
 }
 
     .table th, .table td {
-        border: 1px solid #ddd;
+        border: 1px solid var(--Service_list_table_th_td_border);
         padding: 2px;
         text-align: center;
         font-size: 0.9rem;
@@ -160,10 +160,10 @@
 }
 
 .toast.success {
-    background: #198754;
+    background: var(--Service_list_toast_success_background_color);
 }
 /* zelené */
 .toast.error {
-    background: #dc3545;
+    background: var(--Service_list_toast_error_background_color);
 }
 

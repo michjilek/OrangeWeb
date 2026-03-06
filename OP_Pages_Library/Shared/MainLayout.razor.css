@@ -119,12 +119,12 @@
 }
 
 .login-icon {
-    fill: #C7C7C7;
+    fill: var(--MainLayout_login_icon_fill_color);
     transition: fill 0.3s ease;
 }
 
     .login-icon:active {
-        fill: #444;
+        fill: var(--MainLayout_login_icon_fill_color_active);
     }
 /* LOGIN BUTTON end */
 
@@ -204,9 +204,6 @@
 
 /* 480px – Mobilní telefony (větší displeje) */
 /*@media (min-width: 480px) {
-    .top-bar {
-        background-image: linear-gradient(#00000099, #00000099), url('images/sminky/sminky_1024.webp');
-    }
 }*/
 /* 768px – Tablety (portrét) */
 @media (min-width: 768px) {
@@ -217,7 +214,6 @@
 /* 1024px – Tablety (na šířku), malé notebooky */
 @media (min-width: 1024px) {
     .top-bar {
-        /*    background-image: linear-gradient(#00000099, #00000099), url('images/sminky/sminky_1920.webp');*/
         margin-top: 8px;
         height: 82px;
         padding: 30px;
@@ -235,9 +231,6 @@
 /* 1920px – Full HD
  */
 /*@media (min-width: 1920px) {
-    .top-bar {
-        background-image: linear-gradient(#00000099, #00000099), url('images/sminky/sminky_2560.webp');
-    }
 }*/
 /* 2560px – 2K
  */

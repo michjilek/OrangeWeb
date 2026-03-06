@@ -29,11 +29,11 @@
     .edit-btn svg {
         width: 16px;
         height: 16px;
-        fill: #000; /* black fill */
+        fill: var(--Editable_image_edit_button_svg_fill_color);
     }
 
     .edit-btn:hover svg {
-        fill: #555; /* gray on hover */
+        fill: var(--Editable_image_edit_button_svg_fill_color_hover);
     }
 
 /* =========================
@@ -73,7 +73,7 @@
     max-width: 200px;
     max-height: 150px;
     margin-bottom: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--Editable_image_preview_image_border_color);
     border-radius: 6px;
 }
 
@@ -105,7 +105,7 @@
 }
 
 .busy-card {
-    background: #fff;
+    background: var(--Editable_image_busy_card_background_color);
     color: var(--Editable_image_busy_card_text-color);
     padding: 16px 20px;
     border-radius: 12px;
@@ -136,13 +136,13 @@
 .busy-progress {
     width: 100%;
     height: 6px;
-    background: #e9ecef;
+    background: var(--Editable_image_busy_progress_background_color);
     border-radius: 999px;
     overflow: hidden;
 }
 
 .busy-progress-bar {
     height: 100%;
-    background: #343a40;
+    background: var(--Editable_image_busy_progress_bar_background_color);
     transition: width .15s ease;
 }

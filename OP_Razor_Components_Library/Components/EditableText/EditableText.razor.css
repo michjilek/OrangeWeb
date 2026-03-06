@@ -6,7 +6,7 @@
 
 .editable-span {
     cursor: pointer;
-    border: 1px dashed #999;
+    border: 1px dashed var(--Editable_text_editable_span_border);
     padding: 10px 20px;
 }
 
@@ -43,7 +43,7 @@
     font-size: 1rem;
     padding: 10px;
     border-radius: 8px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--Editable_text_text_area_border_color);
     resize: vertical;
 }
 

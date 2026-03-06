@@ -54,7 +54,7 @@
     display: flex;
     flex: 1;
     padding: 20px 50px;
-    border-bottom: 1px solid #444;
+    border-bottom: 1px solid var(--Navigation_border_bottom);
     text-align: center; /* ← tohle nestačí u flexboxu */
     justify-content: center; /* ← tohle vystředí obsah horizontálně */
     align-items: center; /* ← tohle vystředí obsah vertikálně */

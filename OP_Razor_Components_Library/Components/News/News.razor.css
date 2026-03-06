@@ -69,11 +69,11 @@
     .edit-btn svg {
         width: 16px;
         height: 16px;
-        fill: #000; /* black fill */
+        fill: var(--News_edit_btn_svg);
     }
 
     .edit-btn:hover svg {
-        fill: #555; /* gray on hover */
+        fill: var(--News_edit_btn_svg_hover);
     }
 
 .news {
@@ -200,11 +200,11 @@
         width: 10px;
         height: 10px;
         border-radius: 50%;
-        background: #bbb;
+        background: var(--News_dot_before_color);
     }
 
     .news-dot.active::before {
-        background: #333;
+        background: var(--News_dot_before_color_active);
     }
 /* =========================
    NEWS EDITOR - MODAL
@@ -237,7 +237,7 @@
     .modal input, .modal textarea {
         width: 100%;
         padding: 6px;
-        border: 1px solid #ccc;
+        border: 1px solid var(--News_modal_input_textarea_border_color);
         border-radius: 6px;
     }
 
@@ -260,7 +260,7 @@
     max-width: 200px;
     max-height: 150px;
     margin-bottom: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--News_preview_image_border_color);
     border-radius: 6px;
 }
 /* =========================
@@ -314,8 +314,8 @@
 }
 
     .reorder-btn:hover {
-        background: #fff;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.24);
+        background: var(--News_reorder_btn_hover_background_color);
+        box-shadow: 0 4px 10px var(--News_reorder_btn_hover_shadow_color);
         transform: translateY(-1px);
     }
 
@@ -390,14 +390,14 @@
 .busy-progress {
     width: 100%;
     height: 6px;
-    background: #e9ecef;
+    background: var(--News_busy_progress_background_color);
     border-radius: 999px;
     overflow: hidden;
 }
 
 .busy-progress-bar {
     height: 100%;
-    background: #343a40;
+    background: var(--News_busy_progress_bar_background_color);
     transition: width .15s ease;
 }
 /* =========================

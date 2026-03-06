@@ -24,10 +24,10 @@
     right: 9px;
     top: 48px;
     width: 320px;
-    background: #fff;
-    border: 1px solid #ddd;
+    background: var(--Font_settings_editor_panel_background_color);
+    border: 1px solid var(--Font_settings_editor_panel_border_color);
     border-radius: 8px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6px 18px var(--Font_settings_editor_panel_shadow_color);
     padding: 16px;
     z-index: 10;
 }
@@ -191,7 +191,7 @@
 
 .font-settings-editor__input {
     padding: 6px 8px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--Font_settings_editor_input_border_color);
     border-radius: 4px;
     font-size: 14px;
 }

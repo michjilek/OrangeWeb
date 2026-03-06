@@ -1,9 +1,7 @@
 * {
     --question_form_left_panel_min_width: 293px;
     --question_form_item_height: 45px;
-/*    --question_form_border_color: #C3C3C3;*/
     --question_form_gap: 15px;
-/*    --question_form_placeholder_color: #aaaaaaFF;*/
     --question_form-font: var(--MainFont);
     --question_form_font_size: 14px;
     --question_form_font_weight: 500;

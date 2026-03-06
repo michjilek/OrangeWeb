@@ -22,14 +22,14 @@
     .language-switcher .lang-icon {
         width: 18px;
         height: 18px;
-        stroke: #C7C7C7;
+        stroke: var(--Language_switcher_lang_icon);
     }
 
 .lang-menu {
     position: absolute;
     top: 40px;
     right: 0;
-    background: #fff;
+    background: var(--Language_lang_menu_background);
     border: 1px solid rgba(0,0,0,.15);
     border-radius: 6px;
     list-style: none;
@@ -56,5 +56,5 @@
     }
 
         .lang-menu button:hover {
-            background: #f0f0f0;
+            background: var(--Language_lang_menu_button_hover);
         }

@@ -7,8 +7,8 @@
 /* Circle border remove*/
 #Social_sites #circle_border,
 #Social_sites:active #circle_border {
-    fill: #FFFFFF00 !important;
-    stroke: #FFFFFF00 !important;
+    fill: none !important;
+    stroke: none !important;
 }
 
 /* Circle */
