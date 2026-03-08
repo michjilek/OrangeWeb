@@ -59,8 +59,43 @@
             return builder;
         }
 
+        // Helper: builds a safe absolute path inside configDir and blocks path traversal (../)
+        private static string? TryBuildSafePath(string rootDir, string relativePath)
+        {
+            var candidatePath = Path.GetFullPath(Path.Combine(rootDir, relativePath));
+            var rootPath = Path.GetFullPath(rootDir);
+
+            return candidatePath.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase) ? candidatePath : null;
+        }
+
+
+        private static IResult ResolveBrandingAsset(string relativePath, string contentType, string fallbackWebRootFileName, string? webRootPath)
+        {
+            var configDir = ResolveConfigDir();
+            if (!string.IsNullOrWhiteSpace(configDir) && Directory.Exists(configDir))
+            {
+                var faviconRoot = Path.Combine(configDir, "Favicon");
+                var candidatePath = TryBuildSafePath(faviconRoot, relativePath);
+                if (candidatePath is not null && File.Exists(candidatePath))
+                {
+                    return Results.File(candidatePath, contentType);
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(webRootPath))
+            {
+                var fallbackPath = Path.Combine(webRootPath, fallbackWebRootFileName);
+                if (File.Exists(fallbackPath))
+                {
+                    return Results.File(fallbackPath, contentType);
+                }
+            }
+
+            return Results.NotFound();
+        }
+
         // Function for theme mapping
-        public static WebApplication ResolveThemeMapping(this WebApplication app)
+        public static WebApplication ResolveMapping(this WebApplication app)
         {
             // Register endpoint for GET requests (we need to read themes from external folder)
             // for example: GET https://my-domain.cz/_branding/theme.css
@@ -90,14 +125,7 @@
                     return Results.BadRequest("Branding.ThemeCssFile points to a public URL, not an external file.");
                 }
 
-                // Helper: builds a safe absolute path inside configDir and blocks path traversal (../)
-                static string? TryBuildSafePath(string rootDir, string fileName)
-                {
-                    var candidatePath = Path.GetFullPath(Path.Combine(rootDir, fileName));
-                    var rootPath = Path.GetFullPath(rootDir);
 
-                    return candidatePath.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase) ? candidatePath : null;
-                }
 
                 // 1) try requested theme file
                 var candidatePath = TryBuildSafePath(configDir, themeFileName);
@@ -120,9 +148,20 @@
                 }
 
                 // Return CSS file content (UTF-8)
-                var test = Results.File(candidatePath, "text/css; charset=utf-8");
                 return Results.File(candidatePath, "text/css; charset=utf-8");
             });
+
+            app.MapGet("/_branding/favicon/favicon-96x96.png", (IWebHostEnvironment env) =>
+                ResolveBrandingAsset("favicon-96x96.png", "image/png", "favicon-96x96.png", env.WebRootPath));
+
+            app.MapGet("/_branding/favicon/favicon.svg", (IWebHostEnvironment env) =>
+                ResolveBrandingAsset("favicon.svg", "image/svg+xml", "favicon.svg", env.WebRootPath));
+
+            app.MapGet("/_branding/favicon/favicon.ico", (IWebHostEnvironment env) =>
+                ResolveBrandingAsset("favicon.ico", "image/x-icon", "favicon.ico", env.WebRootPath));
+
+            app.MapGet("/_branding/favicon/apple-touch-icon.png", (IWebHostEnvironment env) =>
+                ResolveBrandingAsset("apple-touch-icon.png", "image/png", "apple-touch-icon.png", env.WebRootPath));
 
             return app;
         }

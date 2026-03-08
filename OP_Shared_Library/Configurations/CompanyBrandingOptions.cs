@@ -5,6 +5,10 @@ public sealed class CompanyBrandingOptions
     public string CompanyName { get; set; } = string.Empty;
     public string WebSiteTitle { get; set; } = string.Empty;
     public string AppleMobileWebAppTitle { get; set; } = string.Empty;
+    public string Favicon96x96Url { get; set; } = string.Empty;
+    public string FaviconSvgUrl { get; set; } = string.Empty;
+    public string ShortcutIconUrl { get; set; } = string.Empty;
+    public string AppleTouchIconUrl { get; set; } = string.Empty;
     public string SeoDescription { get; set; } = string.Empty;
     public string CanonicalUrl { get; set; } = string.Empty;
     public string ContactFormSource { get; set; } = string.Empty;
