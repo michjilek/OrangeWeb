@@ -68,30 +68,24 @@
             return candidatePath.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase) ? candidatePath : null;
         }
 
-
-        private static IResult ResolveBrandingAsset(string relativePath, string contentType, string fallbackWebRootFileName, string? webRootPath)
+        private static string? TryResolveBrandingAssetPath(string configDir, string assetPath)
         {
-            var configDir = ResolveConfigDir();
-            if (!string.IsNullOrWhiteSpace(configDir) && Directory.Exists(configDir))
+            if (string.IsNullOrWhiteSpace(assetPath))
             {
-                var faviconRoot = Path.Combine(configDir, "Favicon");
-                var candidatePath = TryBuildSafePath(faviconRoot, relativePath);
-                if (candidatePath is not null && File.Exists(candidatePath))
-                {
-                    return Results.File(candidatePath, contentType);
-                }
+                return null;
             }
 
-            if (!string.IsNullOrWhiteSpace(webRootPath))
+            var normalizedAssetPath = assetPath.TrimStart('/').Replace('\\', '/');
+
+            // Convention: branding assets are directly under {configDir}/...
+            // Example: Configs/<brand>/file or Configs/<brand>/<folder>/file
+            var candidate = TryBuildSafePath(configDir, normalizedAssetPath);
+            if (candidate is not null && File.Exists(candidate))
             {
-                var fallbackPath = Path.Combine(webRootPath, fallbackWebRootFileName);
-                if (File.Exists(fallbackPath))
-                {
-                    return Results.File(fallbackPath, contentType);
-                }
+                return candidate;
             }
 
-            return Results.NotFound();
+            return null;
         }
 
         // Function for theme mapping
@@ -151,17 +145,27 @@
                 return Results.File(candidatePath, "text/css; charset=utf-8");
             });
 
-            app.MapGet("/_branding/favicon/favicon-96x96.png", (IWebHostEnvironment env) =>
-                ResolveBrandingAsset("favicon-96x96.png", "image/png", "favicon-96x96.png", env.WebRootPath));
+            app.MapGet("/_branding/{**assetPath}", (string assetPath) =>
+            {
+                var provider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
+                var configDir = ResolveConfigDir();
 
-            app.MapGet("/_branding/favicon/favicon.svg", (IWebHostEnvironment env) =>
-                ResolveBrandingAsset("favicon.svg", "image/svg+xml", "favicon.svg", env.WebRootPath));
+                if (!string.IsNullOrWhiteSpace(configDir) && Directory.Exists(configDir))
+                {
+                    var externalPath = TryResolveBrandingAssetPath(configDir, assetPath);
+                    if (externalPath is not null)
+                    {
+                        if (!provider.TryGetContentType(externalPath, out var externalContentType))
+                        {
+                            externalContentType = "application/octet-stream";
+                        }
 
-            app.MapGet("/_branding/favicon/favicon.ico", (IWebHostEnvironment env) =>
-                ResolveBrandingAsset("favicon.ico", "image/x-icon", "favicon.ico", env.WebRootPath));
+                        return Results.File(externalPath, externalContentType);
+                    }
+                }
 
-            app.MapGet("/_branding/favicon/apple-touch-icon.png", (IWebHostEnvironment env) =>
-                ResolveBrandingAsset("apple-touch-icon.png", "image/png", "apple-touch-icon.png", env.WebRootPath));
+                return Results.NotFound();
+            });
 
             return app;
         }
