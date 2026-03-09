@@ -56,7 +56,6 @@ namespace OP_Shared_Library.Configurations
                     .AddJsonFile(baseFile, optional: true, reloadOnChange: true)
                     .AddJsonFile(envFile, optional: true, reloadOnChange: true);
             }
-
             builder.Configuration.AddEnvironmentVariables();
 
             return builder;

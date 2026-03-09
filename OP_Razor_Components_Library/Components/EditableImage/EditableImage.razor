@@ -21,7 +21,7 @@
 }
 
 @* We pass the current public-signed URL (Src). *@
-@ImageContent(new ResponsiveImageData(Src: Src, SrcSet: BuildSrcSet(), Sizes: Sizes, Alt: Src))
+@ImageContent(new ResponsiveImageData(Src: Src, SrcSet: BuildSrcSet(), Sizes: Sizes, Alt: Alt))
 
 @* Busy overlay (uploading/progress, or awaiting file picker). *@
 @if (isBusy)
