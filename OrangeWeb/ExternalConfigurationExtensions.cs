@@ -156,16 +156,10 @@ namespace OP_Shared_Library.Configurations
                 var provider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
                 var configDir = ResolveConfigDir();
 
-
                 if (!string.IsNullOrWhiteSpace(configDir) && Directory.Exists(configDir))
                 {
 
                     var externalPath = TryResolveBrandingAssetPath(configDir, assetPath);
-
-                    //// Log for test
-                    //customLogger.TestLog($"ConfigDir: {configDir}");
-                    //customLogger.TestLog($"AssetPath: {assetPath}");
-                    //customLogger.TestLog($"ExternalPath: {externalPath}");
 
                     if (externalPath is not null)
                     {
