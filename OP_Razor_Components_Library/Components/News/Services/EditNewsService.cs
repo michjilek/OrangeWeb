@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components;
-using System.Text;
-
 namespace OP_Razor_Components_Library.Components.News.Services;
 public class EditNewsService
 {
@@ -44,13 +42,17 @@ public class EditNewsService
         // Change file by lang
         ChangeLangFile(language);
 
-        // Get items from yaml
-        var filePath = $"/data/{FileName}";
-        var url = $"{_navigation.BaseUri}{filePath}";
+        // Primary source: resolved YAML path from YamlService
+        // (external Configs/<brand>/Data when configured, else wwwroot/data).
+        var yamlPath = _yamlService.EnsureYamlPath(FileName);
+
         try
         {
-            using var stream = await _http.GetStreamAsync(url);
-            Items = _yamlService.LoadYamlList<NewsItem>(url, stream) ?? new();
+            if (File.Exists(yamlPath))
+            {
+                await using var fileStream = File.OpenRead(yamlPath);
+                Items = _yamlService.LoadYamlList<NewsItem>(yamlPath, fileStream) ?? new();
+            }
         }
         catch
         {
@@ -63,10 +65,7 @@ public class EditNewsService
     public async Task SaveAsync(string webRootPath)
     {
         // Yaml
-        var yaml = _yamlService.SerializeYaml(Items);
-        var path = Path.Combine(webRootPath, "wwwroot", "data", FileName);
-        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-        await File.WriteAllTextAsync(path, yaml, Encoding.UTF8);
+        await _yamlService.SaveToYamlAsync(Items, FileName);
     }
     public void AddNewItem()
     {

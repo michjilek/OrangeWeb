@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components;
-using OP_Shared_Library;
 using OP_Shared_Library.Struct;
 using System.Globalization;
 using System.Text;
@@ -51,11 +50,15 @@ public class TranslationsService
             try
             {
                 var file = $"{_language}.yaml";
-                var filePath = $"/data/{file}";
-                var url = $"{_navigation.BaseUri}{filePath}";
+                var yamlPath = _yamlService.EnsureYamlPath(file);
 
-                using var stream = await _http.GetStreamAsync(url);
-                ChangeTextItemList = _yamlService.LoadYamlList<ChangeTextItem>(url, stream);
+                // Primary source: resolved YAML path from YamlService
+                // (external Configs/<brand>/Data when configured, else wwwroot/data).
+                if (File.Exists(yamlPath))
+                {
+                    await using var fileStream = File.OpenRead(yamlPath);
+                    ChangeTextItemList = _yamlService.LoadYamlList<ChangeTextItem>(yamlPath, fileStream) ?? new List<ChangeTextItem>();
+                }
 
                 NotifyStateChanged();
             }
@@ -91,7 +94,7 @@ public class TranslationsService
             item.Translation = newText;
             var yaml = _yamlService.SerializeYaml(ChangeTextItemList);
 
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "data", $"{_language}.yaml");
+            var path = _yamlService.EnsureYamlPath($"{_language}.yaml");
             Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             await File.WriteAllTextAsync(path, yaml, Encoding.UTF8);
 

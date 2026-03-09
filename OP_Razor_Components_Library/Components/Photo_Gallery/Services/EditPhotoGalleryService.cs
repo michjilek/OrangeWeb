@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Hosting;
-using System.Text;
 using OP_Shared_Library.Struct;
 
 namespace OP_Razor_Components_Library.Components.Photo_Gallery.Services;
@@ -86,11 +85,15 @@ public class EditPhotoGalleryService
 
         try
         {
-            // Send GET to url and take stream from it
-            using var stream = await _httpClient.GetStreamAsync(_url);
+            // Primary source: resolved YAML path from YamlService
+            // (external Configs/<brand>/Data when configured, else wwwroot/data).
+            var yamlPath = _yamlService.EnsureYamlPath(FileName);
 
-            // Get GalleryImage Items from yaml by url and stream
-            Items = _yamlService.LoadYamlList<GalleryImage>(_url, stream) ?? new();
+            if (File.Exists(yamlPath))
+            {
+                await using var fileStream = File.OpenRead(yamlPath);
+                Items = _yamlService.LoadYamlList<GalleryImage>(yamlPath, fileStream) ?? new();
+            }
         }
         catch (Exception ex)
         {

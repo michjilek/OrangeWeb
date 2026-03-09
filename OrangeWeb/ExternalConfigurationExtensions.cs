@@ -90,6 +90,24 @@ namespace OP_Shared_Library.Configurations
             return null;
         }
 
+        private static string? TryResolveDataAssetPath(string dataDir, string assetPath)
+        {
+            if (string.IsNullOrWhiteSpace(assetPath))
+            {
+                return null;
+            }
+
+            var normalizedAssetPath = assetPath.TrimStart('/').Replace('\\', '/');
+            var candidate = TryBuildSafePath(dataDir, normalizedAssetPath);
+
+            if (candidate is not null && File.Exists(candidate))
+            {
+                return candidate;
+            }
+
+            return null;
+        }
+
         // Function for theme mapping
         public static WebApplication ResolveMapping(this WebApplication app)
         {
@@ -176,6 +194,52 @@ namespace OP_Shared_Library.Configurations
 
                 return Results.NotFound();
             });
+
+            // Endpoint for data yaml/json files.
+            // Priority:
+            // 1) external folder: {OP_CONFIG_DIR}/Data
+            // 2) local fallback: {webroot}/data
+            app.MapGet("/data/{**assetPath}", (string assetPath, IWebHostEnvironment env) =>
+            {
+                var provider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
+                var configDir = ResolveConfigDir();
+
+                if (!string.IsNullOrWhiteSpace(configDir) && Directory.Exists(configDir))
+                {
+                    var externalDataDir = Path.Combine(configDir, "Data");
+                    if (Directory.Exists(externalDataDir))
+                    {
+                        var externalPath = TryResolveDataAssetPath(externalDataDir, assetPath);
+                        if (externalPath is not null)
+                        {
+                            if (!provider.TryGetContentType(externalPath, out var externalContentType))
+                            {
+                                externalContentType = "application/octet-stream";
+                            }
+
+                            return Results.File(externalPath, externalContentType);
+                        }
+                    }
+                }
+
+                var localDataDir = Path.Combine(env.WebRootPath ?? Path.Combine(env.ContentRootPath, "wwwroot"), "data");
+                if (Directory.Exists(localDataDir))
+                {
+                    var localPath = TryResolveDataAssetPath(localDataDir, assetPath);
+                    if (localPath is not null)
+                    {
+                        if (!provider.TryGetContentType(localPath, out var localContentType))
+                        {
+                            localContentType = "application/octet-stream";
+                        }
+
+                        return Results.File(localPath, localContentType);
+                    }
+                }
+
+                return Results.NotFound();
+            });
+
 
             return app;
         }

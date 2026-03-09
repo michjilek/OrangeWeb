@@ -1,7 +1,5 @@
-﻿using Minio.DataModel;
-using System.Text;
+﻿using System.Text;
 using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace Op_LP.Services;
 
@@ -39,8 +37,13 @@ public class YamlService : IYamlService
     #region Private Properties
     private void FillProperties()
     {
-        // Local YAML directories
-        _dataDir = Path.Combine(_env.ContentRootPath, "wwwroot", "data");
+        var configDir = OP_Shared_Library.Configurations.ExternalConfigurationExtensions.ResolveConfigDir();
+
+        // Prefer external brand data folder when OP_CONFIG_DIR is configured.
+        if (!string.IsNullOrWhiteSpace(configDir))
+        {
+            _dataDir = Path.Combine(configDir, "Data");
+        }
         Directory.CreateDirectory(_dataDir);
     }
     private void CreateDeSerializers()
@@ -91,7 +94,7 @@ public class YamlService : IYamlService
     public async Task SaveToYamlAsync<T>(List<T> items, string fileName)
     {
         var yaml = SerializeYaml(items);
-        var path = Path.Combine(_env.ContentRootPath, "wwwroot", "data", fileName);
+        var path = Path.Combine(_dataDir, fileName);
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         await File.WriteAllTextAsync(path, yaml, Encoding.UTF8);
     }

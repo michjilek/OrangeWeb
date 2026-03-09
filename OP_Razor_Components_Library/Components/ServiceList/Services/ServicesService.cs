@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
 using OP_Razor_Components_Library.Components.ServiceList;
-using OP_Shared_Library;
-using OP_Shared_Library.Struct;
-using System.Text;
 
 public class ServicesService
 {
@@ -54,11 +51,15 @@ public class ServicesService
         {
             try
             {
-                var filePath = $"/data/{FileName}";
-                var url = $"{_navigation.BaseUri}{filePath}";
-                using var stream = await _http.GetStreamAsync(url);
+                // Primary source: resolved YAML path from YamlService
+                // (external Configs/<brand>/Data when configured, else wwwroot/data).
+                var yamlPath = _yamlService.EnsureYamlPath(FileName);
 
-                Items = _yamlService.LoadYamlList<ServiceListItem>(url, stream);
+                if (File.Exists(yamlPath))
+                {
+                    await using var fileStream = File.OpenRead(yamlPath);
+                    Items = _yamlService.LoadYamlList<ServiceListItem>(yamlPath, fileStream) ?? new();
+                }
             }
             catch (Exception ex)
             {
@@ -73,10 +74,7 @@ public class ServicesService
     }
     public async Task SaveAsync(string webRootPath)
     {
-        var yaml = _yamlService.SerializeYaml(Items);
-        var path = Path.Combine(webRootPath, "wwwroot", "data", FileName);
-        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-        await File.WriteAllTextAsync(path, yaml, Encoding.UTF8);
+        await _yamlService.SaveToYamlAsync(Items, FileName);
     }
     public void AddNewItem()
     {
