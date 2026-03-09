@@ -14,8 +14,14 @@
     z-index: -1;
 }
 
-.overlay {
+/*.overlay {
     background-color: var(--Home_page_overlay_color width: 100%);
+    justify-content: center;
+}*/
+
+.overlay {
+    background-color: var(--Home_page_overlay_color);
+    width: 100%;
     justify-content: center;
 }
 
