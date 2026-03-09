@@ -1,4 +1,7 @@
-﻿namespace OP_Shared_Library.Configurations
+﻿using Op_LP.Services;
+using Serilog.Core;
+
+namespace OP_Shared_Library.Configurations
 {
     /// <summary>
     /// Loads appsettings from an external folder (outside the project/output).
@@ -91,6 +94,8 @@
         // Function for theme mapping
         public static WebApplication ResolveMapping(this WebApplication app)
         {
+            var customLogger = app.Services.GetRequiredService<ICustomLogger>();
+
             // Register endpoint for GET requests (we need to read themes from external folder)
             // for example: GET https://my-domain.cz/_branding/theme.css
             app.MapGet("/_branding/theme.css", (Microsoft.Extensions.Options.IOptions<CompanyBrandingOptions> brandingOptions) =>
@@ -145,19 +150,31 @@
                 return Results.File(candidatePath, "text/css; charset=utf-8");
             });
 
+            
             app.MapGet("/_branding/{**assetPath}", (string assetPath) =>
             {
                 var provider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
                 var configDir = ResolveConfigDir();
 
+
                 if (!string.IsNullOrWhiteSpace(configDir) && Directory.Exists(configDir))
                 {
+
                     var externalPath = TryResolveBrandingAssetPath(configDir, assetPath);
+
+                    //// Log for test
+                    //customLogger.TestLog($"ConfigDir: {configDir}");
+                    //customLogger.TestLog($"AssetPath: {assetPath}");
+                    //customLogger.TestLog($"ExternalPath: {externalPath}");
+
                     if (externalPath is not null)
                     {
+
                         if (!provider.TryGetContentType(externalPath, out var externalContentType))
                         {
-                            externalContentType = "application/octet-stream";
+                            externalContentType = Path.GetExtension(externalPath).Equals(".webmanifest", StringComparison.OrdinalIgnoreCase)
+                                                    ? "application/manifest+json"
+                                                    : "application/octet-stream";
                         }
 
                         return Results.File(externalPath, externalContentType);
