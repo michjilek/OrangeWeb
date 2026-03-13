@@ -29,6 +29,10 @@
     line-height: 1.43;
 }
 
+.subtitle, .title, .text {
+    text-shadow: 0 1px 0 rgba(255,255,255,0.38), 0 0 1px rgba(255,255,255,0.18), 0 10px 24px rgba(0,0,0,0.16);
+}
+
 /* =========================
    NEWS / CAROUSEL
    ========================= */
@@ -76,15 +80,41 @@
         fill: var(--News_edit_btn_svg_hover);
     }
 
+/*.news {*/
+    /* variables */
+    /*--nav-size: 48px;*/ /* arrow size */
+    /*--arrow-gap: 12px;*/ /* gap between arrow and image */
+    /*--media-w: 100%;*/ /* width of img on mobile */
+    /* others */
+    /*background: rgba(255, 255, 255, 0.7);
+    width: 90%;
+    backdrop-filter: blur(2px);
+}*/
+
 .news {
     /* variables */
-    --nav-size: 48px; /* arrow size */
-    --arrow-gap: 12px; /* gap between arrow and image */
-    --media-w: 100%; /* width of img on mobile */
-    /* others */
-    background: rgba(255, 255, 255, 0.7);
+    --nav-size: 48px;
+    --arrow-gap: 12px;
+    --media-w: 100%;
+    position: relative;
+    overflow: hidden;
     width: 90%;
+    border-radius: 24px;
+    background: linear-gradient( 135deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0.14) );
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -1px 0 rgba(255, 255, 255, 0.12);
 }
+
+    .news::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        border-radius: inherit;
+        background: linear-gradient( 180deg, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0.16) 18%, rgba(255, 255, 255, 0.04) 40%, rgba(255, 255, 255, 0.00) 60% );
+    }
 
 .news-content {
     display: flex;
