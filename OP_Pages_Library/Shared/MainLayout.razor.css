@@ -1,5 +1,8 @@
 ﻿
 .main_container {
+    --top-bar-height: 75px;
+    --logo-vertical-gap: 10px;
+    --logo-max-width: 200px;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -32,8 +35,9 @@
     position: relative;
     align-items: center;
     justify-content: space-between;
+    box-sizing: border-box;
     padding: 10px;
-    height: 75px;
+    height: var(--top-bar-height);
     margin: 0px 0px 8px 0px;
 }
 
@@ -60,10 +64,11 @@
 
 .logo {
     position: relative;
-    height: 100%;
+    top: 2px;
+    flex: 0 0 auto;
     display: flex;
     align-items: center;
-    padding: 10px 0px;
+    height: 100%;
     box-sizing: border-box;
 }
 
@@ -74,11 +79,14 @@
         width: auto;
     }
 
-    .logo img {
-        max-width: 200px;
-        max-height: 26px;
+    .logo img,
+    .logo .site-logo-image {
         width: auto;
         height: auto;
+        max-height: calc(var(--top-bar-height) - (2 * var(--logo-vertical-gap)));
+        max-width: min(var(--logo-max-width), 40vw);
+        object-fit: contain;
+        object-position: center center;
         display: block;
     }
 
@@ -173,6 +181,7 @@
 .logo-edit-wrapper {
     display: flex;
     align-items: center;
+    height: 100%;
     gap: 10px;
 }
 
@@ -213,9 +222,12 @@
 }
 /* 1024px – Tablety (na šířku), malé notebooky */
 @media (min-width: 1024px) {
+    .main_container {
+        --top-bar-height: 82px;
+    }
+
     .top-bar {
         margin-top: 8px;
-        height: 82px;
         padding: 30px;
     }
 }
