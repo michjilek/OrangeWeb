@@ -1,6 +1,7 @@
 ﻿@using OP_Razor_Components_Library.Components.EditableText
 @using OP_Shared_Library.Services
 @using Microsoft.JSInterop
+@using OP_Razor_Components_Library.Components.EditableImage
 @inject TranslationsService TranslationsService
 @inject EditModeService EditModeService
 @inject NavigationManager NavigationManager
@@ -16,7 +17,18 @@
         <p class="text mt_less">Tel.: <EditableText Id="Mobile" EditMode="@EditModeService.IsEditing" /></p>
         <p class="text">Email: <EditableText Id="Email" EditMode="@EditModeService.IsEditing" /></p>
         <hr class="footer_hr mt">
-        <p class="footer_p mt">© <EditableText Id="Company_Name" EditMode="@EditModeService.IsEditing" /></p>
+            <div class="footer_p mt">
+            <EditableImage Key="Img_footer_company" Sizes="160px">
+                <ImageContent Context="image">
+                    <img src="@image.Src"
+                         srcset="@image.SrcSet"
+                         sizes="@image.Sizes"
+                         alt="Footer company mark"
+                         class="footer-company-image"
+                         decoding="async" />
+                </ImageContent>
+            </EditableImage>
+        </div>
         <p class="footer-year mt_less"><EditableText Id="Actual_Year" EditMode="@EditModeService.IsEditing" /></p>
         <p class="footer-year mt_less pb">Version: @_version</p>
     </div>
@@ -44,7 +56,7 @@
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        EditModeService.OnEditModeChanged -= HandleEditModeChanged;
+        //EditModeService.OnEditModeChanged -= HandleEditModeChanged;
 
         if (!firstRender)
         {
