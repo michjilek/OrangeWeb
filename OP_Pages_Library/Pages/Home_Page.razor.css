@@ -64,7 +64,8 @@
 
 /* SERVICE*/
 .service {
-    max-width: 600px;
+    width: min(calc(100% - 40px), 56rem);
+    max-width: 100%;
     text-align: center;
 }
 
@@ -275,9 +276,6 @@
         margin: 15px 0px;
     }
 
-    .service {
-        max-width: 70%;
-    }
 }
 
 /* 1280+ – větší notebooky */
@@ -310,19 +308,12 @@
         margin-top: 60px;
     }
 
-    .service {
-        max-width: 66%;
-    }
 }
 
 /* 2560+ – 2K a víc */
 @media (min-width: 2560px) {
     .text {
         max-width: 60%;
-    }
-
-    .service {
-        max-width: 44%;
     }
 
     .half_services {
