@@ -28,14 +28,17 @@
 
         <!-- Image and Arrows container -->
         <div class="news-media">
-            <button class="news-nav prev"
-                    @onclick="Prev"
-                    aria-label="Previous new"
-                    disabled="@(!CanPrev)">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M15.5 19l-7-7 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-            </button>
+            @if (HasMultipleNews)
+            {
+                <button class="news-nav prev"
+                        @onclick="Prev"
+                        aria-label="Previous new"
+                        disabled="@(!CanPrev)">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M15.5 19l-7-7 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+            }
             <!-- Image -->
             <div class="news-image-container">
                 @{
@@ -76,14 +79,17 @@
 
             </div>
 
-            <button class="news-nav next"
-                    @onclick="Next"
-                    aria-label="Next new"
-                    disabled="@(!CanNext)">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M8.5 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-            </button>
+            @if (HasMultipleNews)
+            {
+                <button class="news-nav next"
+                        @onclick="Next"
+                        aria-label="Next new"
+                        disabled="@(!CanNext)">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M8.5 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+            }
         </div>
 
         <div class="news-content">
@@ -103,16 +109,19 @@
             }
 
             <!-- Create Dots -->
-            <div class="news-dots mt">
-                @for (int i = 0; i < EditNewsService.Items.Count; i++)
-                {
-                    <!-- We need to create local copy because of iteration and lambda expression -->
-                    var index = i;
-                    <button class="news-dot @(i == CurrentIndex ? "active" : null)"
-                            @onclick="(() => GoTo(index))"
-                            aria-label="Goto to news @(i + 1)"></button>
-                }
-            </div>
+            @if (HasMultipleNews)
+            {
+                <div class="news-dots mt">
+                    @for (int i = 0; i < EditNewsService.Items.Count; i++)
+                    {
+                        <!-- We need to create local copy because of iteration and lambda expression -->
+                        var index = i;
+                        <button class="news-dot @(i == CurrentIndex ? "active" : null)"
+                                @onclick="(() => GoTo(index))"
+                                aria-label="Goto to news @(i + 1)"></button>
+                    }
+                </div>
+            }
         </div>
     }
     else
@@ -219,6 +228,7 @@
     #endregion
 
     #region Quick Methods
+    private bool HasMultipleNews => EditNewsService.Items.Count > 1;
     private bool CanPrev => WrapAround || CurrentIndex > 0;
     private bool CanNext => WrapAround || CurrentIndex < (EditNewsService.Items.Count - 1);
     private bool CanMoveEarlier => EditModeService.IsEditing && EditNewsService.Items.Count > 1 && CurrentIndex > 0;
