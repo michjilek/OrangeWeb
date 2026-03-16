@@ -46,7 +46,7 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: var(--Photo_gallery_modal_overlay_background_color);
+    background-color: rgba(0, 0, 0, 0.82);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -54,31 +54,165 @@
 }
 
 .modal-content {
-    max-width: 90%;
-    max-height: 90%;
+    --gallery-nav-size: 48px;
+    --gallery-nav-gap: 18px;
+    --modal-close-size: 46px;
+    position: relative;
+    width: min(99vw, 112rem);
+    max-width: 112rem;
+    height: min(96vh, 64rem);
+    max-height: 96vh;
+    padding: 1rem calc(1.5rem + var(--gallery-nav-size) + var(--gallery-nav-gap)) 1rem;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    justify-items: center;
+    align-items: center;
+    gap: 0.75rem;
     text-align: center;
+    border-radius: 28px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
 }
 
     .modal-content:focus {
         outline: none !important;
-        border: none !important;
+        border: 1px solid rgba(255, 255, 255, 0.22) !important;
     }
 
 .full-image {
-    width: 100%;
+    width: auto;
+    max-width: 100%;
     height: auto;
-    max-height: 80vh;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    max-height: 100%;
+    border-radius: 0;
+    box-shadow: none;
     object-fit: contain;
+    align-self: center;
 }
+
+.gallery-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: var(--gallery-nav-size);
+    height: var(--gallery-nav-size);
+    padding: 0;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: white;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+    z-index: 2;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: var(--modal-close-size);
+    height: var(--modal-close-size);
+    padding: 0;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: white;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+    z-index: 3;
+}
+
+    .modal-close svg {
+        width: 22px;
+        height: 22px;
+        pointer-events: none;
+    }
+
+    .modal-close:hover {
+        background: rgba(255, 255, 255, 0.34);
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+    }
+
+    .modal-close:active {
+        transform: scale(0.98);
+    }
+
+    .gallery-nav.prev {
+        left: 1.5rem;
+    }
+
+    .gallery-nav.next {
+        right: 1.5rem;
+    }
+
+    .gallery-nav svg {
+        width: 22px;
+        height: 22px;
+        pointer-events: none;
+    }
+
+    .gallery-nav:hover {
+        background: rgba(255, 255, 255, 0.34);
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+    }
+
+    .gallery-nav:active {
+        transform: translateY(-50%) scale(0.98);
+    }
 
 .image-caption {
     color: var(--Photo_gallery_image_caption_text_color);
     font-size: 16px;
     text-align: center;
-    margin-top: 10px;
+    margin: 0;
+    min-height: 1.75rem;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+@media (max-width: 767px) {
+    .modal-content {
+        --gallery-nav-size: 42px;
+        --gallery-nav-gap: 10px;
+        --modal-close-size: 42px;
+        width: 100vw;
+        max-width: 100vw;
+        height: 100vh;
+        max-height: 100vh;
+        padding: .5rem .5rem .75rem;
+        border-radius: 0;
+    }
+
+    .full-image {
+        width: 100%;
+        max-height: 100%;
+        border-radius: 0;
+    }
+
+        .gallery-nav.prev {
+            left: .5rem;
+        }
+
+        .gallery-nav.next {
+            right: .5rem;
+        }
+
+    .modal-close {
+        top: .5rem;
+        right: .5rem;
+    }
 }
 
 /* =========================

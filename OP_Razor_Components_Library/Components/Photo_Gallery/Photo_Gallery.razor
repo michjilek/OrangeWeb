@@ -54,17 +54,41 @@ else
 {@* MODAL WINDOW *@
     if (!EditModeService.IsEditing)
     {
-        <div class="modal-overlay" @onclick="CloseModal">
+        <div class="modal-overlay">
             <div class="modal-content" tabindex="0"
                  @onkeydown="Move"
                  @ontouchstart="HandleTouchStart"
                  @ontouchend="HandleTouchEnd">
+                <button class="modal-close"
+                        @onclick="CloseModal"
+                        aria-label="Close gallery">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </button>
                 @if (SelectedImage is not null)
-                {                  
-                   var srcSet = GetImageSrcSet(SelectedImage);
-                   var sizes = GetResponsiveSizes(srcSet);
-                                     
+                {
+                    var srcSet = GetImageSrcSet(SelectedImage);
+                    var sizes = GetResponsiveSizes(srcSet);
+
+                        <button class="gallery-nav prev"
+                                @onclick="MovePrevious"
+                                aria-label="Previous image">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M15.5 19l-7-7 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
+
                     <img src="@GetImageSource(SelectedImage)" alt="Full Image" class="full-image" srcset="@srcSet" sizes="@sizes" />
+
+                        <button class="gallery-nav next"
+                                @onclick="MoveNext"
+                                aria-label="Next image">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M8.5 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
+
                     <p class="image-caption mt_less">@SelectedImage.ImageTitle</p>
                 }
             </div>
