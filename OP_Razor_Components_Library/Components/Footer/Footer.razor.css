@@ -12,6 +12,8 @@
 }
 
 .footer_p {
+    position: relative;
+    display: inline-block;
     color: var(--Footer_p_color);
     letter-spacing: 3px;
     font-size: var(--FirstFontSize);
