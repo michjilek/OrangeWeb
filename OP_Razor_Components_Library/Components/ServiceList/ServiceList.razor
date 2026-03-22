@@ -23,6 +23,7 @@
                 <tr>
                     <th><EditableText Id="Services_Service" EditMode="@EditModeService.IsEditing" /></th>
                     <th><EditableText Id="Services_Description" EditMode="@EditModeService.IsEditing" /></th>
+                    <th><EditableText Id="Services_Price" EditMode="@EditModeService.IsEditing" /></th>
                     @if (EditModeService.IsEditing)
                     {
                         <th style="width:1%"></th>
@@ -51,6 +52,16 @@
                             else
                             {
                                 <div style="white-space: pre-line;">@item.Description</div>
+                            }
+                        </td>
+                        <td>
+                            @if (EditModeService.IsEditing)
+                            {
+                                <input class="form-control" @bind="item.Price" disabled="@isSaving" />
+                            }
+                            else
+                            {
+                                @item.Price
                             }
                         </td>
                         @if (EditModeService.IsEditing)
