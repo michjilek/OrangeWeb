@@ -176,7 +176,9 @@
             <label>Current Image:</label>
             @if (!string.IsNullOrEmpty(draftImageUrl))
             {
-                <img src="@draftImageUrl" alt="Current image" class="preview-img" />
+                <div class="preview-frame">
+                    <img src="@draftImageUrl" alt="Current image" class="preview-img" />
+                </div>
             }
 
             <label class="btn" for="news-upload" @onclick="BeginUpload" disabled="@isBusy">
