@@ -1,8 +1,25 @@
 .container {
+    position: relative;
     display: flex;
     flex-direction: column;
     width: 100%;
     margin: 0 auto;
+    padding: 1.25rem;
+    box-sizing: border-box;
+    border-radius: 28px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.12));
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -1px 0 rgba(255, 255, 255, 0.12);
+    overflow: visible;
+}
+
+.container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.14) 18%, rgba(255, 255, 255, 0.03) 45%, rgba(255, 255, 255, 0) 65%);
 }
 
 .service-list__table-wrap {
@@ -149,8 +166,9 @@
 
 .table {
     width: 100%;
-    border-collapse: collapse;
-    margin: 0px 0;
+    border-collapse: separate;
+    border-spacing: 0 12px;
+    margin: 0;
 }
 
     .table th, .table td {
@@ -159,19 +177,42 @@
         font-size: 0.9rem;
         white-space: pre-line;
         line-height: 1.8;
-    }
-
-    .table th {
-        background-color: var(--Service_list_table_th_color) !important;
-        color: var(--Service_list_table_th_text_color);
-    }
-
-    .table th, .table td {
-        border: 1px solid var(--Service_list_table_th_td_border);
+        border: 0;
     }
 
     .table td {
+        position: relative;
+        border-top: 1px solid rgba(255, 255, 255, 0.38);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.28));
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.32), 0 10px 24px rgba(15, 23, 42, 0.04);
         color: inherit;
+    }
+
+    .table th {
+        position: relative;
+        background: rgba(58, 58, 58, 0.82) !important;
+        color: var(--Service_list_table_th_text_color);
+        border-top: 1px solid rgba(255, 255, 255, 0.16);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+        font-weight: 500;
+        vertical-align: middle;
+        line-height: 1.35;
+    }
+
+    .table th:first-child,
+    .table td:first-child {
+        border-left: 1px solid rgba(255, 255, 255, 0.26);
+        border-top-left-radius: 20px;
+        border-bottom-left-radius: 20px;
+    }
+
+    .table th:last-child,
+    .table td:last-child {
+        border-right: 1px solid rgba(255, 255, 255, 0.26);
+        border-top-right-radius: 20px;
+        border-bottom-right-radius: 20px;
     }
 
 /* MEDIA */
@@ -181,7 +222,7 @@
     }
 
     .table th, .table td {
-        padding: 4px;
+        padding: 8px;
     }
 }
 
@@ -293,11 +334,17 @@
         text-align: left;
         font-size: 1rem;
     }
+
+    .table th {
+        padding-top: 16px;
+        padding-bottom: 16px;
+    }
 }
 
 @media (min-width: 1024px) {
     .container {
         width: 93%;
+        padding: 1.5rem;
     }
 }
 
