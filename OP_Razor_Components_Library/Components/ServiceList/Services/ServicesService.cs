@@ -85,6 +85,7 @@ public class ServicesService
     {
         Items.Add(new ServiceListItem
         {
+            ImageKey = CreateImageKey(),
             Name = "",
             Description = "",
             Price = "",
@@ -106,6 +107,12 @@ public class ServicesService
 
         foreach (var item in Items)
         {
+            if (string.IsNullOrWhiteSpace(item.ImageKey))
+            {
+                item.ImageKey = CreateImageKey();
+                changed = true;
+            }
+
             if (string.IsNullOrWhiteSpace(item.QrCodeKey))
             {
                 item.QrCodeKey = CreateQrCodeKey();
@@ -119,6 +126,11 @@ public class ServicesService
     private static string CreateQrCodeKey()
     {
         return $"Service_QR_{Guid.NewGuid():N}";
+    }
+
+    private static string CreateImageKey()
+    {
+        return $"Service_IMG_{Guid.NewGuid():N}";
     }
     #endregion
 }

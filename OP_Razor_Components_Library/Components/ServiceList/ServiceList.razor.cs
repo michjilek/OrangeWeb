@@ -109,6 +109,11 @@ public partial class ServiceList : IDisposable
         return string.IsNullOrWhiteSpace(item?.Name) ? "QR code" : $"{item.Name} QR code";
     }
 
+    private static string GetServiceImageAlt(ServiceListItem item)
+    {
+        return string.IsNullOrWhiteSpace(item?.Name) ? "Service image" : $"{item.Name} image";
+    }
+
     private static string GetQrOpenLabel(ServiceListItem item)
     {
         return string.IsNullOrWhiteSpace(item?.Name) ? "Open QR code" : $"Open QR code for {item.Name}";
@@ -135,6 +140,7 @@ public partial class ServiceList : IDisposable
 #region Other Classes
 public class ServiceListItem
 {
+    public string ImageKey { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
     public string Price { get; set; }

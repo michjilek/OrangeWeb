@@ -5,6 +5,8 @@
     justify-content: center;
     text-align: center;
     margin: 0 auto;
+    width: min(92vw, 90rem);
+    max-width: 100%;
 }
 
 h1 {
@@ -18,6 +20,6 @@ h1 {
 /* 1024px – Tablety (na šířku), malé notebooky */
 @media (min-width: 1024px) {
     .container {
-        max-width: 1024px;
+        width: min(92vw, 90rem);
     }
 }
