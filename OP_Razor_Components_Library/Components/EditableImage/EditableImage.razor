@@ -76,6 +76,10 @@
                        OnChange="HandleImageChange" />
 
             <div class="modal-actions">
+                @if (!string.IsNullOrWhiteSpace(Src))
+                {
+                    <button class="btn" @onclick="DeleteEdit">Delete</button>
+                }
                 <button class="btn" @onclick="SaveEdit">Save</button>
                 <button class="btn" @onclick="CancelEdit">Cancel</button>
             </div>
@@ -192,6 +196,19 @@
         }
 
         // Reset modal and temporary state.
+        IsEditorOpen = false;
+        uploadedImage = null;
+        draftImageUrl = null;
+
+        StateHasChanged();
+    }
+
+    private async Task DeleteEdit()
+    {
+        await EditImageService.DeleteImageAndMapAsync(Key);
+
+        Src = "";
+        _objectKey = null;
         IsEditorOpen = false;
         uploadedImage = null;
         draftImageUrl = null;

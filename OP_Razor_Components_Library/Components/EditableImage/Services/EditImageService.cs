@@ -93,6 +93,15 @@ public class EditImageService
             });
         }
     }
+    public void Remove(string logicalKey)
+    {
+        if (_map is null || string.IsNullOrWhiteSpace(logicalKey))
+        {
+            return;
+        }
+
+        _map.RemoveAll(x => string.Equals(x.ImageTag, logicalKey, StringComparison.OrdinalIgnoreCase));
+    }
     // Persist YAML to disk
     public async Task SaveToYamlAsync()
     {
@@ -138,6 +147,12 @@ public class EditImageService
 
         await CleanUnusedImagesAsync(MinIoFolder, includeOtherLanguageMaps);
         return objectKey;
+    }
+    public async Task DeleteImageAndMapAsync(string key, bool includeOtherLanguageMaps = true)
+    {
+        Remove(key);
+        await SaveToYamlAsync();
+        await CleanUnusedImagesAsync(MinIoFolder, includeOtherLanguageMaps);
     }
     // Delete objects under the relativeFolder that are not referenced in YAML files
     public async Task CleanUnusedImagesAsync(string relativeFolder = "", bool includeOtherLanguageMaps = true)
