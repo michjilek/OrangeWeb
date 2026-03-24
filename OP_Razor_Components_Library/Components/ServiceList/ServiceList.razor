@@ -76,11 +76,16 @@
                                         }
                                         else
                                         {
-                                            <img src="@image.Src"
-                                                 srcset="@image.SrcSet"
-                                                 sizes="@image.Sizes"
-                                                 alt="@($"{item.Name} QR code")"
-                                                 class="service-list__qr-image" />
+                                            <button type="button"
+                                                    class="service-list__qr-button"
+                                                    @onclick="() => OpenQrModal(image.Src, GetQrImageAlt(item))"
+                                                    aria-label="@GetQrOpenLabel(item)">
+                                                <img src="@image.Src"
+                                                     srcset="@image.SrcSet"
+                                                     sizes="@image.Sizes"
+                                                     alt="@GetQrImageAlt(item)"
+                                                     class="service-list__qr-image" />
+                                            </button>
                                         }
                                     </ImageContent>
                                 </EditableImage>
@@ -128,6 +133,26 @@
                     @toastMessage
                 </div>
             </div>
+        </div>
+    </div>
+}
+
+@if (isQrModalOpen && !string.IsNullOrWhiteSpace(selectedQrImageSrc))
+{
+    <div class="service-list__modal-overlay" @onclick="CloseQrModal">
+        <div class="service-list__modal-content" @onclick:stopPropagation="true">
+            <button type="button"
+                    class="service-list__modal-close"
+                    @onclick="CloseQrModal"
+                    aria-label="Close QR preview">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg>
+            </button>
+
+            <img src="@selectedQrImageSrc"
+                 alt="@selectedQrImageAlt"
+                 class="service-list__modal-image" />
         </div>
     </div>
 }

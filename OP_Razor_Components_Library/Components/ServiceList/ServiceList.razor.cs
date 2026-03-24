@@ -20,6 +20,9 @@ public partial class ServiceList : IDisposable
     private string toastMessage = string.Empty;         // nap�. "Ulo�eno ?" / "Chyba p�i ukl�d�n�"
     private bool toastIsError;                          // true => error, false => success
     private string ToastBgClass => toastIsError ? "text-bg-danger" : "text-bg-success";
+    private bool isQrModalOpen;
+    private string selectedQrImageSrc;
+    private string selectedQrImageAlt;
 
     #endregion
 
@@ -80,6 +83,35 @@ public partial class ServiceList : IDisposable
     private void HandleEditModeChanged()
     {
         InvokeAsync(StateHasChanged);
+    }
+
+    private void OpenQrModal(string imageSrc, string imageAlt)
+    {
+        if (string.IsNullOrWhiteSpace(imageSrc))
+        {
+            return;
+        }
+
+        selectedQrImageSrc = imageSrc;
+        selectedQrImageAlt = imageAlt;
+        isQrModalOpen = true;
+    }
+
+    private void CloseQrModal()
+    {
+        isQrModalOpen = false;
+        selectedQrImageSrc = null;
+        selectedQrImageAlt = null;
+    }
+
+    private static string GetQrImageAlt(ServiceListItem item)
+    {
+        return string.IsNullOrWhiteSpace(item?.Name) ? "QR code" : $"{item.Name} QR code";
+    }
+
+    private static string GetQrOpenLabel(ServiceListItem item)
+    {
+        return string.IsNullOrWhiteSpace(item?.Name) ? "Open QR code" : $"Open QR code for {item.Name}";
     }
     #endregion
 

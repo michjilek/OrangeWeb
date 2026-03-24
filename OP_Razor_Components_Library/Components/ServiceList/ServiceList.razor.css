@@ -25,6 +25,14 @@
     height: 96px;
 }
 
+.service-list__qr-button {
+    display: block;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
 .service-list__qr-image {
     display: block;
     object-fit: contain;
@@ -36,8 +44,67 @@
     justify-content: center;
     border: 1px dashed var(--Service_list_table_th_td_border);
     border-radius: 6px;
-    color: var(--Service_list_table_th_text_color);
+    color: inherit;
     font-size: 0.85rem;
+}
+
+.service-list__modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.82);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1100;
+    padding: 1rem;
+}
+
+.service-list__modal-content {
+    position: relative;
+    width: min(90vw, 38rem);
+    height: min(90vh, 38rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    border-radius: 28px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+
+.service-list__modal-image {
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: 100%;
+    display: block;
+    object-fit: contain;
+}
+
+.service-list__modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.22);
+    color: white;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+    cursor: pointer;
+}
+
+.service-list__modal-close svg {
+    width: 22px;
+    height: 22px;
+    pointer-events: none;
 }
 
 .table {
