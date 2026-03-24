@@ -1,4 +1,5 @@
-﻿@using OP_Razor_Components_Library.Components.EditableText
+@using OP_Razor_Components_Library.Components.EditableImage
+@using OP_Razor_Components_Library.Components.EditableText
 
 <div class="container">
     @if (ServicesService.Items == null)
@@ -24,6 +25,7 @@
                     <th><EditableText Id="Services_Service" EditMode="@EditModeService.IsEditing" /></th>
                     <th><EditableText Id="Services_Description" EditMode="@EditModeService.IsEditing" /></th>
                     <th><EditableText Id="Services_Price" EditMode="@EditModeService.IsEditing" /></th>
+                    <th><EditableText Id="Services_QRCode" EditMode="@EditModeService.IsEditing" /></th>
                     @if (EditModeService.IsEditing)
                     {
                         <th style="width:1%"></th>
@@ -63,6 +65,26 @@
                             {
                                 @item.Price
                             }
+                        </td>
+                        <td class="service-list__qr-cell">
+                            <div class="service-list__qr-wrapper">
+                                <EditableImage Key="@item.QrCodeKey" Sizes="96px" @key="item.QrCodeKey">
+                                    <ImageContent Context="image">
+                                        @if (string.IsNullOrWhiteSpace(image.Src))
+                                        {
+                                            <div class="service-list__qr-placeholder">QR</div>
+                                        }
+                                        else
+                                        {
+                                            <img src="@image.Src"
+                                                 srcset="@image.SrcSet"
+                                                 sizes="@image.Sizes"
+                                                 alt="@($"{item.Name} QR code")"
+                                                 class="service-list__qr-image" />
+                                        }
+                                    </ImageContent>
+                                </EditableImage>
+                            </div>
                         </td>
                         @if (EditModeService.IsEditing)
                         {
@@ -109,3 +131,4 @@
         </div>
     </div>
 }
+

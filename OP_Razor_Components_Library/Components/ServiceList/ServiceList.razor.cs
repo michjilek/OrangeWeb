@@ -17,7 +17,7 @@ public partial class ServiceList : IDisposable
     #region Private Properties
     private bool isSaving;
     private bool showToast;
-    private string toastMessage = string.Empty;         // napø. "Uloženo ?" / "Chyba pøi ukládání"
+    private string toastMessage = string.Empty;         // napï¿½. "Uloï¿½eno ?" / "Chyba pï¿½i uklï¿½dï¿½nï¿½"
     private bool toastIsError;                          // true => error, false => success
     private string ToastBgClass => toastIsError ? "text-bg-danger" : "text-bg-success";
 
@@ -54,12 +54,12 @@ public partial class ServiceList : IDisposable
         try
         {
             await ServicesService.SaveAsync(Env.ContentRootPath);
-            toastMessage = TranslationsService.GetText("Saved");      // pøidej si klíè do YAML (napø. "Uloženo ?")
+            toastMessage = TranslationsService.GetText("Saved");      // pï¿½idej si klï¿½ï¿½ do YAML (napï¿½. "Uloï¿½eno ?")
             toastIsError = false;
         }
         catch
         {
-            toastMessage = TranslationsService.GetText("Error");  // pøidej klíè (napø. "Chyba pøi ukládání")
+            toastMessage = TranslationsService.GetText("Error");  // pï¿½idej klï¿½ï¿½ (napï¿½. "Chyba pï¿½i uklï¿½dï¿½nï¿½")
             toastIsError = true;
         }
         finally
@@ -106,5 +106,6 @@ public class ServiceListItem
     public string Name { get; set; }
     public string Description { get; set; }
     public string Price { get; set; }
+    public string QrCodeKey { get; set; }
 }
 #endregion

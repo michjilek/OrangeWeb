@@ -60,7 +60,9 @@
             @* Use local data-URL preview if available. *@
             @if (!string.IsNullOrEmpty(draftImageUrl))
             {
-                <img src="@draftImageUrl" alt="Current Image" class="preview-img"/>
+                <div class="preview-frame">
+                    <img src="@draftImageUrl" alt="Current Image" class="preview-img" />
+                </div>
             }
 
             @* Clicking the label triggers hidden <InputFile>. We also show the loader immediately. *@

@@ -59,6 +59,7 @@ public class ServicesService
                 {
                     await using var fileStream = File.OpenRead(yamlPath);
                     Items = _yamlService.LoadYamlList<ServiceListItem>(yamlPath, fileStream) ?? new();
+                    EnsureQrCodeKeys();
                 }
             }
             catch (Exception ex)
@@ -74,11 +75,18 @@ public class ServicesService
     }
     public async Task SaveAsync(string webRootPath)
     {
+        EnsureQrCodeKeys();
         await _yamlService.SaveToYamlAsync(Items, FileName);
     }
     public void AddNewItem()
     {
-        Items.Add(new ServiceListItem { Name = "", Description = "", Price = "" });
+        Items.Add(new ServiceListItem
+        {
+            Name = "",
+            Description = "",
+            Price = "",
+            QrCodeKey = CreateQrCodeKey()
+        });
     }
     public void RemoveItem(ServiceListItem item)
     {
@@ -87,6 +95,22 @@ public class ServicesService
     public void ChangeLangFile(string language)
     {
         FileName = language.ToLower() == "cs" ? FileName_orig : FileName_en;
+    }
+
+    private void EnsureQrCodeKeys()
+    {
+        foreach (var item in Items)
+        {
+            if (string.IsNullOrWhiteSpace(item.QrCodeKey))
+            {
+                item.QrCodeKey = CreateQrCodeKey();
+            }
+        }
+    }
+
+    private static string CreateQrCodeKey()
+    {
+        return $"Service_QR_{Guid.NewGuid():N}";
     }
     #endregion
 }
