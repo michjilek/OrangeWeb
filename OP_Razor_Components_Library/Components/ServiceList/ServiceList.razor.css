@@ -386,7 +386,6 @@
     .btn-dark:hover:not(:disabled) {
         background-color: var(--Service_list_button_dark_background_color_hover);
         border-color: var(--Service_list_button_dark_border_color_hover);
-        transform: translateY(-1px);
         box-shadow: 0 3px 8px var(--Service_list_button_dark_shadow_color_hover);
     }
 
