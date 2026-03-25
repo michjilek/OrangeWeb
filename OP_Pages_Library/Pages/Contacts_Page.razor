@@ -10,6 +10,7 @@
 @inject EditModeService EditModeService
 @inject TranslationsService TranslationsService
 @inject IContactFormSender ContactFormSender
+@implements IDisposable
 
 <h1 class="uppercase-text mb"><EditableText Id="Contacts_title" EditMode="@EditModeService.IsEditing" /></h1>
 
@@ -31,90 +32,111 @@
             </div>
         </div>
         <div class="left_panel">
-            <div class="left_panel_item_component">
-                <div class="left_panel_item">
-                    <div class="icon">
-                        <div class="border">
-                            <Svg_place />
+            @if (ShouldShowContactItem("Contacts_place"))
+            {
+                <div class="left_panel_item_component">
+                    <div class="left_panel_item">
+                        <div class="icon">
+                            <div class="border">
+                                <Svg_place />
+                            </div>
+                        </div>
+                        <div class="text">
+                            <EditableText Id="Contacts_place" EditMode="@EditModeService.IsEditing" />
                         </div>
                     </div>
-                    <div class="text">
-                        <EditableText Id="Contacts_place" EditMode="@EditModeService.IsEditing" />
-                    </div>
                 </div>
-            </div>
-            <div class="left_panel_item_component">
-                <div class="left_panel_item">
-                    <div class="icon">
-                        <div class="border">
-                            <Svg_phone />
+            }
+            @if (ShouldShowContactItem("Contacts_phone"))
+            {
+                <div class="left_panel_item_component">
+                    <div class="left_panel_item">
+                        <div class="icon">
+                            <div class="border">
+                                <Svg_phone />
+                            </div>
+                        </div>
+                        <div class="text">
+                            <EditableText Id="Contacts_phone" EditMode="@EditModeService.IsEditing" />
                         </div>
                     </div>
-                    <div class="text">
-                        <EditableText Id="Contacts_phone" EditMode="@EditModeService.IsEditing" />
-                    </div>
                 </div>
-            </div>
-            <div class="left_panel_item_component">
-                <div class="left_panel_item">
-                    <div class="icon">
-                        <div class="border">
-                            <Svg_mail />
+            }
+            @if (ShouldShowContactItem("Contacts_mail"))
+            {
+                <div class="left_panel_item_component">
+                    <div class="left_panel_item">
+                        <div class="icon">
+                            <div class="border">
+                                <Svg_mail />
+                            </div>
+                        </div>
+                        <div class="text">
+                            <EditableText Id="Contacts_mail" EditMode="@EditModeService.IsEditing" />
                         </div>
                     </div>
-                    <div class="text">
-                        <EditableText Id="Contacts_mail" EditMode="@EditModeService.IsEditing" />
-                    </div>
                 </div>
-            </div>
-            <div class="left_panel_item_component">
-                <div class="left_panel_item">
-                    <div class="icon">
-                        <div class="border">
-                            <Svg_message />
+            }
+            @if (ShouldShowContactItem("Contacts_bank_account"))
+            {
+                <div class="left_panel_item_component">
+                    <div class="left_panel_item">
+                        <div class="icon">
+                            <div class="border">
+                                <Svg_message />
+                            </div>
+                        </div>
+                        <div class="text">
+                            <EditableText Id="Contacts_bank_account" EditMode="@EditModeService.IsEditing" />
                         </div>
                     </div>
-                    <div class="text">
-                        <EditableText Id="Contacts_bank_account" EditMode="@EditModeService.IsEditing" />
-                    </div>
                 </div>
-            </div>
-            <div class="left_panel_item_component">
-                <div class="left_panel_item">
-                    <div class="icon">
-                        <div class="border">
-                            <Svg_message />
+            }
+            @if (ShouldShowContactItem("Contacts_ico"))
+            {
+                <div class="left_panel_item_component">
+                    <div class="left_panel_item">
+                        <div class="icon">
+                            <div class="border">
+                                <Svg_message />
+                            </div>
+                        </div>
+                        <div class="text">
+                            <EditableText Id="Contacts_ico" EditMode="@EditModeService.IsEditing" />
                         </div>
                     </div>
-                    <div class="text">
-                        <EditableText Id="Contacts_ico" EditMode="@EditModeService.IsEditing" />
-                    </div>
                 </div>
-            </div>
-            <div class="left_panel_item_component">
-                <div class="left_panel_item">
-                    <div class="icon">
-                        <div class="border">
-                            <Svg_phone />
+            }
+            @if (ShouldShowContactItem("Contacts_opening_hours"))
+            {
+                <div class="left_panel_item_component">
+                    <div class="left_panel_item">
+                        <div class="icon">
+                            <div class="border">
+                                <Svg_phone />
+                            </div>
+                        </div>
+                        <div class="text">
+                            <EditableText Id="Contacts_opening_hours" EditMode="@EditModeService.IsEditing" />
                         </div>
                     </div>
-                    <div class="text">
-                        <EditableText Id="Contacts_opening_hours" EditMode="@EditModeService.IsEditing" />
-                    </div>
                 </div>
-            </div>
-            <div class="left_panel_item_component">
-                <div class="left_panel_item">
-                    <div class="icon">
-                        <div class="border">
-                            <Svg_phone />
+            }
+            @if (ShouldShowContactItem("Contacts_ordering_hours"))
+            {
+                <div class="left_panel_item_component">
+                    <div class="left_panel_item">
+                        <div class="icon">
+                            <div class="border">
+                                <Svg_phone />
+                            </div>
+                        </div>
+                        <div class="text">
+                            <EditableText Id="Contacts_ordering_hours" EditMode="@EditModeService.IsEditing" />
                         </div>
                     </div>
-                    <div class="text">
-                        <EditableText Id="Contacts_ordering_hours" EditMode="@EditModeService.IsEditing" />
-                    </div>
                 </div>
-            </div>
+            }
         </div>
     </div>
     <div class="contacts_form_panel">
@@ -135,10 +157,17 @@
 
         // Register On Edit Change Title
         EditModeService.OnEditModeChanged += HandleEditModeChanged;
+        TranslationsService.OnChange += HandleTranslationsChanged;
 
         //isLoaded = true;
     }
     #endregion
+
+    public void Dispose()
+    {
+        EditModeService.OnEditModeChanged -= HandleEditModeChanged;
+        TranslationsService.OnChange -= HandleTranslationsChanged;
+    }
 
     #region Handle
     private void HandleEditModeChanged()
@@ -146,6 +175,23 @@
         // Redraw the component when the edit mode changes
         InvokeAsync(StateHasChanged);
     }
+
+    private void HandleTranslationsChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private bool ShouldShowContactItem(string id)
+    {
+        if (EditModeService.IsEditing)
+        {
+            return true;
+        }
+
+        var text = TranslationsService.GetText(id);
+        return !string.IsNullOrWhiteSpace(text);
+    }
+
     // Handle form submission
     private async Task OnSubmitValueClicked(ContactFormModel formModel)
     {
