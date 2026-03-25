@@ -48,6 +48,7 @@ p {
 .text_about {
     display: flex;
     flex-direction: column;
+    justify-content: center;
     gap: 12px;
 }
 
@@ -59,7 +60,7 @@ p {
 
     .content_about {
         flex-direction: row; /* SIDE BY SIDE */
-        align-items: flex-start;
+        align-items: center;
         gap: 32px;
         text-align: left; /* align text to the left */
     }
