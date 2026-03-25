@@ -65,6 +65,31 @@ h1 {
             max-width: var(--contacts_left_panel_min_width);
             align-self: start;
             flex: 1;
+            position: relative;
+        }
+
+        .contacts_logo_overlay {
+            position: absolute;
+            left: 39.2%;
+            top: 62.6%;
+            width: 76px;
+            height: 44px;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+            overflow: visible;
+            border-radius: 3px;
+            z-index: 1;
+        }
+
+        .contacts_logo_overlay_image {
+            display: block;
+            width: 52px;
+            height: 20px;
+            object-fit: contain;
+            object-position: center;
         }
 
         .left_panel {
