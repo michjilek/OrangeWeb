@@ -39,6 +39,7 @@ p {
         display: block;
         width: 100%;
         height: auto;
+        max-height: 24rem;
         object-fit: contain; /* entire image visible; you can use "cover" if you want it to fill */
         object-position: center;
     }
