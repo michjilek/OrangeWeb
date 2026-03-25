@@ -152,8 +152,17 @@ h1 {
     padding: var(--contacts_right_panel_paddinf_top) var(--contacts_gap);
 }
 
+.contacts_form_panel {
+    display: flex;
+    align-self: flex-end;
+}
+
 @media (max-width: 700px) {
     .contacts_border {
         justify-content: center;
+    }
+
+    .contacts_form_panel {
+        align-self: stretch;
     }
 }
