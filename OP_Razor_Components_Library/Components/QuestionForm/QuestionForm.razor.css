@@ -64,7 +64,7 @@
             justify-content: center;
         }
 
-        .item_component .border ::deep .svg-mail-icon {
+        .item_component .border ::deep .svg-material-icon {
             display: block;
             line-height: 1;
         }
@@ -83,6 +83,7 @@
 
     .item_component.message .text_placeholder {
         align-items: flex-start !important;
+        background-color: aqua;
     }
 
 .panel .item_component .border {
