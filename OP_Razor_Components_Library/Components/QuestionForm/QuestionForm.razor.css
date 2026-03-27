@@ -64,10 +64,11 @@
     justify-content: center;
 }
 
-.item_component .border ::deep .svg-material-icon {
-    display: block;
-    line-height: 1;
-}
+/*.item_component .border ::deep .svg-material-icon {*/
+/*    .item_component .border ::deep svg-send-icon {
+        display: block;
+        line-height: 1;
+    }*/
 
 .item_component.message {
     flex: 1 1 auto;
