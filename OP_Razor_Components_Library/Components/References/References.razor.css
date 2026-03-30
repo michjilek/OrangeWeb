@@ -26,9 +26,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 28px;
-    min-height: 280px;
-    padding: 74px 24px 42px;
+    gap: 22px;
+    min-height: 0;
+    padding: 82px 24px 48px;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.46));
     border: 1px solid rgba(255, 255, 255, 0.56);
     box-shadow: 0 10px 34px rgba(15, 23, 42, 0.08);
@@ -66,10 +66,10 @@
 
 .reference-text {
     margin: 0;
-    max-width: 980px;
+    max-width: 1120px;
     color: var(--DarkGrayColor);
-    font-size: clamp(1.05rem, 1rem + 0.45vw, 1.35rem);
-    line-height: 1.7;
+    font-size: clamp(0.98rem, 0.94rem + 0.22vw, 1.12rem);
+    line-height: 1.6;
     text-align: center;
     white-space: pre-line;
 }
@@ -78,13 +78,14 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 2px;
+    margin-top: 2px;
 }
 
 .reference-author {
     margin: 0;
     color: var(--BlackColor);
-    font-size: clamp(1.2rem, 1.05rem + 0.25vw, 1.45rem);
+    font-size: clamp(1.02rem, 0.98rem + 0.18vw, 1.16rem);
     font-weight: 700;
     text-align: center;
 }
@@ -92,7 +93,7 @@
 .reference-subtitle {
     margin: 0;
     color: var(--GrayMoreDarkerColor);
-    font-size: 1rem;
+    font-size: 0.92rem;
     text-align: center;
 }
 
@@ -293,8 +294,7 @@
     }
 
     .reference-body {
-        min-height: 0;
-        padding: 72px 18px 28px;
+        padding: 68px 18px 30px;
     }
 
     .reference-controls {
