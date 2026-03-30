@@ -26,7 +26,8 @@ public sealed class NavigationService
                 new NavigationItem { Id = Guid.NewGuid(), Href="/photo_gallery", TextId="Photogallery_menu_item", Order=10 },
                 new NavigationItem { Id = Guid.NewGuid(), Href="/service_list",  TextId="Services_menu_item",     Order=20 },
                 new NavigationItem { Id = Guid.NewGuid(), Href="/about_us",      TextId="About_us_menu_item",    Order=30 },
-                new NavigationItem { Id = Guid.NewGuid(), Href="/contacts",      TextId="Contacts_menu_item",    Order=30 }
+                new NavigationItem { Id = Guid.NewGuid(), Href="/reference",     TextId="References_menu_item",  Order=40 },
+                new NavigationItem { Id = Guid.NewGuid(), Href="/contacts",      TextId="Contacts_menu_item",    Order=50 }
             };
 
             initialized = true;

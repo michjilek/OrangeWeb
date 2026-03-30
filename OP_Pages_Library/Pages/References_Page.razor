@@ -1,0 +1,13 @@
+@page "/reference"
+@using OP_Razor_Components_Library.Components.EditableText
+@using OP_Razor_Components_Library.Components.References
+@using OP_Shared_Library.Services
+@inject EditModeService EditModeService
+
+<section class="references-page">
+    <h1 class="uppercase-text mb">
+        <EditableText Id="References_title" EditMode="@EditModeService.IsEditing" />
+    </h1>
+
+    <References />
+</section>
