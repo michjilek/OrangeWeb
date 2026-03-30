@@ -29,7 +29,7 @@ h1 {
 .contacts_border {
     position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 620px) minmax(293px, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
     max-width: var(--contacts_border_max_width);
     width: 100%;
     border-radius: var(--contacts_border_radius);
@@ -85,7 +85,7 @@ h1 {
 
         .contacts_logo_overlay {
             position: absolute;
-            left: 39.2%;
+            left: 33.6%;
             top: 62.6%;
             width: 76px;
             height: 44px;
@@ -173,6 +173,7 @@ h1 {
 
 .contacts_form_panel {
     display: flex;
+    justify-self: end;
     align-self: flex-end;
     position: relative;
     z-index: 1;

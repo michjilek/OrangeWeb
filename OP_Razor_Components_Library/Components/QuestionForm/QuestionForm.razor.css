@@ -19,7 +19,7 @@
     align-content: stretch;
     justify-content: start;
     row-gap: var(--question_form_row_gap_small);
-    }
+}
 
 .item_component {
     width: var(--question_form_left_panel_min_width);
