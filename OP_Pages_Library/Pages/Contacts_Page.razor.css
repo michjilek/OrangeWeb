@@ -78,14 +78,15 @@ h1 {
             justify-items: center;
             justify-content: stretch;
             min-height: 172px;
+            width: 100%;
             max-width: var(--contacts_left_panel_min_width);
-            align-self: start;
+            align-self: center;
             position: relative;
         }
 
         .contacts_logo_overlay {
             position: absolute;
-            left: 33.6%;
+            left: 38.6%;
             top: 62.6%;
             width: 76px;
             height: 44px;
