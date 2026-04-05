@@ -15,7 +15,6 @@ public class TranslationsService
     #region Private Properties
     private string _language = "cs";
     private readonly SemaphoreSlim _lock = new(1, 1);
-    private Task? _loadTask;
     #endregion
 
     #region Public Properties
@@ -38,9 +37,9 @@ public class TranslationsService
     #region Public Methods
     public Task LoadAsync()
     {
-        return _loadTask ??= LoadCoreAsync();
+        return LoadCoreAsync(_language);
     }
-    public async Task LoadCoreAsync()
+    public async Task LoadCoreAsync(string language)
     {
         // We need to use Lock because of possible concurrent calls
         await _lock.WaitAsync();
@@ -49,7 +48,7 @@ public class TranslationsService
         {
             try
             {
-                var file = $"{_language}.yaml";
+                var file = $"{language}.yaml";
                 var yamlPath = _yamlService.EnsureYamlPath(file);
 
                 // Primary source: resolved YAML path from YamlService
@@ -70,7 +69,6 @@ public class TranslationsService
         finally
         {
             _lock.Release();
-            _loadTask = null;
         }
     }
     public string GetText(string name)
@@ -83,7 +81,7 @@ public class TranslationsService
 
         SetCulture(language);
 
-        await LoadAsync();
+        await LoadCoreAsync(language);
     }
     public async Task UpdateTranslationAsync(string id, string newText, string webRootPath)
     {
@@ -98,7 +96,7 @@ public class TranslationsService
             Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             await File.WriteAllTextAsync(path, yaml, Encoding.UTF8);
 
-            await LoadAsync();
+            await LoadCoreAsync(_language);
         }
     }
     public string GetLanguage()

@@ -17,19 +17,22 @@ public partial class MainLayout : IDisposable
 
     #region Private Properties
     private CompanyBrandingOptions Branding => BrandingOptions?.Value ?? new CompanyBrandingOptions();
-    private string currentLang = "cs"; // nebo si to vezmi z TranslationsService
+    private string currentLang = "cs";
     #endregion
 
     #region Ctor
     protected override async Task OnInitializedAsync()
     {
         await Translations.LoadAsync();
+        currentLang = Translations.GetLanguage();
 
         EditModeService.OnEditModeChanged += HandleEditModeChanged;
+        Translations.OnChange += HandleTranslationsChanged;
     }
     public void Dispose()
     {
         EditModeService.OnEditModeChanged -= HandleEditModeChanged;
+        Translations.OnChange -= HandleTranslationsChanged;
     }
     #endregion
 
@@ -39,13 +42,12 @@ public partial class MainLayout : IDisposable
         // Save state to Globals
         Globals.Instance.IsOnlineGlobal = isOnline;
     }
-    public void OnLanguageChanged(string newLang)
+    public async Task OnLanguageChanged(string newLang)
     {
         currentLang = newLang;
-        // zavolej svou metodu zde
-        // napø. TranslationsService.SetLanguage(newLang);
-        // NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true); // pøípadnì refresh
+        await Translations.ChangeLanguageAsync(newLang);
         Log.Information($"Language changed to {newLang}");
+        await InvokeAsync(StateHasChanged);
     }
     public void ToggleEditMode()
     {
@@ -57,6 +59,11 @@ public partial class MainLayout : IDisposable
     private void HandleEditModeChanged()
     {
         // Redraw the component when the edit mode changes
+        InvokeAsync(StateHasChanged);
+    }
+    private void HandleTranslationsChanged()
+    {
+        currentLang = Translations.GetLanguage();
         InvokeAsync(StateHasChanged);
     }
     #endregion
