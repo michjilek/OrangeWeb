@@ -11,9 +11,9 @@ public class ServicesService
     #endregion
 
     #region Private Properties
-    private const string FileName_orig = "servicelist.yaml";
-    private const string FileName_en = "servicelist_en.yaml";
-    private string FileName;
+    private const string FileNameCs = "servicelist.yaml";
+    private const string FileNameEn = "servicelist_en.yaml";
+    private string _currentLanguage = "cs";
     private readonly SemaphoreSlim _lock = new(1, 1);
     private Task? _loadTask;
     #endregion
@@ -38,8 +38,7 @@ public class ServicesService
     #region Public Methods
     public async Task LoadAsync(string language)
     {
-        ChangeLangFile(language);
-
+        _currentLanguage = NormalizeLanguage(language);
         await LoadCoreAsync();
     }
     public async Task LoadCoreAsync()
@@ -53,16 +52,17 @@ public class ServicesService
             {
                 // Primary source: resolved YAML path from YamlService
                 // (external Configs/<brand>/Data when configured, else wwwroot/data).
-                var yamlPath = _yamlService.EnsureYamlPath(FileName);
+                var sharedItems = await LoadYamlAsync(FileNameCs);
+                EnsureItemKeys(sharedItems);
 
-                if (File.Exists(yamlPath))
+                if (_currentLanguage == "cs")
                 {
-                    await using var fileStream = File.OpenRead(yamlPath);
-                    Items = _yamlService.LoadYamlList<ServiceListItem>(yamlPath, fileStream) ?? new();
-                    if (EnsureQrCodeKeys())
-                    {
-                        await _yamlService.SaveToYamlAsync(Items, FileName);
-                    }
+                    Items = CloneItems(sharedItems);
+                }
+                else
+                {
+                    var localizedItems = await LoadYamlAsync(FileNameEn);
+                    Items = MergeSharedAndLocalized(sharedItems, localizedItems);
                 }
             }
             catch (Exception ex)
@@ -78,8 +78,27 @@ public class ServicesService
     }
     public async Task SaveAsync(string webRootPath)
     {
-        EnsureQrCodeKeys();
-        await _yamlService.SaveToYamlAsync(Items, FileName);
+        EnsureItemKeys(Items);
+
+        var sharedItems = await LoadYamlAsync(FileNameCs);
+        var localizedItems = await LoadYamlAsync(FileNameEn);
+
+        if (_currentLanguage == "cs")
+        {
+            var itemsToSave = CloneItems(Items);
+            await _yamlService.SaveToYamlAsync(itemsToSave, FileNameCs);
+
+            var synchronizedLocalizedItems = ProjectLocalizedItems(itemsToSave, localizedItems);
+            await _yamlService.SaveToYamlAsync(synchronizedLocalizedItems, FileNameEn);
+        }
+        else
+        {
+            var synchronizedSharedItems = ProjectSharedItems(Items, sharedItems);
+            await _yamlService.SaveToYamlAsync(synchronizedSharedItems, FileNameCs);
+
+            var localizedToSave = ProjectLocalizedItems(Items, localizedItems);
+            await _yamlService.SaveToYamlAsync(localizedToSave, FileNameEn);
+        }
     }
     public void AddNewItem()
     {
@@ -96,16 +115,125 @@ public class ServicesService
     {
         Items.Remove(item);
     }
-    public void ChangeLangFile(string language)
+    private static string NormalizeLanguage(string language)
     {
-        FileName = language.ToLower() == "cs" ? FileName_orig : FileName_en;
+        return string.Equals(language, "en", StringComparison.OrdinalIgnoreCase) ? "en" : "cs";
     }
 
-    private bool EnsureQrCodeKeys()
+    private async Task<List<ServiceListItem>> LoadYamlAsync(string fileName)
+    {
+        var yamlPath = _yamlService.EnsureYamlPath(fileName);
+        if (!File.Exists(yamlPath))
+        {
+            return new();
+        }
+
+        await using var fileStream = File.OpenRead(yamlPath);
+        return _yamlService.LoadYamlList<ServiceListItem>(yamlPath, fileStream) ?? new();
+    }
+
+    private static List<ServiceListItem> CloneItems(List<ServiceListItem> items)
+    {
+        return items.Select(item => new ServiceListItem
+        {
+            ImageKey = item.ImageKey,
+            Name = item.Name,
+            Description = item.Description,
+            Price = item.Price,
+            QrCodeKey = item.QrCodeKey
+        }).ToList();
+    }
+
+    private static ServiceListItem? FindMatchingItem(List<ServiceListItem> items, string imageKey, int index)
+    {
+        var byImageKey = !string.IsNullOrWhiteSpace(imageKey)
+            ? items.FirstOrDefault(item => string.Equals(item.ImageKey, imageKey, StringComparison.Ordinal))
+            : null;
+
+        if (byImageKey is not null)
+        {
+            return byImageKey;
+        }
+
+        if (index >= 0 && index < items.Count)
+        {
+            return items[index];
+        }
+
+        return null;
+    }
+
+    private static List<ServiceListItem> MergeSharedAndLocalized(List<ServiceListItem> sharedItems, List<ServiceListItem> localizedItems)
+    {
+        var result = new List<ServiceListItem>();
+
+        for (var i = 0; i < sharedItems.Count; i++)
+        {
+            var sharedItem = sharedItems[i];
+            var localizedItem = FindMatchingItem(localizedItems, sharedItem.ImageKey, i);
+
+            result.Add(new ServiceListItem
+            {
+                ImageKey = sharedItem.ImageKey,
+                QrCodeKey = sharedItem.QrCodeKey,
+                Name = localizedItem?.Name ?? sharedItem.Name,
+                Description = localizedItem?.Description ?? sharedItem.Description,
+                Price = localizedItem?.Price ?? sharedItem.Price
+            });
+        }
+
+        return result;
+    }
+
+    private static List<ServiceListItem> ProjectSharedItems(List<ServiceListItem> currentItems, List<ServiceListItem> existingSharedItems)
+    {
+        var result = new List<ServiceListItem>();
+
+        for (var i = 0; i < currentItems.Count; i++)
+        {
+            var currentItem = currentItems[i];
+            var existingSharedItem = FindMatchingItem(existingSharedItems, currentItem.ImageKey, i);
+
+            result.Add(new ServiceListItem
+            {
+                ImageKey = currentItem.ImageKey,
+                QrCodeKey = currentItem.QrCodeKey,
+                Name = existingSharedItem?.Name ?? currentItem.Name,
+                Description = existingSharedItem?.Description ?? currentItem.Description,
+                Price = existingSharedItem?.Price ?? currentItem.Price
+            });
+        }
+
+        return result;
+    }
+
+    private static List<ServiceListItem> ProjectLocalizedItems(List<ServiceListItem> currentItems, List<ServiceListItem> existingLocalizedItems)
+    {
+        var result = new List<ServiceListItem>();
+
+        for (var i = 0; i < currentItems.Count; i++)
+        {
+            var currentItem = currentItems[i];
+            var existingLocalizedItem = FindMatchingItem(existingLocalizedItems, currentItem.ImageKey, i);
+
+            result.Add(new ServiceListItem
+            {
+                ImageKey = currentItem.ImageKey,
+                QrCodeKey = currentItem.QrCodeKey,
+                Name = currentItem.Name,
+                Description = currentItem.Description,
+                Price = currentItem.Price
+            });
+        }
+
+        return result;
+    }
+
+    private static bool EnsureItemKeys(List<ServiceListItem> items)
     {
         var changed = false;
 
-        foreach (var item in Items)
+        foreach (var item in items)
         {
             if (string.IsNullOrWhiteSpace(item.ImageKey))
             {
