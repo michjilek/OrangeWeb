@@ -25,15 +25,16 @@
         <div class="references-list">
             @for (int i = 0; i < EditReferencesService.Items.Count; i++)
             {
+                var index = i;
                 var item = EditReferencesService.Items[i];
 
                 <article class="reference-card">
                     @if (EditModeService.IsEditing)
                     {
                         <div class="reference-controls">
-                            <button class="reference-control" @onclick="() => MoveEarlier(i)" disabled="@(i == 0)" title="Move up">↑</button>
-                            <button class="reference-control" @onclick="() => MoveLater(i)" disabled="@(i == EditReferencesService.Items.Count - 1)" title="Move down">↓</button>
-                            <button class="reference-control" @onclick="() => OpenEditor(i)" title="Edit reference">✎</button>
+                            <button class="reference-control" @onclick="() => MoveEarlier(index)" disabled="@(index == 0)" title="Move up">↑</button>
+                            <button class="reference-control" @onclick="() => MoveLater(index)" disabled="@(index == EditReferencesService.Items.Count - 1)" title="Move down">↓</button>
+                            <button class="reference-control" @onclick="() => OpenEditor(index)" title="Edit reference">✎</button>
                         </div>
                     }
 
