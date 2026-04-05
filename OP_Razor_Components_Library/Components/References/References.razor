@@ -16,7 +16,7 @@
     @if (EditModeService.IsEditing)
     {
         <div class="references-toolbar">
-            <button class="references-action references-action-primary" @onclick="OpenNew">+ Add reference</button>
+            <button class="references-action references-action-primary" @onclick="OpenNew">+ Přidat referenci</button>
         </div>
     }
 
@@ -78,10 +78,6 @@
     {
         <div class="references-empty">
             <p class="references-empty-title">Reference zatím nejsou přidané.</p>
-            @if (EditModeService.IsEditing)
-            {
-                <button class="references-action references-action-primary" @onclick="OpenNew">+ Add first reference</button>
-            }
         </div>
     }
 </section>

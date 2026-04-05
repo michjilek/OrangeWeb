@@ -159,6 +159,13 @@
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.68), rgba(255, 255, 255, 0.34));
 }
 
+.references-action-primary:hover {
+    transform: none;
+    background: linear-gradient(180deg, rgba(58, 58, 58, 0.96), rgba(42, 42, 42, 0.88));
+    color: var(--WhiteColor);
+    border-color: rgba(255, 255, 255, 0.16);
+}
+
 .reference-control:disabled {
     opacity: 0.45;
     cursor: not-allowed;
