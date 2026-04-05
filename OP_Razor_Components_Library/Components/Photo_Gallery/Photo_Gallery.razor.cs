@@ -33,6 +33,7 @@ public partial class Photo_Gallery : IDisposable
 
     #region Protected Properties
     protected bool IsModalOpen = false;
+    protected bool IsNew = false;
     protected GalleryImage SelectedImage;
     protected double startX;
     #endregion
@@ -128,6 +129,12 @@ public partial class Photo_Gallery : IDisposable
     }
     private async Task SaveEdit()
     {
+        if (IsNew)
+        {
+            await SaveNewItem();
+            return;
+        }
+
         // Check null of selected image
         if (SelectedImage is null) return;
 
@@ -181,11 +188,12 @@ public partial class Photo_Gallery : IDisposable
 
         // Close modal
         IsModalOpen = false;
+        IsNew = false;
 
         // Clear uploaded image
         uploadedImage = null;
     }
-    private async Task SaveAsNew()
+    private async Task SaveNewItem()
     {
         // Create default new Gallery Image
         var newItem = new GalleryImage
@@ -242,6 +250,7 @@ public partial class Photo_Gallery : IDisposable
 
         // Close modal
         IsModalOpen = false;
+        IsNew = false;
 
         // Clear uploaded image
         uploadedImage = null;
@@ -259,6 +268,7 @@ public partial class Photo_Gallery : IDisposable
     }
     private void OpenNew()
     {
+        SelectedImage = null;
         draft = new GalleryImage
         {
             Id = Guid.NewGuid(),
@@ -268,6 +278,7 @@ public partial class Photo_Gallery : IDisposable
 
         uploadedImage = null;
         draftPreview = string.Empty;
+        IsNew = true;
         IsModalOpen = true;
 
         _ = ModalToggled.InvokeAsync(true);
@@ -309,6 +320,7 @@ public partial class Photo_Gallery : IDisposable
 
         draftPreview = GetImageSource(galleryImage);
 
+        IsNew = false;
         IsModalOpen = true;
         await JSRuntime.InvokeVoidAsync("document.body.classList.add", "modal-open");
         await ModalToggled.InvokeAsync(true);
@@ -317,6 +329,7 @@ public partial class Photo_Gallery : IDisposable
     protected async Task CloseModal()
     {
         IsModalOpen = false;
+        IsNew = false;
         await JSRuntime.InvokeVoidAsync("document.body.classList.remove", "modal-open");
         await ModalToggled.InvokeAsync(false);
     }

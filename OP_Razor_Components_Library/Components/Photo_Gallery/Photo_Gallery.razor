@@ -2,6 +2,17 @@
 @using OP_Shared_Library.Services
 @inject EditModeService EditModeService
 
+@if (EditModeService.IsEditing)
+{
+    <div class="gallery-actions">
+        <button class="gallery-add-btn" @onclick="OpenNew" title="Add photo" aria-label="Add photo">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+        </button>
+    </div>
+}
+
 @if (EditPhotoGalleryService.Items.Count > 0)
 {
     @* IMAGE GALLERY *@
@@ -13,20 +24,11 @@
                     var srcSet = GetImageSrcSet(image);
                     var sizes = GetResponsiveSizes(srcSet);
                 }
-                
+
                 <img src="@GetImageSource(image)" alt="Gallery Image" srcset="@srcSet" sizes="@sizes" />
             </div>
         }
     </div>
-}
-else
-{
-    @if (EditModeService.IsEditing)
-    {
-        <div class="mt">
-            <button class="btn_first" @onclick="OpenNew">+ Add first photo</button>
-        </div>
-    }
 }
 
 @if (isBusy)
@@ -122,9 +124,11 @@ else
 
                 <div class="modal-actions">
                     <button class="btn" @onclick="CloseModal">Cancel</button>
-                    <button class="btn" @onclick="Delete" disabled="@(SelectedImage is null)">Delete</button>
-                    <button class="btn" @onclick="SaveAsNew">+ Save New</button>
-                    <button class="btn" @onclick="SaveEdit" disabled="@(SelectedImage is null)">Save</button>
+                    @if (!IsNew)
+                    {
+                        <button class="btn" @onclick="Delete" disabled="@(SelectedImage is null)">Delete</button>
+                    }
+                    <button class="btn" @onclick="SaveEdit">Save</button>
                 </div>
             </div>
         </div>
