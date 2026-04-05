@@ -69,6 +69,13 @@
                         </svg>
                     </button>
 
+                    <!-- Add Button -->
+                    <button class="add-btn" @onclick="OpenNew" title="Add news">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </button>
+
                     <!-- Edit Button -->
                     <button class="edit-btn" @onclick="OpenEditor" title="Edit news">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -191,8 +198,10 @@
 
             <div class="modal-actions">
                 <button class="btn" @onclick="CancelEdit">Cancel</button>
-                <button class="btn" @onclick="DeleteNews">Delete</button>
-                <button class="btn" @onclick="SaveAsNew">+ Save New</button>
+                @if (!IsNew)
+                {
+                    <button class="btn" @onclick="DeleteNews">Delete</button>
+                }
                 <button class="btn" @onclick="SaveEdit">Save</button>
             </div>
         </div>
@@ -321,8 +330,16 @@
     }
     private async Task SaveEdit()
     {
-        if (CurrentIndex < 0 || CurrentIndex >= EditNewsService.Items.Count)
+        if (IsNew)
+        {
+            await SaveNewItem();
             return;
+        }
+
+        if (CurrentIndex < 0 || CurrentIndex >= EditNewsService.Items.Count)
+        {
+            return;
+        }
 
         isBusy = true;
         uploadProgress = 0;
@@ -381,7 +398,7 @@
     {
         IsEditorOpen = false;
     }
-    private async Task SaveAsNew()
+    private async Task SaveNewItem()
     {
         // Easy validation
         if (string.IsNullOrWhiteSpace(draftTitle)) { return; }
@@ -423,6 +440,7 @@
 
         // Close modal and clean temporary variables
         IsEditorOpen = false;
+        IsNew = false;
         uploadedImage = null;
         draftTitle = draftText1 = draftText2 = draftImageUrl = null;
         draftImageObjectKey = null;

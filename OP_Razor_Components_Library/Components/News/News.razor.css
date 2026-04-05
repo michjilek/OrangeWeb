@@ -322,7 +322,7 @@
 .add-btn {
     position: absolute;
     top: 8px;
-    right: 48px; /* vedle edit tlačítka */
+    right: 48px;
     background: rgba(255,255,255,0.8);
     border: none;
     border-radius: 50%;
@@ -394,7 +394,7 @@
     }
 
     .reorder-btn.move-right {
-        right: 48px;
+        right: 88px;
     }
 /* =========================
    BUSY OVERLAY
