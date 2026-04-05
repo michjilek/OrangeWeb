@@ -10,6 +10,31 @@
     margin-bottom: 18px;
 }
 
+.references-add-btn {
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.8);
+    color: #1f2937;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    transition: background .2s ease;
+}
+
+.references-add-btn:hover {
+    background: rgba(255,255,255,1);
+}
+
+.references-add-btn svg {
+    width: 24px;
+    height: 24px;
+}
+
 .references-list {
     display: flex;
     flex-direction: column;

@@ -16,7 +16,11 @@
     @if (EditModeService.IsEditing)
     {
         <div class="references-toolbar">
-            <button class="references-action references-action-primary" @onclick="OpenNew">+ Přidat referenci</button>
+            <button class="references-add-btn" @onclick="OpenNew" title="Přidat referenci" aria-label="Přidat referenci">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg>
+            </button>
         </div>
     }
 
