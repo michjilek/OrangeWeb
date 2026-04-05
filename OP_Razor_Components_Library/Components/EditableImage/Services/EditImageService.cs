@@ -14,10 +14,8 @@ public class EditImageService
     #endregion
 
     #region Private Properties
-    // YAML filenames
-    private const string _fileName_orig = "images.yaml";
-    private const string _fileName_en = "images_en.yaml";
-    private string _fileName = _fileName_orig;
+    // Shared YAML filename for all languages
+    private const string _fileName = "images.yaml";
     private string _yamlPath = string.Empty;
     public const string MinIoFolder = "gallery";
 
@@ -37,18 +35,10 @@ public class EditImageService
     #endregion
 
     #region Public Methods
-    // Switch language file ("cs" => images.yaml, otherwise images_en.yaml)
-    public void ChangeLangFile(string language)
-    {
-        _fileName = language?.ToLowerInvariant() == "cs" ? _fileName_orig : _fileName_en;
-    }
     // Load mapping from yaml
     public async Task LoadAsync(string language)
     {
-        // Change lang file
-        ChangeLangFile(language);
-
-        // Use changed lang file to ensure yaml path
+        // Always use one shared image mapping for all languages.
         _yamlPath = _yamlService.EnsureYamlPath(_fileName);
 
         // If path doesnt exists, create new map dictionary <string,string>
@@ -145,14 +135,14 @@ public class EditImageService
         Set(key, objectKey);
         await SaveToYamlAsync();
 
-        await CleanUnusedImagesAsync(MinIoFolder, includeOtherLanguageMaps);
+        await CleanUnusedImagesAsync(MinIoFolder);
         return objectKey;
     }
     public async Task DeleteImageAndMapAsync(string key, bool includeOtherLanguageMaps = true)
     {
         Remove(key);
         await SaveToYamlAsync();
-        await CleanUnusedImagesAsync(MinIoFolder, includeOtherLanguageMaps);
+        await CleanUnusedImagesAsync(MinIoFolder);
     }
     // Delete objects under the relativeFolder that are not referenced in YAML files
     public async Task CleanUnusedImagesAsync(string relativeFolder = "", bool includeOtherLanguageMaps = true)
@@ -169,33 +159,6 @@ public class EditImageService
                             .Where(u => !string.IsNullOrWhiteSpace(u)
                        && u!.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                             .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-        if (includeOtherLanguageMaps)
-        {
-            var otherFileName = _fileName == _fileName_orig ? _fileName_en : _fileName_orig;
-            var otherPath = _yamlService.EnsureYamlPath(otherFileName);
-            if (File.Exists(otherPath))
-            {
-                try
-                {
-                    var yaml = await File.ReadAllTextAsync(otherPath);
-                    var other = string.IsNullOrWhiteSpace(yaml)
-                        ? new List<ImageMap>()
-                        : _yamlService.Deserializer.Deserialize<List<ImageMap>>(yaml) ?? new();
-                    foreach (var v in other)
-                    {
-                        if (!string.IsNullOrWhiteSpace(v.ImageUrl) && v.ImageUrl.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-                        {
-                            referenced.Add(v.ImageUrl);
-                        }
-                    }
-                }
-                catch
-                {
-                    _logger.MyLogger.Error($"EditImageService: CleanUnusedImageAsync: Issuse in 'if (File.Exists(otherPath))' block.");
-                }
-            }
-        }
 
         // For responsive images, we need to consider variants as well
         var referencedWithVariants = new HashSet<string>(referenced, StringComparer.OrdinalIgnoreCase);
