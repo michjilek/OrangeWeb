@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
+
 namespace OP_Razor_Components_Library.Components.News.Services;
+
 public class EditNewsService
 {
     #region Dependency Injection
@@ -11,9 +13,9 @@ public class EditNewsService
     #endregion
 
     #region Private Properties
-    private const string FileName_orig = "news.yaml";
-    private const string FileName_en = "news_en.yaml";
-    private string FileName;
+    private const string FileNameCs = "news.yaml";
+    private const string FileNameEn = "news_en.yaml";
+    private string _currentLanguage = "cs";
     public const string MinIoFolder = "news";
     #endregion
 
@@ -39,34 +41,45 @@ public class EditNewsService
     #region Public Methods
     public async Task LoadAsync(string language)
     {
-        // Change file by lang
-        ChangeLangFile(language);
+        _currentLanguage = NormalizeLanguage(language);
 
-        // Primary source: resolved YAML path from YamlService
-        // (external Configs/<brand>/Data when configured, else wwwroot/data).
-        var yamlPath = _yamlService.EnsureYamlPath(FileName);
-
-        try
+        var sharedItems = await LoadYamlAsync(FileNameCs);
+        if (_currentLanguage == "cs")
         {
-            if (File.Exists(yamlPath))
-            {
-                await using var fileStream = File.OpenRead(yamlPath);
-                Items = _yamlService.LoadYamlList<NewsItem>(yamlPath, fileStream) ?? new();
-            }
+            Items = CloneItems(sharedItems);
         }
-        catch
+        else
         {
-            Items = new();
+            var localizedItems = await LoadYamlAsync(FileNameEn);
+            Items = MergeSharedAndLocalized(sharedItems, localizedItems);
         }
 
-        // MinIo
         await RefreshSignedUrlsAsync();
     }
+
     public async Task SaveAsync(string webRootPath)
     {
-        // Yaml
-        await _yamlService.SaveToYamlAsync(Items, FileName);
+        var sharedItems = await LoadYamlAsync(FileNameCs);
+        var localizedItems = await LoadYamlAsync(FileNameEn);
+
+        if (_currentLanguage == "cs")
+        {
+            var itemsToSave = CloneItems(Items);
+            await _yamlService.SaveToYamlAsync(itemsToSave, FileNameCs);
+
+            var synchronizedLocalizedItems = ProjectLocalizedItems(itemsToSave, localizedItems);
+            await _yamlService.SaveToYamlAsync(synchronizedLocalizedItems, FileNameEn);
+        }
+        else
+        {
+            var synchronizedSharedItems = ProjectSharedItems(Items, sharedItems);
+            await _yamlService.SaveToYamlAsync(synchronizedSharedItems, FileNameCs);
+
+            var localizedToSave = ProjectLocalizedItems(Items, localizedItems);
+            await _yamlService.SaveToYamlAsync(localizedToSave, FileNameEn);
+        }
     }
+
     public void AddNewItem()
     {
         Items.Add(new NewsItem
@@ -76,24 +89,19 @@ public class EditNewsService
             Text1 = "",
             Text2 = "",
             ImageUrl = "",
-            ImageSignedUrl=""
+            ImageSignedUrl = ""
         });
     }
+
     public void RemoveItem(NewsItem item)
     {
         Items.Remove(item);
     }
-    public void ChangeLangFile(string language)
-    {
-        FileName = language.ToLower() == "cs" ? FileName_orig : FileName_en;
-    }
-    // Resolve Image URL
+
     public async Task<string> ResolveImageUrlAsync(string imageReference)
     {
-        // Get normalized image reference
         var normalizedImageReference = _minIoService.NormalizeImageReference(imageReference);
 
-        // If isnt filled yet, get from minIo
         try
         {
             return await _minIoService.GetPublicUrl(normalizedImageReference);
@@ -107,7 +115,128 @@ public class EditNewsService
     #endregion
 
     #region Private Methods
-    // Refresh public urls in MinIo
+    private string NormalizeLanguage(string language)
+    {
+        return string.Equals(language, "en", StringComparison.OrdinalIgnoreCase) ? "en" : "cs";
+    }
+
+    private async Task<List<NewsItem>> LoadYamlAsync(string fileName)
+    {
+        var yamlPath = _yamlService.EnsureYamlPath(fileName);
+
+        try
+        {
+            if (File.Exists(yamlPath))
+            {
+                await using var fileStream = File.OpenRead(yamlPath);
+                return _yamlService.LoadYamlList<NewsItem>(yamlPath, fileStream) ?? new();
+            }
+        }
+        catch
+        {
+        }
+
+        return new();
+    }
+
+    private List<NewsItem> MergeSharedAndLocalized(List<NewsItem> sharedItems, List<NewsItem> localizedItems)
+    {
+        var result = new List<NewsItem>();
+
+        for (var i = 0; i < sharedItems.Count; i++)
+        {
+            var sharedItem = sharedItems[i];
+            var localizedItem = FindMatchingItem(localizedItems, sharedItem.Id, i);
+
+            result.Add(new NewsItem
+            {
+                Id = sharedItem.Id,
+                Title = localizedItem?.Title ?? sharedItem.Title,
+                Text1 = localizedItem?.Text1 ?? sharedItem.Text1,
+                Text2 = localizedItem?.Text2 ?? sharedItem.Text2,
+                ImageUrl = sharedItem.ImageUrl,
+                ImageSignedUrl = sharedItem.ImageSignedUrl
+            });
+        }
+
+        return result;
+    }
+
+    private List<NewsItem> ProjectSharedItems(List<NewsItem> currentItems, List<NewsItem> existingSharedItems)
+    {
+        var result = new List<NewsItem>();
+
+        for (var i = 0; i < currentItems.Count; i++)
+        {
+            var currentItem = currentItems[i];
+            var existingSharedItem = FindMatchingItem(existingSharedItems, currentItem.Id, i);
+
+            result.Add(new NewsItem
+            {
+                Id = currentItem.Id,
+                Title = existingSharedItem?.Title ?? currentItem.Title,
+                Text1 = existingSharedItem?.Text1 ?? currentItem.Text1,
+                Text2 = existingSharedItem?.Text2 ?? currentItem.Text2,
+                ImageUrl = currentItem.ImageUrl,
+                ImageSignedUrl = currentItem.ImageSignedUrl
+            });
+        }
+
+        return result;
+    }
+
+    private List<NewsItem> ProjectLocalizedItems(List<NewsItem> currentItems, List<NewsItem> existingLocalizedItems)
+    {
+        var result = new List<NewsItem>();
+
+        for (var i = 0; i < currentItems.Count; i++)
+        {
+            var currentItem = currentItems[i];
+            var existingLocalizedItem = FindMatchingItem(existingLocalizedItems, currentItem.Id, i);
+
+            result.Add(new NewsItem
+            {
+                Id = currentItem.Id,
+                Title = currentItem.Title,
+                Text1 = currentItem.Text1,
+                Text2 = currentItem.Text2,
+                ImageUrl = currentItem.ImageUrl,
+                ImageSignedUrl = existingLocalizedItem?.ImageSignedUrl ?? currentItem.ImageSignedUrl
+            });
+        }
+
+        return result;
+    }
+
+    private List<NewsItem> CloneItems(List<NewsItem> items)
+    {
+        return items.Select(item => new NewsItem
+        {
+            Id = item.Id,
+            Title = item.Title,
+            Text1 = item.Text1,
+            Text2 = item.Text2,
+            ImageUrl = item.ImageUrl,
+            ImageSignedUrl = item.ImageSignedUrl
+        }).ToList();
+    }
+
+    private NewsItem? FindMatchingItem(List<NewsItem> items, Guid id, int index)
+    {
+        var byId = items.FirstOrDefault(item => item.Id == id);
+        if (byId is not null)
+        {
+            return byId;
+        }
+
+        if (index >= 0 && index < items.Count)
+        {
+            return items[index];
+        }
+
+        return null;
+    }
+
     private async Task RefreshSignedUrlsAsync()
     {
         foreach (var item in Items)
