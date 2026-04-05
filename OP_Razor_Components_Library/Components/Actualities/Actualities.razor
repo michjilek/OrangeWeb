@@ -1,0 +1,450 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.Extensions.Hosting
+@using OP_Razor_Components_Library.Components.Actualities.Services
+@using OP_Shared_Library.Services
+@using System.Globalization
+@using System.Linq
+@inject EditModeService EditModeService
+@inject EditActualitiesService EditActualitiesService
+@inject TranslationsService TranslationsService
+@inject IHostEnvironment Env
+@inject IMinIoService MinIoService
+@implements IDisposable
+
+@namespace OP_Razor_Components_Library.Components.Actualities
+
+<section class="actualities-shell">
+    @if (EditModeService.IsEditing)
+    {
+        <div class="actualities-toolbar">
+            <button class="actualities-action actualities-action-primary" @onclick="OpenNew">+ Přidat aktualitu</button>
+        </div>
+    }
+
+    @if (EditActualitiesService.Items.Count > 0)
+    {
+        <div class="actualities-list">
+            @for (int i = 0; i < EditActualitiesService.Items.Count; i++)
+            {
+                var index = i;
+                var item = EditActualitiesService.Items[i];
+
+                <article class="actuality-card">
+                    @if (EditModeService.IsEditing)
+                    {
+                        <div class="actuality-controls">
+                            <button class="actuality-control" @onclick="() => MoveEarlier(index)" disabled="@(index == 0)" title="Move up">↑</button>
+                            <button class="actuality-control" @onclick="() => MoveLater(index)" disabled="@(index == EditActualitiesService.Items.Count - 1)" title="Move down">↓</button>
+                            <button class="actuality-control" @onclick="() => OpenEditor(index)" title="Edit actuality">✎</button>
+                        </div>
+                    }
+
+                    <p class="actuality-date">@FormatCreatedAt(item.CreatedAt)</p>
+
+                    @if (!string.IsNullOrWhiteSpace(GetDisplayUrl(item)))
+                    {
+                        var srcSet = GetResponsiveSrcSet(item);
+                        var sizes = GetResponsiveSizes(srcSet);
+
+                        <div class="actuality-image-wrap">
+                            <img src="@GetDisplayUrl(item)"
+                                 alt="@FormatCreatedAt(item.CreatedAt)"
+                                 class="actuality-image"
+                                 srcset="@srcSet"
+                                 sizes="@sizes" />
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(item.Text))
+                    {
+                        <p class="actuality-text">@item.Text</p>
+                    }
+                </article>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="actualities-empty">
+            <p class="actualities-empty-title">Aktuality zatím nejsou přidané.</p>
+        </div>
+    }
+</section>
+
+@if (isBusy)
+{
+    <div class="busy-overlay" role="alert" aria-live="assertive" aria-busy="true">
+        <div class="busy-card">
+            <div class="busy-spinner"></div>
+
+            @if (uploadProgress > 0 && uploadProgress < 100)
+            {
+                <div class="busy-progress">
+                    <div class="busy-progress-bar" style="width:@($"{uploadProgress}%")"></div>
+                </div>
+            }
+
+            @if (isAwaitingFile)
+            {
+                <button class="actualities-action" @onclick="CancelBusy">Close</button>
+            }
+        </div>
+    </div>
+}
+
+@if (EditModeService.IsEditing && IsEditorOpen)
+{
+    <div class="modal-backdrop">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>@(IsNew ? "Add Actuality" : "Edit Actuality")</h2>
+            </div>
+
+            <label>Date and time:</label>
+            <input type="datetime-local" value="@draftCreatedAt" @onchange="OnCreatedAtChanged" />
+
+            <label>Text:</label>
+            <textarea class="actuality-textarea" @bind="draftText"></textarea>
+
+            <label>Current image:</label>
+            @if (!string.IsNullOrEmpty(draftImageUrl))
+            {
+                <div class="preview-frame">
+                    <img src="@draftImageUrl" alt="Current image" class="preview-img" />
+                </div>
+            }
+
+            <label class="actualities-action actualities-action-primary" for="actuality-upload" @onclick="BeginUpload">
+                Upload New Image
+            </label>
+
+            <InputFile id="actuality-upload"
+                       hidden
+                       OnChange="HandleImageChange" />
+
+            <div class="modal-actions">
+                <button class="actualities-action" @onclick="CancelEdit">Cancel</button>
+                @if (!IsNew)
+                {
+                    <button class="actualities-action" @onclick="DeleteActuality">Delete</button>
+                }
+                <button class="actualities-action actualities-action-primary" @onclick="SaveEdit">Save</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private int CurrentIndex;
+    private bool IsEditorOpen;
+    private bool IsNew;
+    private IBrowserFile uploadedImage;
+    private bool isBusy;
+    private int uploadProgress;
+    private bool isAwaitingFile;
+
+    private string draftCreatedAt;
+    private string draftText;
+    private string draftImageUrl;
+    private string draftImageObjectKey;
+
+    private const int PreviewMaxWidth = 1600;
+    private const string DateTimeFormat = "yyyy-MM-ddTHH:mm";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await TranslationsService.LoadAsync();
+        await EditActualitiesService.LoadAsync(TranslationsService.GetLanguage());
+
+        TranslationsService.OnChange += TranslationChanged;
+        EditModeService.OnEditModeChanged += HandleEditModeChanged;
+    }
+
+    public void Dispose()
+    {
+        EditModeService.OnEditModeChanged -= HandleEditModeChanged;
+        TranslationsService.OnChange -= TranslationChanged;
+    }
+
+    private void OpenEditor(int index)
+    {
+        if (index < 0 || index >= EditActualitiesService.Items.Count) return;
+
+        CurrentIndex = index;
+        var item = EditActualitiesService.Items[index];
+        draftCreatedAt = item.CreatedAt.ToString(DateTimeFormat);
+        draftText = item.Text;
+        draftImageUrl = GetDisplayUrl(item);
+        draftImageObjectKey = item.ImageUrl;
+        uploadedImage = null;
+
+        IsNew = false;
+        IsEditorOpen = true;
+    }
+
+    private void OpenNew()
+    {
+        CurrentIndex = EditActualitiesService.Items.Count;
+        draftCreatedAt = DateTime.Now.ToString(DateTimeFormat);
+        draftText = string.Empty;
+        draftImageUrl = string.Empty;
+        draftImageObjectKey = string.Empty;
+        uploadedImage = null;
+
+        IsNew = true;
+        IsEditorOpen = true;
+    }
+
+    private async Task SaveEdit()
+    {
+        if (!TryParseCreatedAt(draftCreatedAt, out var createdAt) || string.IsNullOrWhiteSpace(draftText))
+        {
+            return;
+        }
+
+        isBusy = true;
+        uploadProgress = 0;
+        StateHasChanged();
+
+        try
+        {
+            ActualityItem item;
+
+            if (IsNew)
+            {
+                item = new ActualityItem
+                {
+                    Id = Guid.NewGuid()
+                };
+                EditActualitiesService.Items.Add(item);
+                CurrentIndex = EditActualitiesService.Items.Count - 1;
+            }
+            else
+            {
+                if (CurrentIndex < 0 || CurrentIndex >= EditActualitiesService.Items.Count) return;
+                item = EditActualitiesService.Items[CurrentIndex];
+            }
+
+            item.CreatedAt = createdAt;
+            item.Text = draftText ?? string.Empty;
+
+            if (uploadedImage != null)
+            {
+                var (objectKey, signedUrl) = await UploadImageToMinIoAsync(uploadedImage);
+                if (!string.IsNullOrWhiteSpace(objectKey))
+                {
+                    item.ImageUrl = objectKey;
+                    item.ImageSignedUrl = signedUrl;
+                    draftImageObjectKey = objectKey;
+                    draftImageUrl = signedUrl ?? string.Empty;
+                }
+            }
+            else if (!string.IsNullOrWhiteSpace(draftImageObjectKey))
+            {
+                item.ImageUrl = draftImageObjectKey;
+                item.ImageSignedUrl = await EditActualitiesService.ResolveImageUrlAsync(draftImageObjectKey);
+            }
+            else
+            {
+                item.ImageUrl = string.Empty;
+                item.ImageSignedUrl = null;
+            }
+
+            await EditActualitiesService.SaveAsync(Env.ContentRootPath);
+
+            IsEditorOpen = false;
+            IsNew = false;
+            uploadedImage = null;
+        }
+        finally
+        {
+            isBusy = false;
+            StateHasChanged();
+        }
+    }
+
+    private void CancelEdit()
+    {
+        IsEditorOpen = false;
+        IsNew = false;
+    }
+
+    private async Task DeleteActuality()
+    {
+        if (CurrentIndex < 0 || CurrentIndex >= EditActualitiesService.Items.Count) return;
+
+        EditActualitiesService.RemoveItem(EditActualitiesService.Items[CurrentIndex]);
+
+        if (CurrentIndex >= EditActualitiesService.Items.Count)
+        {
+            CurrentIndex = Math.Max(0, EditActualitiesService.Items.Count - 1);
+        }
+
+        await EditActualitiesService.SaveAsync(Env.ContentRootPath);
+
+        IsEditorOpen = false;
+        IsNew = false;
+    }
+
+    private async Task MoveEarlier(int index)
+    {
+        if (index <= 0 || index >= EditActualitiesService.Items.Count) return;
+
+        var item = EditActualitiesService.Items[index];
+        EditActualitiesService.Items.RemoveAt(index);
+        EditActualitiesService.Items.Insert(index - 1, item);
+        await EditActualitiesService.SaveAsync(Env.ContentRootPath);
+    }
+
+    private async Task MoveLater(int index)
+    {
+        if (index < 0 || index >= EditActualitiesService.Items.Count - 1) return;
+
+        var item = EditActualitiesService.Items[index];
+        EditActualitiesService.Items.RemoveAt(index);
+        EditActualitiesService.Items.Insert(index + 1, item);
+        await EditActualitiesService.SaveAsync(Env.ContentRootPath);
+    }
+
+    private void BeginUpload()
+    {
+        isBusy = true;
+        isAwaitingFile = true;
+        uploadProgress = 0;
+        StateHasChanged();
+    }
+
+    private void CancelBusy()
+    {
+        isBusy = false;
+        isAwaitingFile = false;
+        uploadProgress = 0;
+    }
+
+    private string GetDisplayUrl(ActualityItem item) =>
+        item?.ImageSignedUrl ?? item?.ImageUrl ?? string.Empty;
+
+    private string GetResponsiveSrcSet(ActualityItem item)
+    {
+        return ResponsiveImageHelper.BuildSrcSet(MinIoService, item.ImageUrl);
+    }
+
+    private string GetResponsiveSizes(string srcSet)
+    {
+        return string.IsNullOrWhiteSpace(srcSet)
+            ? null
+            : "(min-width: 1280px) 900px, (min-width: 768px) 80vw, 100vw";
+    }
+
+    private string FormatCreatedAt(DateTime createdAt)
+    {
+        return createdAt.ToString("dd.MM.yyyy HH:mm", CultureInfo.GetCultureInfo("cs-CZ"));
+    }
+
+    private bool TryParseCreatedAt(string value, out DateTime createdAt)
+    {
+        return DateTime.TryParseExact(value,
+                                      DateTimeFormat,
+                                      CultureInfo.InvariantCulture,
+                                      DateTimeStyles.None,
+                                      out createdAt);
+    }
+
+    private void OnCreatedAtChanged(ChangeEventArgs e)
+    {
+        draftCreatedAt = e.Value?.ToString() ?? string.Empty;
+    }
+
+    private async Task UploadResponsiveVariantAsync(IBrowserFile file, string objectKey)
+    {
+        var maxWidth = ResponsiveImageHelper.VariantWidths.Max();
+
+        foreach (var width in ResponsiveImageHelper.VariantWidths)
+        {
+            var resized = await file.RequestImageFileAsync(file.ContentType, width, ResponsiveImageHelper.MaxUploadedHeight);
+            await using var readStream = resized.OpenReadStream(maxAllowedSize: 10_000_000);
+            using var ms = new MemoryStream();
+            await readStream.CopyToAsync(ms);
+            ms.Position = 0;
+
+            var key = width == maxWidth ? objectKey : ResponsiveImageHelper.BuildVariantKey(objectKey, width);
+            await MinIoService.PutObjectAsync(key, ms, resized);
+        }
+    }
+
+    private async Task<(string ObjectKey, string SignedUrl)> UploadImageToMinIoAsync(IBrowserFile file)
+    {
+        if (file is null)
+        {
+            return (string.Empty, null);
+        }
+
+        var ext = Path.GetExtension(file.Name);
+        if (string.IsNullOrWhiteSpace(ext) || !MinIoService.AllowedImageExtensions.Contains(ext))
+        {
+            return (string.Empty, null);
+        }
+
+        await MinIoService.EnsureBucketAsync();
+
+        var objectKey = ResponsiveImageHelper.BuildResponsiveObjectKey(EditActualitiesService.MinIoFolder, ext);
+        await UploadResponsiveVariantAsync(file, objectKey);
+        var signedUrl = await EditActualitiesService.ResolveImageUrlAsync(objectKey);
+
+        return (objectKey, signedUrl);
+    }
+
+    private async Task HandleImageChange(InputFileChangeEventArgs e)
+    {
+        uploadedImage = e.File;
+        draftImageObjectKey = null;
+
+        isAwaitingFile = false;
+        isBusy = true;
+        uploadProgress = 0;
+        StateHasChanged();
+        await Task.Delay(1);
+
+        try
+        {
+            var preview = await uploadedImage.RequestImageFileAsync(uploadedImage.ContentType, PreviewMaxWidth, ResponsiveImageHelper.MaxUploadedHeight);
+            await using var stream = preview.OpenReadStream(maxAllowedSize: 10_000_000);
+            using var ms = new MemoryStream();
+
+            var buffer = new byte[80 * 1024];
+            long readTotal = 0;
+            int read;
+            while ((read = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+            {
+                await ms.WriteAsync(buffer, 0, read);
+                readTotal += read;
+                uploadProgress = (int)(readTotal * 100 / preview.Size);
+
+                if (readTotal % (512 * 1024) == 0)
+                {
+                    StateHasChanged();
+                }
+            }
+
+            draftImageUrl = $"data:{preview.ContentType};base64,{Convert.ToBase64String(ms.ToArray())}";
+            uploadProgress = 100;
+        }
+        finally
+        {
+            isBusy = false;
+            isAwaitingFile = false;
+            StateHasChanged();
+        }
+    }
+
+    private void HandleEditModeChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async void TranslationChanged()
+    {
+        await EditActualitiesService.LoadAsync(TranslationsService.GetLanguage());
+        StateHasChanged();
+    }
+}

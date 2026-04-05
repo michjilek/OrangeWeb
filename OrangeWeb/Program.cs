@@ -5,6 +5,7 @@ using Minio;
 using OP_Db.Server;
 using Op_LP.Services;
 using Op_LP.Services.Admin;
+using OP_Razor_Components_Library.Components.Actualities.Services;
 using OP_Razor_Components_Library.Components.EditableImage.Services;
 using OP_Razor_Components_Library.Components.Navigation.Services;
 using OP_Razor_Components_Library.Components.News.Services;
@@ -57,7 +58,7 @@ builder.Services.AddSingleton<IYamlService, YamlService>();
 builder.Services.AddScoped<NavigationService>();
 builder.Services.AddSingleton<IMinioClient>(sp =>
 {
-    // Get Configuration from appsettings.json (teï už mùže být externí)
+    // Get Configuration from appsettings.json (teï¿½ uï¿½ mï¿½ï¿½e bï¿½t externï¿½)
     var cfg = sp.GetRequiredService<IConfiguration>().GetSection("Minio");
     var env = sp.GetRequiredService<IHostEnvironment>();
 
@@ -81,6 +82,7 @@ builder.Services.AddScoped<TranslationsService>();
 builder.Services.AddScoped<EditModeService>();
 builder.Services.AddScoped<ServicesService>();
 builder.Services.AddScoped<EditNewsService>();
+builder.Services.AddScoped<EditActualitiesService>();
 builder.Services.AddScoped<EditReferencesService>();
 builder.Services.AddScoped<EditImageService>();
 builder.Services.AddScoped<EditPhotoGalleryService>();

@@ -1,0 +1,247 @@
+.actualities-shell {
+    width: min(100%, 960px);
+    margin: 0 auto;
+}
+
+.actualities-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.actualities-list {
+    display: grid;
+    gap: 28px;
+}
+
+.actuality-card {
+    position: relative;
+    display: grid;
+    gap: 18px;
+    padding: 24px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(10px);
+}
+
+.actuality-date {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(15, 23, 42, 0.72);
+}
+
+.actuality-image-wrap {
+    width: 100%;
+    overflow: hidden;
+    border-radius: 18px;
+    background: rgba(15, 23, 42, 0.05);
+}
+
+.actuality-image {
+    display: block;
+    width: 100%;
+    max-height: 460px;
+    object-fit: cover;
+}
+
+.actuality-text {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    white-space: pre-line;
+    color: var(--News_body_text_color);
+}
+
+.actuality-controls {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    display: flex;
+    gap: 8px;
+}
+
+.actuality-control,
+.actualities-action {
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform .15s ease, opacity .15s ease, background-color .15s ease;
+}
+
+.actuality-control {
+    width: 34px;
+    height: 34px;
+    background: rgba(255, 255, 255, 0.92);
+    color: #0f172a;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.16);
+}
+
+.actuality-control:hover,
+.actualities-action:hover {
+    transform: translateY(-1px);
+}
+
+.actuality-control:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.actualities-action {
+    padding: 10px 18px;
+    background: rgba(15, 23, 42, 0.1);
+    color: #0f172a;
+    font-weight: 600;
+}
+
+.actualities-action-primary {
+    background: #0f172a;
+    color: #fff;
+}
+
+.actualities-empty {
+    display: grid;
+    justify-items: center;
+    align-items: center;
+    gap: 16px;
+    padding: 48px 24px;
+    text-align: center;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.64);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.actualities-empty-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 400;
+}
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.45);
+    z-index: 1000;
+}
+
+.modal {
+    width: min(92vw, 640px);
+    max-height: 88vh;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 24px;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.24);
+}
+
+.modal input,
+.modal textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid rgba(15, 23, 42, 0.16);
+    border-radius: 12px;
+    font: inherit;
+}
+
+.actuality-textarea {
+    min-height: 180px;
+    resize: vertical;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.preview-frame {
+    width: min(100%, 240px);
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(15, 23, 42, 0.03);
+}
+
+.preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.busy-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.4);
+    z-index: 1100;
+}
+
+.busy-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    min-width: 240px;
+    padding: 18px 22px;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
+}
+
+.busy-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid rgba(15, 23, 42, 0.18);
+    border-top-color: #0f172a;
+    border-radius: 50%;
+    animation: actuality-spin .8s linear infinite;
+}
+
+@keyframes actuality-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.busy-progress {
+    width: 100%;
+    height: 6px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.08);
+}
+
+.busy-progress-bar {
+    height: 100%;
+    background: #0f172a;
+    transition: width .15s ease;
+}
+
+@media (max-width: 767px) {
+    .actuality-card {
+        padding: 20px;
+    }
+
+    .actuality-controls {
+        position: static;
+        justify-content: flex-end;
+    }
+}

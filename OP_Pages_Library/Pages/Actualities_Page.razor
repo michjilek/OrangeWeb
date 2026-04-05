@@ -1,0 +1,13 @@
+@page "/aktuality"
+@using OP_Razor_Components_Library.Components.Actualities
+@using OP_Razor_Components_Library.Components.EditableText
+@using OP_Shared_Library.Services
+@inject EditModeService EditModeService
+
+<section class="actualities-page">
+    <h1 class="uppercase-text mb">
+        <EditableText Id="Actualities_title" EditMode="@EditModeService.IsEditing" />
+    </h1>
+
+    <Actualities />
+</section>
