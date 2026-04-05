@@ -12,7 +12,7 @@ public class EditReferencesService
 
     private const string FileNameCs = "references.yaml";
     private const string FileNameEn = "references_en.yaml";
-    private string _fileName = FileNameCs;
+    private string _currentLanguage = "cs";
 
     public const string MinIoFolder = "references";
 
@@ -33,20 +33,19 @@ public class EditReferencesService
 
     public async Task LoadAsync(string language)
     {
-        ChangeLangFile(language);
-
-        var yamlPath = _yamlService.EnsureYamlPath(_fileName);
+        _currentLanguage = NormalizeLanguage(language);
 
         try
         {
-            if (File.Exists(yamlPath))
+            var sharedItems = await LoadYamlAsync(FileNameCs);
+            if (_currentLanguage == "cs")
             {
-                await using var fileStream = File.OpenRead(yamlPath);
-                Items = _yamlService.LoadYamlList<ReferenceItem>(yamlPath, fileStream) ?? new();
+                Items = CloneItems(sharedItems);
             }
             else
             {
-                Items = new();
+                var localizedItems = await LoadYamlAsync(FileNameEn);
+                Items = MergeSharedAndLocalized(sharedItems, localizedItems);
             }
         }
         catch
@@ -59,7 +58,25 @@ public class EditReferencesService
 
     public async Task SaveAsync(string webRootPath)
     {
-        await _yamlService.SaveToYamlAsync(Items, _fileName);
+        var sharedItems = await LoadYamlAsync(FileNameCs);
+        var localizedItems = await LoadYamlAsync(FileNameEn);
+
+        if (_currentLanguage == "cs")
+        {
+            var itemsToSave = CloneItems(Items);
+            await _yamlService.SaveToYamlAsync(itemsToSave, FileNameCs);
+
+            var synchronizedLocalizedItems = ProjectLocalizedItems(itemsToSave, localizedItems);
+            await _yamlService.SaveToYamlAsync(synchronizedLocalizedItems, FileNameEn);
+        }
+        else
+        {
+            var synchronizedSharedItems = ProjectSharedItems(Items, sharedItems);
+            await _yamlService.SaveToYamlAsync(synchronizedSharedItems, FileNameCs);
+
+            var localizedToSave = ProjectLocalizedItems(Items, localizedItems);
+            await _yamlService.SaveToYamlAsync(localizedToSave, FileNameEn);
+        }
     }
 
     public void RemoveItem(ReferenceItem item)
@@ -67,9 +84,9 @@ public class EditReferencesService
         Items.Remove(item);
     }
 
-    public void ChangeLangFile(string language)
+    private static string NormalizeLanguage(string language)
     {
-        _fileName = language?.ToLowerInvariant() == "cs" ? FileNameCs : FileNameEn;
+        return string.Equals(language, "en", StringComparison.OrdinalIgnoreCase) ? "en" : "cs";
     }
 
     public async Task<string> ResolveImageUrlAsync(string imageReference)
@@ -93,5 +110,115 @@ public class EditReferencesService
         {
             item.ImageSignedUrl = await ResolveImageUrlAsync(item.ImageUrl);
         }
+    }
+
+    private async Task<List<ReferenceItem>> LoadYamlAsync(string fileName)
+    {
+        var yamlPath = _yamlService.EnsureYamlPath(fileName);
+        if (!File.Exists(yamlPath))
+        {
+            return new();
+        }
+
+        await using var fileStream = File.OpenRead(yamlPath);
+        return _yamlService.LoadYamlList<ReferenceItem>(yamlPath, fileStream) ?? new();
+    }
+
+    private static List<ReferenceItem> CloneItems(List<ReferenceItem> items)
+    {
+        return items.Select(item => new ReferenceItem
+        {
+            Id = item.Id,
+            Author = item.Author,
+            Subtitle = item.Subtitle,
+            Text = item.Text,
+            ImageUrl = item.ImageUrl,
+            ImageSignedUrl = item.ImageSignedUrl
+        }).ToList();
+    }
+
+    private static ReferenceItem? FindMatchingItem(List<ReferenceItem> items, Guid id, int index)
+    {
+        var byId = items.FirstOrDefault(item => item.Id == id);
+        if (byId is not null)
+        {
+            return byId;
+        }
+
+        if (index >= 0 && index < items.Count)
+        {
+            return items[index];
+        }
+
+        return null;
+    }
+
+    private static List<ReferenceItem> MergeSharedAndLocalized(List<ReferenceItem> sharedItems, List<ReferenceItem> localizedItems)
+    {
+        var result = new List<ReferenceItem>();
+
+        for (var i = 0; i < sharedItems.Count; i++)
+        {
+            var sharedItem = sharedItems[i];
+            var localizedItem = FindMatchingItem(localizedItems, sharedItem.Id, i);
+
+            result.Add(new ReferenceItem
+            {
+                Id = sharedItem.Id,
+                Author = localizedItem?.Author ?? sharedItem.Author,
+                Subtitle = localizedItem?.Subtitle ?? sharedItem.Subtitle,
+                Text = localizedItem?.Text ?? sharedItem.Text,
+                ImageUrl = sharedItem.ImageUrl,
+                ImageSignedUrl = sharedItem.ImageSignedUrl
+            });
+        }
+
+        return result;
+    }
+
+    private static List<ReferenceItem> ProjectSharedItems(List<ReferenceItem> currentItems, List<ReferenceItem> existingSharedItems)
+    {
+        var result = new List<ReferenceItem>();
+
+        for (var i = 0; i < currentItems.Count; i++)
+        {
+            var currentItem = currentItems[i];
+            var existingSharedItem = FindMatchingItem(existingSharedItems, currentItem.Id, i);
+
+            result.Add(new ReferenceItem
+            {
+                Id = currentItem.Id,
+                Author = existingSharedItem?.Author ?? currentItem.Author,
+                Subtitle = existingSharedItem?.Subtitle ?? currentItem.Subtitle,
+                Text = existingSharedItem?.Text ?? currentItem.Text,
+                ImageUrl = currentItem.ImageUrl,
+                ImageSignedUrl = currentItem.ImageSignedUrl
+            });
+        }
+
+        return result;
+    }
+
+    private static List<ReferenceItem> ProjectLocalizedItems(List<ReferenceItem> currentItems, List<ReferenceItem> existingLocalizedItems)
+    {
+        var result = new List<ReferenceItem>();
+
+        for (var i = 0; i < currentItems.Count; i++)
+        {
+            var currentItem = currentItems[i];
+            var existingLocalizedItem = FindMatchingItem(existingLocalizedItems, currentItem.Id, i);
+
+            result.Add(new ReferenceItem
+            {
+                Id = currentItem.Id,
+                Author = currentItem.Author,
+                Subtitle = currentItem.Subtitle,
+                Text = currentItem.Text,
+                ImageUrl = currentItem.ImageUrl,
+                ImageSignedUrl = existingLocalizedItem?.ImageSignedUrl ?? currentItem.ImageSignedUrl
+            });
+        }
+
+        return result;
     }
 }
