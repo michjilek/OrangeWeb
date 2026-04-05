@@ -76,12 +76,12 @@
                        OnChange="HandleImageChange" />
 
             <div class="modal-actions">
+                <button class="btn" @onclick="CancelEdit">Zrušit</button>
                 @if (!string.IsNullOrWhiteSpace(Src))
                 {
                     <button class="btn" @onclick="DeleteEdit">Smazat</button>
                 }
                 <button class="btn" @onclick="SaveEdit">Uložit</button>
-                <button class="btn" @onclick="CancelEdit">Zrušit</button>
             </div>
         </div>
     </div>
