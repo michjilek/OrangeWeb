@@ -137,9 +137,6 @@
     #region Lifecycle
     protected override async Task OnInitializedAsync()
     {
-        // Ensure translations are ready (affects which YAML mapping is loaded by the service).
-        await TranslationsService.LoadAsync();
-
         // Load the language-specific YAML mapping (logical key -> object key).
         await EditImageService.LoadAsync(TranslationsService.GetLanguage());
 
