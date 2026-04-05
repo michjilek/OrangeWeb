@@ -14,8 +14,10 @@
         @if (EditModeService.IsEditing)
         {
             <!-- Přidat službu -->
-            <button class="btn btn-dark" @onclick="AddService" disabled="@isSaving">
-                @TranslationsService.GetText("Services_AddService")
+            <button class="service-list__add-btn" @onclick="AddService" disabled="@isSaving" title="@TranslationsService.GetText("Services_AddService")" aria-label="@TranslationsService.GetText("Services_AddService")">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg>
             </button>
         }
 
