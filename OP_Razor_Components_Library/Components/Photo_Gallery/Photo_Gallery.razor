@@ -5,7 +5,7 @@
 @if (EditModeService.IsEditing)
 {
     <div class="gallery-actions">
-        <button class="gallery-add-btn" @onclick="OpenNew" title="Add photo" aria-label="Add photo">
+        <button class="gallery-add-btn" @onclick="OpenNew" title="Přidat fotku" aria-label="Přidat fotku">
             <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
             </svg>
@@ -46,7 +46,7 @@
 
             @if (isAwaitingFile)
             {
-                <button class="btn" @onclick="CancelBusy">Close</button>
+                <button class="btn" @onclick="CancelBusy">Zavřít</button>
             }
         </div>
     </div>
@@ -105,17 +105,17 @@
                     <h2>EDIT PHOTO GALLERY</h2>
                 </div>
 
-                <label>Title:</label>
+                <label>Název:</label>
                 <input @bind="draft.ImageTitle" />
 
-                <label>Current Image:</label>
+                <label>Aktuální obrázek:</label>
                 @if (!string.IsNullOrEmpty(draft.ImagePath))
                 {
-                    <img src="@draftPreview" alt="Current image" class="preview-img" />
+                    <img src="@draftPreview" alt="Aktuální obrázek" class="preview-img" />
                 }
 
                 <label class="btn" for="news-upload" @onclick="BeginUpload" disabled="@isBusy">
-                    Upload New Image
+                    Nahrát nový obrázek
                 </label>
 
                 <InputFile id="news-upload"
@@ -123,12 +123,12 @@
                            OnChange="HandleImageChange" />
 
                 <div class="modal-actions">
-                    <button class="btn" @onclick="CloseModal">Cancel</button>
+                    <button class="btn" @onclick="CloseModal">Zrušit</button>
                     @if (!IsNew)
                     {
-                        <button class="btn" @onclick="Delete" disabled="@(SelectedImage is null)">Delete</button>
+                        <button class="btn" @onclick="Delete" disabled="@(SelectedImage is null)">Smazat</button>
                     }
-                    <button class="btn" @onclick="SaveEdit">Save</button>
+                    <button class="btn" @onclick="SaveEdit">Uložit</button>
                 </div>
             </div>
         </div>

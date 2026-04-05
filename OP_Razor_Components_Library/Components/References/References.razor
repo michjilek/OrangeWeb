@@ -38,7 +38,7 @@
                         <div class="reference-controls">
                             <button class="reference-control" @onclick="() => MoveEarlier(index)" disabled="@(index == 0)" title="Move up">↑</button>
                             <button class="reference-control" @onclick="() => MoveLater(index)" disabled="@(index == EditReferencesService.Items.Count - 1)" title="Move down">↓</button>
-                            <button class="reference-control" @onclick="() => OpenEditor(index)" title="Edit reference">✎</button>
+                            <button class="reference-control" @onclick="() => OpenEditor(index)" title="Upravit referenci">✎</button>
                         </div>
                     }
 
@@ -101,7 +101,7 @@
 
             @if (isAwaitingFile)
             {
-                <button class="references-action" @onclick="CancelBusy">Close</button>
+                <button class="references-action" @onclick="CancelBusy">Zavřít</button>
             }
         </div>
     </div>
@@ -112,28 +112,28 @@
     <div class="modal-backdrop">
         <div class="modal">
             <div class="modal-header">
-                <h2>@(IsNew ? "Add Reference" : "Edit Reference")</h2>
+                <h2>@(IsNew ? "Přidat referenci" : "Upravit referenci")</h2>
             </div>
 
-            <label>Name:</label>
+            <label>Jméno:</label>
             <input @bind="draftAuthor" />
 
-            <label>Subtitle:</label>
+            <label>Podtitulek:</label>
             <input @bind="draftSubtitle" />
 
-            <label>Reference text:</label>
+            <label>Text reference:</label>
             <textarea class="reference-textarea" @bind="draftText"></textarea>
 
-            <label>Current image:</label>
+            <label>Aktuální obrázek:</label>
             @if (!string.IsNullOrEmpty(draftImageUrl))
             {
                 <div class="preview-frame">
-                    <img src="@draftImageUrl" alt="Current image" class="preview-img" />
+                    <img src="@draftImageUrl" alt="Aktuální obrázek" class="preview-img" />
                 </div>
             }
 
             <label class="references-action references-action-primary" for="reference-upload" @onclick="BeginUpload">
-                Upload New Image
+                Nahrát nový obrázek
             </label>
 
             <InputFile id="reference-upload"
@@ -141,12 +141,12 @@
                        OnChange="HandleImageChange" />
 
             <div class="modal-actions">
-                <button class="references-action" @onclick="CancelEdit">Cancel</button>
+                <button class="references-action" @onclick="CancelEdit">Zrušit</button>
                 @if (!IsNew)
                 {
-                    <button class="references-action" @onclick="DeleteReference">Delete</button>
+                    <button class="references-action" @onclick="DeleteReference">Smazat</button>
                 }
-                <button class="references-action references-action-primary" @onclick="SaveEdit">Save</button>
+                <button class="references-action references-action-primary" @onclick="SaveEdit">Uložit</button>
             </div>
         </div>
     </div>

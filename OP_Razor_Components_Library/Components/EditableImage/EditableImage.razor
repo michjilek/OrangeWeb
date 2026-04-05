@@ -10,7 +10,7 @@
 @* Show edit button only when the app is in "editing" mode *@
 @if (EditModeService.IsEditing)
 {
-    <button class="edit-btn" @onclick="OpenEditor" title="Edit news">
+    <button class="edit-btn" @onclick="OpenEditor" title="Upravit obrázek">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04
                                                                              a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003
@@ -41,7 +41,7 @@
             @* When we're simply waiting for the user to choose a file, allow closing the overlay. *@
             @if (isAwaitingFile)
             {
-                <button class="btn" @onclick="CancelBusy">Close</button>
+                <button class="btn" @onclick="CancelBusy">Zavřít</button>
             }
         </div>
     </div>
@@ -56,18 +56,18 @@
                 <h2>CHANGE PICTURE</h2>
             </div>
 
-            <label>Current Image:</label>
+            <label>Aktuální obrázek:</label>
             @* Use local data-URL preview if available. *@
             @if (!string.IsNullOrEmpty(draftImageUrl))
             {
                 <div class="preview-frame">
-                    <img src="@draftImageUrl" alt="Current Image" class="preview-img" />
+                    <img src="@draftImageUrl" alt="Aktuální obrázek" class="preview-img" />
                 </div>
             }
 
             @* Clicking the label triggers hidden <InputFile>. We also show the loader immediately. *@
             <label class="btn" for="news-upload" @onclick="BeginUpload" disabled="@isBusy">
-                Upload New Image
+                Nahrát nový obrázek
             </label>
 
             @* Hidden file input – actual OS file picker. *@
@@ -78,10 +78,10 @@
             <div class="modal-actions">
                 @if (!string.IsNullOrWhiteSpace(Src))
                 {
-                    <button class="btn" @onclick="DeleteEdit">Delete</button>
+                    <button class="btn" @onclick="DeleteEdit">Smazat</button>
                 }
-                <button class="btn" @onclick="SaveEdit">Save</button>
-                <button class="btn" @onclick="CancelEdit">Cancel</button>
+                <button class="btn" @onclick="SaveEdit">Uložit</button>
+                <button class="btn" @onclick="CancelEdit">Zrušit</button>
             </div>
         </div>
     </div>

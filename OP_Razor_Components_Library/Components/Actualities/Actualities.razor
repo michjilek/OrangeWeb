@@ -35,7 +35,7 @@
                         <div class="actuality-controls">
                             <button class="actuality-control" @onclick="() => MoveEarlier(index)" disabled="@(index == 0)" title="Move up">↑</button>
                             <button class="actuality-control" @onclick="() => MoveLater(index)" disabled="@(index == EditActualitiesService.Items.Count - 1)" title="Move down">↓</button>
-                            <button class="actuality-control" @onclick="() => OpenEditor(index)" title="Edit actuality">✎</button>
+                            <button class="actuality-control" @onclick="() => OpenEditor(index)" title="Upravit aktualitu">✎</button>
                         </div>
                     }
 
@@ -86,7 +86,7 @@
 
             @if (isAwaitingFile)
             {
-                <button class="actualities-action" @onclick="CancelBusy">Close</button>
+                <button class="actualities-action" @onclick="CancelBusy">Zavřít</button>
             }
         </div>
     </div>
@@ -97,7 +97,7 @@
     <div class="modal-backdrop">
         <div class="modal">
             <div class="modal-header">
-                <h2>@(IsNew ? "Add Actuality" : "Edit Actuality")</h2>
+                <h2>@(IsNew ? "Přidat aktualitu" : "Upravit aktualitu")</h2>
             </div>
 
             <label>Date and time:</label>
@@ -106,16 +106,16 @@
             <label>Text:</label>
             <textarea class="actuality-textarea" @bind="draftText"></textarea>
 
-            <label>Current image:</label>
+            <label>Aktuální obrázek:</label>
             @if (!string.IsNullOrEmpty(draftImageUrl))
             {
                 <div class="preview-frame">
-                    <img src="@draftImageUrl" alt="Current image" class="preview-img" />
+                    <img src="@draftImageUrl" alt="Aktuální obrázek" class="preview-img" />
                 </div>
             }
 
             <label class="actualities-action actualities-action-primary" for="actuality-upload" @onclick="BeginUpload">
-                Upload New Image
+                Nahrát nový obrázek
             </label>
 
             <InputFile id="actuality-upload"
@@ -123,12 +123,12 @@
                        OnChange="HandleImageChange" />
 
             <div class="modal-actions">
-                <button class="actualities-action" @onclick="CancelEdit">Cancel</button>
+                <button class="actualities-action" @onclick="CancelEdit">Zrušit</button>
                 @if (!IsNew)
                 {
-                    <button class="actualities-action" @onclick="DeleteActuality">Delete</button>
+                    <button class="actualities-action" @onclick="DeleteActuality">Smazat</button>
                 }
-                <button class="actualities-action actualities-action-primary" @onclick="SaveEdit">Save</button>
+                <button class="actualities-action actualities-action-primary" @onclick="SaveEdit">Uložit</button>
             </div>
         </div>
     </div>
