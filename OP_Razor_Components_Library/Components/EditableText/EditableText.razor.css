@@ -27,21 +27,21 @@
 /* Vnitřní editační panel */
 .edit_area {
     background-color: var(--Editable_text_edit_area_background_color);
-    padding: 20px;
+    padding: 16px;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     width: 90%;
-    max-width: 400px;
+    max-width: 360px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
 }
 
 .text-area {
     width: 100%;
-    min-height: 100px;
+    min-height: 72px;
     font-size: 1rem;
-    padding: 10px;
+    padding: 8px 10px;
     border-radius: 8px;
     border: 1px solid var(--Editable_text_text_area_border_color);
     resize: vertical;
@@ -73,7 +73,7 @@
 }
 
 .btn {
-    padding: 8px 16px;
+    padding: 7px 14px;
     border-radius: 8px;
     border: none;
     background-color: var(--Editable_text_btn_background_color);
