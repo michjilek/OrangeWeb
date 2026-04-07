@@ -1,0 +1,144 @@
+.editable-span {
+    cursor: pointer;
+    border: 1px dashed var(--Editable_text_editable_span_border);
+    padding: 10px 20px;
+}
+
+.rich-preview {
+    display: inline;
+    white-space: normal;
+}
+
+.rich-preview :global(p:first-child) {
+    margin-top: 0;
+}
+
+.rich-preview :global(p:last-child) {
+    margin-bottom: 0;
+}
+
+.overlay {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100%;
+    height: 100%;
+    background-color: var(--OverlayColor);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    pointer-events: all;
+}
+
+.edit_area {
+    background-color: var(--Editable_text_edit_area_background_color);
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    width: min(92vw, 760px);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid var(--Editable_text_text_area_border_color);
+    border-radius: 12px;
+    background-color: #fff;
+}
+
+.tool-btn,
+.tool-select,
+.tool-color {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 40px;
+    padding: 0 10px;
+    border: 1px solid var(--Editable_text_text_area_border_color);
+    border-radius: 10px;
+    background-color: #fff;
+    color: #333;
+}
+
+.tool-btn {
+    cursor: pointer;
+}
+
+.tool-btn:hover,
+.tool-select:hover,
+.tool-color:hover {
+    background-color: #f3f3f3;
+}
+
+.tool-select select {
+    border: none;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
+}
+
+.tool-color input {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.editor-surface {
+    min-height: 220px;
+    padding: 18px 24px;
+    border: 1px solid var(--Editable_text_text_area_border_color);
+    border-radius: 12px;
+    background-color: #fff;
+    outline: none;
+    overflow: auto;
+    line-height: 1.6;
+}
+
+.editor-surface :global(p) {
+    margin: 0 0 0.75rem;
+}
+
+.editor-surface :global(p:last-child) {
+    margin-bottom: 0;
+}
+
+.editor-surface :global(ul),
+.editor-surface :global(ol) {
+    margin: 0.5rem 0 0.75rem;
+    padding-left: 1.6rem;
+    margin-left: 0;
+    list-style-position: outside;
+}
+
+.editor-surface :global(li) {
+    margin-bottom: 0.35rem;
+}
+
+.button-group {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    background-color: var(--Editable_text_btn_background_color);
+    color: white;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: var(--Editable_text_btn_background_color_hover);
+}

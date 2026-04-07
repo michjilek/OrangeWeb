@@ -12,7 +12,7 @@ h1 {
     justify-content: center;
 }
 
-p {
+.text_about p {
     margin-bottom: 10px;
     font-size: 1rem !important;
     line-height: 1.8 !important;
@@ -52,6 +52,20 @@ p {
     gap: 12px;
 }
 
+.rich-text-block {
+    font-size: 1rem !important;
+    line-height: 1.8 !important;
+}
+
+.rich-text-block :global(ol),
+.rich-text-block :global(ul) {
+    margin: 0.5rem 0 0.75rem 1.5rem;
+}
+
+.rich-text-block :global(li) {
+    margin-bottom: 0.35rem;
+}
+
 /* 768+ – side by side: image left, text right */
 @media (min-width: 768px) {
     .container_about {
@@ -75,7 +89,8 @@ p {
         flex: 1 1 50%;
     }
 
-    p {
+    .text_about p,
+    .rich-text-block {
         font-size: 1.15rem;
     }
 }
@@ -86,7 +101,8 @@ p {
         max-width: 1024px;
     }
 
-    p {
+    .text_about p,
+    .rich-text-block {
         font-size: 1.2rem !important;
     }
 }

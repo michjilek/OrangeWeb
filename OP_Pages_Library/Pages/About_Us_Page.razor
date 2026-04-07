@@ -1,5 +1,6 @@
-﻿@page "/about_us"
+@page "/about_us"
 @using OP_Razor_Components_Library.Components.EditableImage
+@using OP_Razor_Components_Library.Components.EditableRichText
 @using OP_Razor_Components_Library.Components.EditableText
 @using OP_Razor_Components_Library.Components.Footer
 @using OP_Shared_Library.Services
@@ -21,10 +22,10 @@
                 </EditableImage>
             </div>
             <div class="text_about">
-                <p><EditableText Id="About_us_text_1" EditMode="@EditModeService.IsEditing" /></p>
-                <p><EditableText Id="About_us_text_2" EditMode="@EditModeService.IsEditing" /></p>
-                <p><EditableText Id="About_us_text_3" EditMode="@EditModeService.IsEditing" /></p>
-                <p><EditableText Id="About_us_text_4" EditMode="@EditModeService.IsEditing" /></p>
+                <div class="rich-text-block"><EditableRichText Id="About_us_text_1" EditMode="@EditModeService.IsEditing" /></div>
+                <div class="rich-text-block"><EditableRichText Id="About_us_text_2" EditMode="@EditModeService.IsEditing" /></div>
+                <div class="rich-text-block"><EditableRichText Id="About_us_text_3" EditMode="@EditModeService.IsEditing" /></div>
+                <div class="rich-text-block"><EditableRichText Id="About_us_text_4" EditMode="@EditModeService.IsEditing" /></div>
             </div>
         </div>
     </div>
