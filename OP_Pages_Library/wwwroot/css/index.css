@@ -21,6 +21,8 @@ body, html {
     width: 100%;
     min-width: 320px;
     overflow-x: hidden;
+    overflow-y: scroll;
+    scrollbar-gutter: stable;
 }
 
 body {
