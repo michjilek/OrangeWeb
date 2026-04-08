@@ -67,6 +67,14 @@
     min-width: 120px;
 }
 
+.service-list__image-cell {
+    width: 200px;
+}
+
+.service-list__qr-cell {
+    width: 120px;
+}
+
 .service-list__image-wrapper,
 .service-list__qr-wrapper {
     display: flex;
@@ -106,6 +114,15 @@
     border: 0;
     background: transparent;
     cursor: pointer;
+}
+
+.service-list__image-button {
+    width: 100%;
+}
+
+.service-list__qr-button {
+    width: 96px;
+    height: 96px;
 }
 
 .service-list__qr-image {
@@ -199,6 +216,7 @@
 
 .table {
     width: 100%;
+    table-layout: fixed;
     border-collapse: separate;
     border-spacing: 0 12px;
     margin: 0;
@@ -268,6 +286,7 @@
         display: block;
         width: 100%;
         min-width: 0;
+        table-layout: auto;
         border-spacing: 0;
     }
 
