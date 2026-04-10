@@ -90,6 +90,8 @@
     width: calc(100% - 16px);
     max-width: 180px;
     min-height: 120px;
+    border-radius: 20px;
+    overflow: hidden;
 }
 
 .service-list__service-image,
@@ -105,6 +107,7 @@
     object-fit: contain;
     width: 100%;
     height: 120px;
+    border-radius: inherit;
 }
 
 .service-list__image-button,
@@ -118,6 +121,7 @@
 
 .service-list__image-button {
     width: 100%;
+    border-radius: inherit;
 }
 
 .service-list__qr-button {
