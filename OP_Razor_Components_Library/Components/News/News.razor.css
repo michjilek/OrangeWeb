@@ -97,6 +97,7 @@
     --nav-size: 48px;
     --arrow-gap: 12px;
     --media-w: 100%;
+    --news-content-min-height: 30rem;
     position: relative;
     overflow: hidden;
     width: 90%;
@@ -123,7 +124,7 @@
     flex-direction: column;
     align-items: center;
     gap: 12px;
-    min-height: 38rem;
+    min-height: var(--news-content-min-height);
     width: min(100%, 72rem);
     justify-content: flex-start;
     margin: 20px auto 0;
@@ -134,6 +135,23 @@
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 12px 34px rgba(15, 23, 42, 0.08);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+}
+
+.news-measurements {
+    /* Keep measurement nodes out of view while preserving layout metrics for JS height calculation. */
+    position: absolute;
+    left: -99999px;
+    top: 0;
+    width: 100%;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+.news-content--measure {
+    /* Measurement cards must size to real content, not to the shared min-height variable. */
+    min-height: auto;
+    height: auto;
+    margin: 20px auto 0;
 }
 
 /* Wrapper for picture + arrows: 3 columns [‹] [image] [›] */
@@ -457,6 +475,10 @@
    MEDIA
    ========================= */
 @media (min-width: 480px) {
+    .news {
+        --news-content-min-height: 36rem;
+    }
+
     .subtitle {
         font-size: 1.1rem;
     }
@@ -469,7 +491,6 @@
         font-size: 1.1rem !important;
     }
     .news-content {
-        min-height: 42rem;
         padding: 22px 22px 28px;
     }
 }
@@ -479,6 +500,7 @@
         --nav-size: 56px;
         --arrow-gap: 12px;
         --media-w: 80%;
+        --news-content-min-height: 26rem;
     }
 
     .title {
@@ -501,7 +523,6 @@
         grid-row: 1;
     }
     .news-content {
-        min-height: 40rem;
         padding: 24px 28px 28px;
     }
 }
@@ -511,6 +532,7 @@
         --nav-size: 64px;
         --arrow-gap: 16px;
         --media-w: 60%;
+        --news-content-min-height: 32rem;
     }
 
     .text {
@@ -523,7 +545,6 @@
         width: 80%;
     }
     .news-content {
-        min-height: 42rem;
         padding: 28px 36px 32px;
     }
 }
@@ -537,6 +558,7 @@
 @media (min-width: 1440px) {
     .news {
         --arrow-gap: 20px;
+        --news-content-min-height: 26rem;
     }
     /* move arrows inside */
     .news-media {
@@ -545,9 +567,6 @@
 
     .text, .title {
         max-width: 980px;
-    }
-    .news-content {
-        min-height: 42rem;
     }
 }
 

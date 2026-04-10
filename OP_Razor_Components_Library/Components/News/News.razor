@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.Extensions.Hosting
+@using Microsoft.JSInterop
 @using OP_Razor_Components_Library.Components.EditableText
 @using OP_Razor_Components_Library.Components.News.Services
 @using OP_Shared_Library.Services
@@ -10,9 +11,11 @@
 @inject TranslationsService TranslationsService
 @inject IHostEnvironment Env
 @inject IMinIoService MinIoService
-@implements IDisposable
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
 
 <div class="news centered mt pt pl pr pb"
+     @ref="_newsRootRef"
      tabindex="0"
      @onkeydown="HandleKey"
      @onpointerdown="OnPointerDown"
@@ -130,6 +133,39 @@
                 </div>
             }
         </div>
+
+        @* Hidden measurement nodes used to compute a stable max content height for all news items. *@
+        <div class="news-measurements" aria-hidden="true">
+            @foreach (var measureItem in EditNewsService.Items)
+            {
+                <div class="news-content news-content--measure">
+                    <p class="title color_dark uppercase-text">@measureItem.Title</p>
+
+                    @if (!string.IsNullOrWhiteSpace(measureItem.Text1))
+                    {
+                        <p class="text mt_less color_dark centered">@measureItem.Text1</p>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(measureItem.Text2))
+                    {
+                        <p class="text mt_less color_dark centered">@measureItem.Text2</p>
+                    }
+
+                    @if (HasMultipleNews)
+                    {
+                        <div class="news-dots mt">
+                            @for (int i = 0; i < EditNewsService.Items.Count; i++)
+                            {
+                                <button class="news-dot @(i == 0 ? "active" : null)"
+                                        type="button"
+                                        tabindex="-1"
+                                        aria-hidden="true"></button>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
     }
     else
     {
@@ -222,6 +258,10 @@
     private bool isBusy;
     private int uploadProgress = 0;
     private bool isAwaitingFile;
+    private ElementReference _newsRootRef;
+    private IJSObjectReference? _jsModule;
+    // Tracks whether the JS auto-height observer was already attached.
+    private bool _newsAutoHeightInitialized;
     #endregion
 
     #region Constants
@@ -255,12 +295,50 @@
         TranslationsService.OnChange += TranslationChanged;
         EditModeService.OnEditModeChanged += HandleEditModeChanged;
     }
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         EditModeService.OnEditModeChanged -= HandleEditModeChanged;
         TranslationsService.OnChange -= TranslationChanged;
+
+        if (_jsModule is not null)
+        {
+            try
+            {
+                await _jsModule.InvokeVoidAsync("disposeNewsAutoHeight", _newsRootRef);
+                await _jsModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
     }
     #endregion
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_jsModule is null)
+        {
+            // Load the module that measures all hidden news variants and syncs the visible card height.
+            _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./_content/OP_Razor_Components_Library/Components/News/News.razor.js");
+        }
+
+        if (EditNewsService.Items.Count == 0)
+        {
+            return;
+        }
+
+        if (!_newsAutoHeightInitialized)
+        {
+            // Initialize resize/font observers once so the card height stays stable across item switches.
+            await _jsModule.InvokeVoidAsync("initializeNewsAutoHeight", _newsRootRef);
+            _newsAutoHeightInitialized = true;
+        }
+
+        // Re-sync after each render because content and layout can change with navigation or edits.
+        await _jsModule.InvokeVoidAsync("syncNewsContentHeight", _newsRootRef);
+    }
 
     #region Private Methods
     private void Next()
