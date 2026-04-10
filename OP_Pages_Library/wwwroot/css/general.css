@@ -39,6 +39,17 @@
     text-transform: uppercase;
 }
 
+/* ABOUT PAGE PHOTO */
+.container_about .image_about {
+    border-radius: 24px;
+    overflow: hidden;
+}
+
+.container_about .image_about img {
+    display: block;
+    border-radius: 24px;
+}
+
 /* FONTS */
 h1, h2, p, th, td {
     font-family: var(--MainFont);
