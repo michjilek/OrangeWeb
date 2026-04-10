@@ -27,11 +27,6 @@
 	  </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.8" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\OP_Db\OP_Db.csproj" />
     <ProjectReference Include="..\OP_Pages_Library\OP_Pages_Library.csproj" />
     <ProjectReference Include="..\OP_Shared_Library\OP_Shared_Library.csproj" />
   </ItemGroup>

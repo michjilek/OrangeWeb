@@ -5,8 +5,6 @@ VisualStudioVersion = 18.0.11222.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrangeWeb", "OrangeWeb.csproj", "{A6DE5CF0-4BDE-4D8D-ACBF-12289BDF771F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OP_Db", "..\OP_Db\OP_Db.csproj", "{73263A5E-639F-4B4C-9FA6-1649AAF79573}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OP_Pages_Library", "..\OP_Pages_Library\OP_Pages_Library.csproj", "{EEB0D4A6-083C-45C3-A125-561ECDAC879C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OP_Razor_Components_Library", "..\OP_Razor_Components_Library\OP_Razor_Components_Library.csproj", "{14C2F42B-F049-4C3B-BC3B-64D5B3BDE3AC}"
@@ -32,10 +30,6 @@ Global
 		{A6DE5CF0-4BDE-4D8D-ACBF-12289BDF771F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6DE5CF0-4BDE-4D8D-ACBF-12289BDF771F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6DE5CF0-4BDE-4D8D-ACBF-12289BDF771F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{73263A5E-639F-4B4C-9FA6-1649AAF79573}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{73263A5E-639F-4B4C-9FA6-1649AAF79573}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{73263A5E-639F-4B4C-9FA6-1649AAF79573}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{73263A5E-639F-4B4C-9FA6-1649AAF79573}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EEB0D4A6-083C-45C3-A125-561ECDAC879C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EEB0D4A6-083C-45C3-A125-561ECDAC879C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EEB0D4A6-083C-45C3-A125-561ECDAC879C}.Release|Any CPU.ActiveCfg = Release|Any CPU

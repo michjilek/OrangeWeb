@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.EntityFrameworkCore;
 using Minio;
-using OP_Db.Server;
 using Op_LP.Services;
 using Op_LP.Services.Admin;
 using OP_Razor_Components_Library.Components.Actualities.Services;
@@ -47,8 +45,6 @@ builder.Services.Configure<AdminAuthOptions>(builder.Configuration.GetSection("A
 builder.Services.Configure<ContactFormEmailOptions>(builder.Configuration.GetSection("ContactFormEmail"));
 builder.Services.Configure<CompanyBrandingOptions>(builder.Configuration.GetSection("Branding"));
 
-//Db Prepare
-builder.Services.AddDbContext<OP_Db_Context>(options => options.UseSqlite("Data Source=OP_db.db"));
 builder.Services.AddHttpClient();
 
 // Services - singletons
@@ -94,17 +90,6 @@ var app = builder.Build();
 // Log App START
 var customLogger = app.Services.GetRequiredService<ICustomLogger>();
 customLogger.MyLogger.Information($"[ONLY SERVER APP]: START...");
-
-// Db Initialize
-var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
-using (var scope = scopeFactory.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<OP_Db_Context>();
-    if (db.Database.EnsureCreated())
-    {
-        SeedData.Initialize(db);
-    }
-}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
