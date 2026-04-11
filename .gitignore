@@ -22,3 +22,7 @@
 /OP_Shared_Library/bin/Release/net10.0
 /PasswordChangeApp/bin/Release/net10.0
 /OrangeWeb
+/OP_Pages_Library/Properties/PublishProfiles/OP_HT_test.pubxml.user
+/OP_Razor_Components_Library/Properties/PublishProfiles/OP_HT_test.pubxml.user
+/OP_Razor_Image_Library/Properties/PublishProfiles/OP_HT_test.pubxml.user
+/OP_Shared_Library/Properties/PublishProfiles/OP_HT_test.pubxml.user
