@@ -18,43 +18,58 @@
         @*  <OnlineStatusIndicator IsOnlineChanged="isOnline => OnlineStatusChanged(isOnline)" /> *@
     </div>
     <div class="social-media">
-        <div id="google_div">
-            <a href="@Branding.SocialLinks.Google"
-               target="_blank"
-               rel="noopener noreferrer"
-               aria-label="@($"Google firmy {Branding.CompanyName}")">
-                <Google />
-            </a>
-        </div>
-        <div id="seznam_div">
-            <a href="@Branding.SocialLinks.Seznam"
-               target="_blank"
-               rel="noopener noreferrer"
-               aria-label="@($"Seznam Firmy.cz {Branding.CompanyName}")">
-                <Seznam />
-            </a>
-        </div>
-        <div id="facebook_div">
-            <a href="@Branding.SocialLinks.Facebook"
-               target="_blank"
-               rel="noopener noreferrer"
-               aria-label="@($"Facebook {Branding.CompanyName}")">
-                <Facebook />
-            </a>
-        </div>
+        @if (GoogleLink is not null)
+        {
+            <div id="google_div">
+                <a href="@GoogleLink"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   aria-label="@($"Google firmy {Branding.CompanyName}")">
+                    <Google />
+                </a>
+            </div>
+        }
+        @if (SeznamLink is not null)
+        {
+            <div id="seznam_div">
+                <a href="@SeznamLink"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   aria-label="@($"Seznam Firmy.cz {Branding.CompanyName}")">
+                    <Seznam />
+                </a>
+            </div>
+        }
+        @if (FacebookLink is not null)
+        {
+            <div id="facebook_div">
+                <a href="@FacebookLink"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   aria-label="@($"Facebook {Branding.CompanyName}")">
+                    <Facebook />
+                </a>
+            </div>
+        }
         @* Aria-label - text description for for screen readers *@
         @* Rel -> because of target="_blank" -> noopener: beacuse of hacks (new page cant manipulate with original)
            noreferrer: doesnt send referer header, so hacker dont know, from where the user is coming
         *@
-        <div id="instagram_div">
-            <a href="@Branding.SocialLinks.Instagram"
-               target="_blank"
-               rel="noopener noreferrer"
-               aria-label="@($"Instagram {Branding.CompanyName}")">
-                <Instagram />
-            </a>
-        </div>
-        <span class="social-divider" aria-hidden="true"></span>
+        @if (InstagramLink is not null)
+        {
+            <div id="instagram_div">
+                <a href="@InstagramLink"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   aria-label="@($"Instagram {Branding.CompanyName}")">
+                    <Instagram />
+                </a>
+            </div>
+        }
+        @if (HasAnySocialLink)
+        {
+            <span class="social-divider" aria-hidden="true"></span>
+        }
         <LanguageSwitcher CurrentLanguage="@currentLang" LanguageChanged="OnLanguageChanged" />
         <div id="login_div">
             <AuthorizeView>

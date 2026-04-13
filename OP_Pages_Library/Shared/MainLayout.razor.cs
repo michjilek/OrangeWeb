@@ -20,7 +20,16 @@ public partial class MainLayout : IDisposable, IAsyncDisposable
     #region Private Properties
     private CompanyBrandingOptions Branding => BrandingOptions?.Value ?? new CompanyBrandingOptions();
     private string currentLang = "cs";
-    private IJSObjectReference? _materialSymbolsModule;
+    private IJSObjectReference _materialSymbolsModule;
+    private string GoogleLink => NormalizeExternalUrl(Branding.SocialLinks.Google);
+    private string SeznamLink => NormalizeExternalUrl(Branding.SocialLinks.Seznam);
+    private string FacebookLink => NormalizeExternalUrl(Branding.SocialLinks.Facebook);
+    private string InstagramLink => NormalizeExternalUrl(Branding.SocialLinks.Instagram);
+    private bool HasAnySocialLink =>
+        GoogleLink is not null ||
+        SeznamLink is not null ||
+        FacebookLink is not null ||
+        InstagramLink is not null;
     #endregion
 
     #region Ctor
@@ -98,6 +107,31 @@ public partial class MainLayout : IDisposable, IAsyncDisposable
     {
         currentLang = Translations.GetLanguage();
         InvokeAsync(StateHasChanged);
+    }
+
+    private static string NormalizeExternalUrl(string rawUrl)
+    {
+        if (string.IsNullOrWhiteSpace(rawUrl))
+        {
+            return null;
+        }
+
+        var trimmedUrl = rawUrl.Trim();
+
+        if (!Uri.TryCreate(trimmedUrl, UriKind.Absolute, out var absoluteUri))
+        {
+            if (!Uri.TryCreate($"https://{trimmedUrl}", UriKind.Absolute, out absoluteUri))
+            {
+                return null;
+            }
+        }
+
+        if (absoluteUri.Scheme == Uri.UriSchemeHttp || absoluteUri.Scheme == Uri.UriSchemeHttps)
+        {
+            return absoluteUri.AbsoluteUri;
+        }
+
+        return null;
     }
     #endregion
 }
