@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Hosting;
+using OP_Shared_Library.Services;
 using OP_Shared_Library.Struct;
 
 namespace OP_Razor_Components_Library.Components.Photo_Gallery.Services;
@@ -221,6 +222,8 @@ public class EditPhotoGalleryService
             var localizedToSave = ProjectLocalizedItems(Items, localizedItems);
             await _yamlService.SaveToYamlAsync(localizedToSave, FileNameEn);
         }
+
+        await CleanUnusedImagesAsync();
     }
     public void AddNewItem()
     {
@@ -258,5 +261,48 @@ public class EditPhotoGalleryService
     {
         return _minIoService.NormalizeImageReference(imageReference);
     }
+
+    public async Task CleanUnusedImagesAsync()
+    {
+        var prefix = $"{MinIoFolder.Trim('/')}/";
+
+        var sharedItems = await LoadYamlAsync(FileNameCs);
+        var localizedItems = await LoadYamlAsync(FileNameEn);
+
+        var referenced = sharedItems
+            .Concat(localizedItems)
+            .Select(item => _minIoService.NormalizeImageReference(item.ImagePath))
+            .Where(imagePath => !string.IsNullOrWhiteSpace(imagePath)
+                && imagePath.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var referencedWithVariants = BuildReferencedSetWithVariants(referenced);
+        await _minIoService.RemoveObjectInBucket(prefix, referencedWithVariants);
+    }
     #endregion
+
+    private static HashSet<string> BuildReferencedSetWithVariants(IEnumerable<string> referenced)
+    {
+        var result = new HashSet<string>(referenced, StringComparer.OrdinalIgnoreCase);
+        var maxWidth = ResponsiveImageHelper.VariantWidths.Max();
+
+        foreach (var key in result.ToArray())
+        {
+            if (!ResponsiveImageHelper.IsResponsiveKey(key))
+            {
+                continue;
+            }
+
+            foreach (var width in ResponsiveImageHelper.VariantWidths)
+            {
+                var variantKey = width == maxWidth
+                    ? key
+                    : ResponsiveImageHelper.BuildVariantKey(key, width);
+
+                result.Add(variantKey);
+            }
+        }
+
+        return result;
+    }
 }

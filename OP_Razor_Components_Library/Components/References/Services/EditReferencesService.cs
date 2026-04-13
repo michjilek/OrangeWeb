@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using OP_Shared_Library.Services;
 
 namespace OP_Razor_Components_Library.Components.References.Services;
 
@@ -77,6 +78,8 @@ public class EditReferencesService
             var localizedToSave = ProjectLocalizedItems(Items, localizedItems);
             await _yamlService.SaveToYamlAsync(localizedToSave, FileNameEn);
         }
+
+        await CleanUnusedImagesAsync();
     }
 
     public void RemoveItem(ReferenceItem item)
@@ -217,6 +220,49 @@ public class EditReferencesService
                 ImageUrl = currentItem.ImageUrl,
                 ImageSignedUrl = existingLocalizedItem?.ImageSignedUrl ?? currentItem.ImageSignedUrl
             });
+        }
+
+        return result;
+    }
+
+    private async Task CleanUnusedImagesAsync()
+    {
+        var prefix = $"{MinIoFolder.Trim('/')}/";
+
+        var sharedItems = await LoadYamlAsync(FileNameCs);
+        var localizedItems = await LoadYamlAsync(FileNameEn);
+
+        var referenced = sharedItems
+            .Concat(localizedItems)
+            .Select(item => _minIoService.NormalizeImageReference(item.ImageUrl))
+            .Where(imageUrl => !string.IsNullOrWhiteSpace(imageUrl)
+                && imageUrl.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var referencedWithVariants = BuildReferencedSetWithVariants(referenced);
+        await _minIoService.RemoveObjectInBucket(prefix, referencedWithVariants);
+    }
+
+    private static HashSet<string> BuildReferencedSetWithVariants(IEnumerable<string> referenced)
+    {
+        var result = new HashSet<string>(referenced, StringComparer.OrdinalIgnoreCase);
+        var maxWidth = ResponsiveImageHelper.VariantWidths.Max();
+
+        foreach (var key in result.ToArray())
+        {
+            if (!ResponsiveImageHelper.IsResponsiveKey(key))
+            {
+                continue;
+            }
+
+            foreach (var width in ResponsiveImageHelper.VariantWidths)
+            {
+                var variantKey = width == maxWidth
+                    ? key
+                    : ResponsiveImageHelper.BuildVariantKey(key, width);
+
+                result.Add(variantKey);
+            }
         }
 
         return result;
