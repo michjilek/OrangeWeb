@@ -37,6 +37,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Update="Properties\PublishProfiles\OP_HT_prod.pubxml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
     <None Update="Properties\PublishProfiles\OP_HT_test.pubxml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
