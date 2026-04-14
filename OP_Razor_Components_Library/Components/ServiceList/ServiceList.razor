@@ -25,11 +25,26 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th><EditableText Id="Services_Image" EditMode="@EditModeService.IsEditing" /></th>
-                        <th><EditableText Id="Services_Service" EditMode="@EditModeService.IsEditing" /></th>
-                        <th><EditableText Id="Services_Description" EditMode="@EditModeService.IsEditing" /></th>
-                        <th><EditableText Id="Services_Price" EditMode="@EditModeService.IsEditing" /></th>
-                        <th><EditableText Id="Services_QRCode" EditMode="@EditModeService.IsEditing" /></th>
+                        @if (ShowImageColumn)
+                        {
+                            <th><EditableText Id="Services_Image" EditMode="@EditModeService.IsEditing" /></th>
+                        }
+                        @if (ShowServiceColumn)
+                        {
+                            <th><EditableText Id="Services_Service" EditMode="@EditModeService.IsEditing" /></th>
+                        }
+                        @if (ShowDescriptionColumn)
+                        {
+                            <th><EditableText Id="Services_Description" EditMode="@EditModeService.IsEditing" /></th>
+                        }
+                        @if (ShowPriceColumn)
+                        {
+                            <th><EditableText Id="Services_Price" EditMode="@EditModeService.IsEditing" /></th>
+                        }
+                        @if (ShowQrCodeColumn)
+                        {
+                            <th><EditableText Id="Services_QRCode" EditMode="@EditModeService.IsEditing" /></th>
+                        }
                         @if (EditModeService.IsEditing)
                         {
                             <th style="width:1%"></th>
@@ -40,89 +55,104 @@
                     @foreach (var item in ServicesService.Items)
                     {
                         <tr>
-                            <td class="service-list__image-cell" data-label="@TranslationsService.GetText("Services_Image")">
-                                <div class="service-list__image-wrapper">
-                                    <EditableImage Key="@item.ImageKey" Sizes="96px" @key="item.ImageKey">
-                                        <ImageContent Context="image">
-                                            @if (string.IsNullOrWhiteSpace(image.Src))
-                                            {
-                                                <div class="service-list__image-placeholder">IMG</div>
-                                            }
-                                            else
-                                            {
-                                                <button type="button"
-                                                        class="service-list__image-button"
-                                                        aria-label="@GetServiceImageAlt(item)">
-                                                    <img src="@image.Src"
-                                                         srcset="@image.SrcSet"
-                                                         sizes="@image.Sizes"
-                                                         width="180"
-                                                         height="120"
-                                                         alt="@GetServiceImageAlt(item)"
-                                                         class="service-list__service-image" />
-                                                </button>
-                                            }
-                                        </ImageContent>
-                                    </EditableImage>
-                                </div>
-                            </td>
-                            <td data-label="@TranslationsService.GetText("Services_Service")">
-                                @if (EditModeService.IsEditing)
-                                {
-                                    <input class="form-control" @bind="item.Name" disabled="@isSaving" />
-                                }
-                                else
-                                {
-                                    @item.Name
-                                }
-                            </td>
-                            <td data-label="@TranslationsService.GetText("Services_Description")">
-                                @if (EditModeService.IsEditing)
-                                {
-                                    <textarea class="form-control" @bind="item.Description" disabled="@isSaving"></textarea>
-                                }
-                                else
-                                {
-                                    <div style="white-space: pre-line;">@item.Description</div>
-                                }
-                            </td>
-                            <td data-label="@TranslationsService.GetText("Services_Price")">
-                                @if (EditModeService.IsEditing)
-                                {
-                                    <input class="form-control" @bind="item.Price" disabled="@isSaving" />
-                                }
-                                else
-                                {
-                                    @item.Price
-                                }
-                            </td>
-                            <td class="service-list__qr-cell" data-label="@TranslationsService.GetText("Services_QRCode")">
-                                <div class="service-list__qr-wrapper">
-                                    <EditableImage Key="@item.QrCodeKey" Sizes="96px" @key="item.QrCodeKey">
-                                        <ImageContent Context="image">
-                                            @if (string.IsNullOrWhiteSpace(image.Src))
-                                            {
-                                                <div class="service-list__qr-placeholder">QR</div>
-                                            }
-                                            else
-                                            {
-                                                <button type="button"
-                                                        class="service-list__qr-button"
-                                                        @onclick="() => OpenQrModal(image.Src, GetQrImageAlt(item))"
-                                                        aria-label="@GetQrOpenLabel(item)">
-                                                    <img src="@image.Src"
-                                                         srcset="@image.SrcSet"
-                                                         sizes="@image.Sizes"
-                                                         width="96"
-                                                         height="96"
-                                                         alt="@GetQrImageAlt(item)"
-                                                         class="service-list__qr-image" />
-                                                </button>
-                                            }
-                                        </ImageContent>
-                                    </EditableImage>
-                                </div>
-                            </td>
+                            @if (ShowImageColumn)
+                            {
+                                <td class="service-list__image-cell" data-label="@TranslationsService.GetText("Services_Image")">
+                                    <div class="service-list__image-wrapper">
+                                        <EditableImage Key="@item.ImageKey" Sizes="96px" @key="item.ImageKey">
+                                            <ImageContent Context="image">
+                                                @if (string.IsNullOrWhiteSpace(image.Src))
+                                                {
+                                                    <div class="service-list__image-placeholder">IMG</div>
+                                                }
+                                                else
+                                                {
+                                                    <button type="button"
+                                                            class="service-list__image-button"
+                                                            aria-label="@GetServiceImageAlt(item)">
+                                                        <img src="@image.Src"
+                                                             srcset="@image.SrcSet"
+                                                             sizes="@image.Sizes"
+                                                             width="180"
+                                                             height="120"
+                                                             alt="@GetServiceImageAlt(item)"
+                                                             class="service-list__service-image" />
+                                                    </button>
+                                                }
+                                            </ImageContent>
+                                        </EditableImage>
+                                    </div>
+                                </td>
+                            }
+                            @if (ShowServiceColumn)
+                            {
+                                <td data-label="@TranslationsService.GetText("Services_Service")">
+                                    @if (EditModeService.IsEditing)
+                                    {
+                                        <input class="form-control" @bind="item.Name" disabled="@isSaving" />
+                                    }
+                                    else
+                                    {
+                                        @item.Name
+                                    }
+                                </td>
+                            }
+                            @if (ShowDescriptionColumn)
+                            {
+                                <td data-label="@TranslationsService.GetText("Services_Description")">
+                                    @if (EditModeService.IsEditing)
+                                    {
+                                        <textarea class="form-control" @bind="item.Description" disabled="@isSaving"></textarea>
+                                    }
+                                    else
+                                    {
+                                        <div style="white-space: pre-line;">@item.Description</div>
+                                    }
+                                </td>
+                            }
+                            @if (ShowPriceColumn)
+                            {
+                                <td data-label="@TranslationsService.GetText("Services_Price")">
+                                    @if (EditModeService.IsEditing)
+                                    {
+                                        <input class="form-control" @bind="item.Price" disabled="@isSaving" />
+                                    }
+                                    else
+                                    {
+                                        @item.Price
+                                    }
+                                </td>
+                            }
+                            @if (ShowQrCodeColumn)
+                            {
+                                <td class="service-list__qr-cell" data-label="@TranslationsService.GetText("Services_QRCode")">
+                                    <div class="service-list__qr-wrapper">
+                                        <EditableImage Key="@item.QrCodeKey" Sizes="96px" @key="item.QrCodeKey">
+                                            <ImageContent Context="image">
+                                                @if (string.IsNullOrWhiteSpace(image.Src))
+                                                {
+                                                    <div class="service-list__qr-placeholder">QR</div>
+                                                }
+                                                else
+                                                {
+                                                    <button type="button"
+                                                            class="service-list__qr-button"
+                                                            @onclick="() => OpenQrModal(image.Src, GetQrImageAlt(item))"
+                                                            aria-label="@GetQrOpenLabel(item)">
+                                                        <img src="@image.Src"
+                                                             srcset="@image.SrcSet"
+                                                             sizes="@image.Sizes"
+                                                             width="96"
+                                                             height="96"
+                                                             alt="@GetQrImageAlt(item)"
+                                                             class="service-list__qr-image" />
+                                                    </button>
+                                                }
+                                            </ImageContent>
+                                        </EditableImage>
+                                    </div>
+                                </td>
+                            }
                             @if (EditModeService.IsEditing)
                             {
                                 <td class="text-end" data-label="@TranslationsService.GetText("Services_Delete")">

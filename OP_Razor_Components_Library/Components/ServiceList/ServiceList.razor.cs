@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using OP_Shared_Library.Services;
 using System.Threading.Tasks;
@@ -12,9 +13,16 @@ public partial class ServiceList : IDisposable
     [Inject] private TranslationsService TranslationsService { get; set; }
     [Inject] private EditModeService EditModeService { get; set; }
     [Inject] private IHostEnvironment Env { get; set; }
+    [Inject] private IConfiguration Configuration { get; set; }
     #endregion
 
     #region Private Properties
+    private static readonly HashSet<string> ImageColumnKeys = new(StringComparer.OrdinalIgnoreCase) { "image", "img", "photo", "picture" };
+    private static readonly HashSet<string> ServiceColumnKeys = new(StringComparer.OrdinalIgnoreCase) { "service", "name", "title" };
+    private static readonly HashSet<string> DescriptionColumnKeys = new(StringComparer.OrdinalIgnoreCase) { "description", "desc", "text" };
+    private static readonly HashSet<string> PriceColumnKeys = new(StringComparer.OrdinalIgnoreCase) { "price", "cost" };
+    private static readonly HashSet<string> QrCodeColumnKeys = new(StringComparer.OrdinalIgnoreCase) { "qrcode", "qr", "qr-code", "qr_code" };
+
     private bool isSaving;
     private bool showToast;
     private string toastMessage = string.Empty;         // nap�. "Ulo�eno ?" / "Chyba p�i ukl�d�n�"
@@ -23,12 +31,21 @@ public partial class ServiceList : IDisposable
     private bool isQrModalOpen;
     private string selectedQrImageSrc;
     private string selectedQrImageAlt;
+    private HashSet<string> hiddenColumns = new(StringComparer.OrdinalIgnoreCase);
+
+    private bool ShowImageColumn => !IsColumnHidden(ImageColumnKeys);
+    private bool ShowServiceColumn => !IsColumnHidden(ServiceColumnKeys);
+    private bool ShowDescriptionColumn => !IsColumnHidden(DescriptionColumnKeys);
+    private bool ShowPriceColumn => !IsColumnHidden(PriceColumnKeys);
+    private bool ShowQrCodeColumn => !IsColumnHidden(QrCodeColumnKeys);
 
     #endregion
 
     #region Ctor
     protected override async Task OnInitializedAsync()
     {
+        hiddenColumns = GetHiddenColumns("Services:HiddenColumns");
+
         await TranslationsService.LoadAsync();
         await ServicesService.LoadAsync(TranslationsService.GetLanguage());
 
@@ -83,6 +100,22 @@ public partial class ServiceList : IDisposable
     private void HandleEditModeChanged()
     {
         InvokeAsync(StateHasChanged);
+    }
+
+    private bool IsColumnHidden(HashSet<string> aliases)
+    {
+        return hiddenColumns.Overlaps(aliases);
+    }
+
+    private HashSet<string> GetHiddenColumns(string sectionPath)
+    {
+        var values = Configuration.GetSection(sectionPath).Get<string[]>() ?? Array.Empty<string>();
+
+        return new HashSet<string>(
+            values
+                .Where(value => !string.IsNullOrWhiteSpace(value))
+                .Select(value => value.Trim()),
+            StringComparer.OrdinalIgnoreCase);
     }
 
     private void OpenQrModal(string imageSrc, string imageAlt)
