@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <_LastSelectedProfileId>D:\OneDrive\OP\OP_projects\OrangeWeb\VS_Project\OP_Shared_Library\Properties\PublishProfiles\OP_HT_prod.pubxml</_LastSelectedProfileId>
+    <_LastSelectedProfileId>D:\OneDrive\OP\OP_projects\OrangeWeb\VS_Project\OP_Shared_Library\Properties\PublishProfiles\OP_Web_Server.pubxml</_LastSelectedProfileId>
   </PropertyGroup>
 </Project>
