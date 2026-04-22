@@ -12,6 +12,7 @@ public partial class Home_Page : IDisposable
 
     #region Private Properties
     private bool isLoaded = false;
+    private bool isHeroImageLoaded = false;
     #endregion
 
     #region Protected Properties
@@ -38,6 +39,14 @@ public partial class Home_Page : IDisposable
     {
         // Redraw the component when the edit mode changes
         InvokeAsync(StateHasChanged);
+    }
+
+    private void HandleHeroImageLoaded()
+    {
+        if (!isHeroImageLoaded)
+        {
+            isHeroImageLoaded = true;
+        }
     }
     #endregion
 }

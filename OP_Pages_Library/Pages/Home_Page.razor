@@ -10,18 +10,19 @@
 
 @if (isLoaded)
 {
-    <section class="main_picture_section pb"> 
+    <section class="main_picture_section">
         <div class="overlay">
             <EditableImage Key="Img_1" Sizes="100vw">
                 <ImageContent Context="image">
                     <img src="@image.Src"
-                         class="main-image"
+                         class="main-image @(isHeroImageLoaded ? "is-loaded" : null)"
                          srcset="@image.SrcSet"
                          sizes="@image.Sizes"
                          alt="@image.Alt"
                          fetchpriority="high"
                          loading="eager"
-                         decoding="async" />
+                         decoding="async"
+                         @onload="HandleHeroImageLoaded" />
                 </ImageContent>
             </EditableImage>
             <div class="content">
