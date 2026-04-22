@@ -76,7 +76,9 @@
                                                              width="180"
                                                              height="120"
                                                              alt="@GetServiceImageAlt(item)"
-                                                             class="service-list__service-image" />
+                                                             class="service-list__service-image"
+                                                             loading="lazy"
+                                                             decoding="async" />
                                                     </button>
                                                 }
                                             </ImageContent>
@@ -145,7 +147,9 @@
                                                              width="96"
                                                              height="96"
                                                              alt="@GetQrImageAlt(item)"
-                                                             class="service-list__qr-image" />
+                                                             class="service-list__qr-image"
+                                                             loading="lazy"
+                                                             decoding="async" />
                                                     </button>
                                                 }
                                             </ImageContent>
@@ -215,7 +219,8 @@
 
             <img src="@selectedQrImageSrc"
                  alt="@selectedQrImageAlt"
-                 class="service-list__modal-image" />
+                 class="service-list__modal-image"
+                 decoding="async" />
         </div>
     </div>
 }

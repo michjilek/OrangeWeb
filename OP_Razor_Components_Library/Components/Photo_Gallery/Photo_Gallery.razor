@@ -25,7 +25,12 @@
                     var sizes = GetResponsiveSizes(srcSet);
                 }
 
-                <img src="@GetImageSource(image)" alt="Gallery Image" srcset="@srcSet" sizes="@sizes" />
+                <img src="@GetImageSource(image)"
+                     alt="Gallery Image"
+                     srcset="@srcSet"
+                     sizes="@sizes"
+                     loading="lazy"
+                     decoding="async" />
             </div>
         }
     </div>
@@ -76,7 +81,7 @@
                 @if (SelectedImage is not null)
                 {
                     var srcSet = GetImageSrcSet(SelectedImage);
-                    var sizes = GetResponsiveSizes(srcSet);
+                    var sizes = GetModalResponsiveSizes(srcSet);
 
                         <button class="gallery-nav prev"
                                 @onclick="MovePrevious"
@@ -86,7 +91,12 @@
                             </svg>
                         </button>
 
-                    <img src="@GetImageSource(SelectedImage)" alt="Full Image" class="full-image" srcset="@srcSet" sizes="@sizes" />
+                    <img src="@GetImageSource(SelectedImage)"
+                         alt="Full Image"
+                         class="full-image"
+                         srcset="@srcSet"
+                         sizes="@sizes"
+                         decoding="async" />
 
                         <button class="gallery-nav next"
                                 @onclick="MoveNext"

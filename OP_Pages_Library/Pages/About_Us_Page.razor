@@ -16,7 +16,12 @@
             <div class="image_about">
                 <EditableImage Key="Img_about_us_1">
                     <ImageContent Context="image">
-                        <img src=@image.Src srcset="@image.SrcSet" sizes="@image.Sizes" alt="@image.Alt" />
+                        <img src="@image.Src"
+                             srcset="@image.SrcSet"
+                             sizes="@image.Sizes"
+                             alt="@image.Alt"
+                             loading="lazy"
+                             decoding="async" />
                     </ImageContent>
                 </EditableImage>
             </div>

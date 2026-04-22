@@ -419,7 +419,16 @@ public partial class Photo_Gallery : IDisposable
     // Get sizes attribute for responsive images
     protected string GetResponsiveSizes(string srcSet)
     {
-        return string.IsNullOrWhiteSpace(srcSet) ? null : "100vw";
+        return string.IsNullOrWhiteSpace(srcSet)
+            ? null
+            : "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw";
+    }
+
+    protected string GetModalResponsiveSizes(string srcSet)
+    {
+        return string.IsNullOrWhiteSpace(srcSet)
+            ? null
+            : "(max-width: 767px) 100vw, 90vw";
     }
     #endregion
 

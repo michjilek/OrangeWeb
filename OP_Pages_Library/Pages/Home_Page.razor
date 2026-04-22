@@ -49,7 +49,12 @@
     <div class="service_image mt">
         <EditableImage Key="Img_2" Sizes="100vw">
             <ImageContent Context="image">
-                <img src="@image.Src" srcset="@image.SrcSet" sizes="@image.Sizes" alt="@image.Alt" />
+                <img src="@image.Src"
+                     srcset="@image.SrcSet"
+                     sizes="@image.Sizes"
+                     alt="@image.Alt"
+                     loading="lazy"
+                     decoding="async" />
             </ImageContent>
         </EditableImage>
     </div>
@@ -76,7 +81,12 @@
     <div class="service_image mt">
         <EditableImage Key="Img_3" Sizes="100vw">
             <ImageContent Context="image">
-                <img src="@image.Src" srcset="@image.SrcSet" sizes="@image.Sizes" alt="@image.Alt" />
+                <img src="@image.Src"
+                     srcset="@image.SrcSet"
+                     sizes="@image.Sizes"
+                     alt="@image.Alt"
+                     loading="lazy"
+                     decoding="async" />
             </ImageContent>
     </EditableImage>
     </div>

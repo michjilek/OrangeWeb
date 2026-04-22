@@ -48,7 +48,13 @@
                     var srcSet = GetResponsiveSrcSet(item);
                     var sizes = GetResponsiveSizes(srcSet);
                 }
-                <img src="@GetDisplayUrl(item)" alt="@item.Title" class="news_1" srcset="@srcSet" sizes="@sizes" />
+                <img src="@GetDisplayUrl(item)"
+                     alt="@item.Title"
+                     class="news_1"
+                     srcset="@srcSet"
+                     sizes="@sizes"
+                     loading="lazy"
+                     decoding="async" />
 
                 @if (EditModeService.IsEditing)
                 {
