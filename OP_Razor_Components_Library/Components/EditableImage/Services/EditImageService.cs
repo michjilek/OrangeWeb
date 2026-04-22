@@ -121,7 +121,9 @@ public class EditImageService
 
         //var objectName = BuildObjectName(relativeFolder, ext);
         // Use ResponsiveImageHelper to build the object key
-        var objectName = ResponsiveImageHelper.BuildResponsiveObjectKey(relativeFolder, ext);
+        var objectName = ResponsiveImageHelper.BuildResponsiveObjectKey(
+            relativeFolder,
+            ResponsiveImageHelper.GetResponsiveUploadExtension());
 
         // Upload responsive variants
         await UploadResponsiveVariantsAsync(file, objectName, maxBytes);
@@ -202,7 +204,7 @@ public class EditImageService
         foreach (var width in ResponsiveImageHelper.VariantWidths)
         {
             // Resize image by current width variant
-            var resized = await file.RequestImageFileAsync(format: file.ContentType, maxWidth: width, maxHeight: ResponsiveImageHelper.MaxUploadedHeight);
+            var resized = await ResponsiveImageHelper.RequestResponsiveVariantAsync(file, width);
 
             // Create stream for MinIo, copy because of original stream is readonly and we need to reset position
             await using var readStream = resized.OpenReadStream(maxBytes); // open read stream

@@ -361,7 +361,7 @@
 
         foreach (var width in ResponsiveImageHelper.VariantWidths)
         {
-            var resized = await file.RequestImageFileAsync(file.ContentType, width, ResponsiveImageHelper.MaxUploadedHeight);
+            var resized = await ResponsiveImageHelper.RequestResponsiveVariantAsync(file, width);
             await using var readStream = resized.OpenReadStream(maxAllowedSize: 10_000_000);
             using var ms = new MemoryStream();
             await readStream.CopyToAsync(ms);
@@ -387,7 +387,9 @@
 
         await MinIoService.EnsureBucketAsync();
 
-        var objectKey = ResponsiveImageHelper.BuildResponsiveObjectKey(EditActualitiesService.MinIoFolder, ext);
+        var objectKey = ResponsiveImageHelper.BuildResponsiveObjectKey(
+            EditActualitiesService.MinIoFolder,
+            ResponsiveImageHelper.GetResponsiveUploadExtension());
         await UploadResponsiveVariantAsync(file, objectKey);
         var signedUrl = await EditActualitiesService.ResolveImageUrlAsync(objectKey);
 

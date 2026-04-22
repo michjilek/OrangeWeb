@@ -12,7 +12,7 @@
 {
     <section class="main_picture_section pb"> 
         <div class="overlay">
-            <EditableImage Key="Img_1">
+            <EditableImage Key="Img_1" Sizes="100vw">
                 <ImageContent Context="image">
                     <img src="@image.Src"
                          class="main-image"
@@ -47,7 +47,7 @@
         <p class="text mt_less centered"><EditableText Id="Topic_1_Text_2" EditMode="@EditModeService.IsEditing" /></p>
     </section>
     <div class="service_image mt">
-        <EditableImage Key="Img_2">
+        <EditableImage Key="Img_2" Sizes="100vw">
             <ImageContent Context="image">
                 <img src="@image.Src" srcset="@image.SrcSet" sizes="@image.Sizes" alt="@image.Alt" />
             </ImageContent>
@@ -74,7 +74,7 @@
     <!-- But we need to work with Src Inside and thats why we insert url via EditableImage -->
     <!-- Img needs to take Context from EditableImage to work properly -->
     <div class="service_image mt">
-        <EditableImage Key="Img_3">
+        <EditableImage Key="Img_3" Sizes="100vw">
             <ImageContent Context="image">
                 <img src="@image.Src" srcset="@image.SrcSet" sizes="@image.Sizes" alt="@image.Alt" />
             </ImageContent>

@@ -1,17 +1,39 @@
 ﻿
+using Microsoft.AspNetCore.Components.Forms;
+
 namespace OP_Shared_Library.Services;
 
 public static class ResponsiveImageHelper
 {
     #region Public Static readonly
-    public static readonly int[] VariantWidths = {320, 448, 480, 640, 768, 1024, 1366, 1600, 1920, 2560, 3840 };
+    public static readonly int[] LegacyVariantWidths = { 320, 448, 480, 640, 768, 1024, 1366, 1600, 1920, 2560, 3840 };
+    public static readonly int[] VariantWidths = { 160, 224, 288, 320, 448, 480, 640, 768, 1024, 1366, 1600, 1920, 2560, 3840 };
     #endregion
 
     #region Public constants
     public const int MaxUploadedHeight = 4000;
+    public const string PreferredImageContentType = "image/webp";
+    public const string PreferredImageExtension = ".webp";
     #endregion
 
     #region Public Static Methods
+    public static int[] GetVariantWidths(string objectKey)
+    {
+        return IsModernResponsiveKey(objectKey)
+            ? VariantWidths
+            : LegacyVariantWidths;
+    }
+    public static string GetResponsiveUploadExtension()
+    {
+        return PreferredImageExtension;
+    }
+    public static async Task<IBrowserFile> RequestResponsiveVariantAsync(IBrowserFile file, int width)
+    {
+        return await file.RequestImageFileAsync(
+            format: PreferredImageContentType,
+            maxWidth: width,
+            maxHeight: MaxUploadedHeight);
+    }
     // Builds a responsive object key given a relative folder and file extension
     public static string BuildResponsiveObjectKey(string relativeFolder, string ext)
     {
@@ -27,8 +49,12 @@ public static class ResponsiveImageHelper
             extension = $".{extension}";
         }
 
-        // Generate a unique filename using a GUID -> _r like responsive
-        var fileName = $"{Guid.NewGuid():N}_r{extension}";
+        var responsiveSuffix = string.Equals(extension, PreferredImageExtension, StringComparison.OrdinalIgnoreCase)
+            ? "_rw"
+            : "_r";
+
+        // Generate a unique filename using a GUID -> _r like responsive, _rw like responsive WebP.
+        var fileName = $"{Guid.NewGuid():N}{responsiveSuffix}{extension}";
 
         // Combine folder and filename
         return string.IsNullOrWhiteSpace(folder) ? fileName : $"{folder}/{fileName}";
@@ -45,8 +71,20 @@ public static class ResponsiveImageHelper
         // Extract the filename from the object key
         var fileName = Path.GetFileNameWithoutExtension(objectKey);
 
-        // Check if the filename ends with _r (case-insensitive)
-        return fileName.EndsWith("_r", StringComparison.OrdinalIgnoreCase);
+        // Check if the filename ends with a responsive suffix (case-insensitive).
+        return fileName.EndsWith("_r", StringComparison.OrdinalIgnoreCase)
+            || fileName.EndsWith("_rw", StringComparison.OrdinalIgnoreCase);
+    }
+    public static bool IsModernResponsiveKey(string objectKey)
+    {
+        if (string.IsNullOrWhiteSpace(objectKey))
+        {
+            return false;
+        }
+
+        var fileName = Path.GetFileNameWithoutExtension(objectKey);
+
+        return fileName.EndsWith("_rw", StringComparison.OrdinalIgnoreCase);
     }
     // Builds a variant object key based on the base key and specified width
     public static string BuildVariantKey(string baseKey, int width)
@@ -75,13 +113,15 @@ public static class ResponsiveImageHelper
             return null;
         }
 
+        var variantWidths = GetVariantWidths(objectKey);
+
         // Get the maximum width from the predefined variant widths
-        var maxWidth = VariantWidths.Max();
+        var maxWidth = variantWidths.Max();
 
         // Initialize a list to hold the srcset parts
         var parts = new List<string>();
 
-        foreach (var width in VariantWidths)
+        foreach (var width in variantWidths)
         {
             // Determine the appropriate key for the current width
             // Dont need to build variant for max width as its the original image

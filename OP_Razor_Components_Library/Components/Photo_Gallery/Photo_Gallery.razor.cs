@@ -102,7 +102,9 @@ public partial class Photo_Gallery : IDisposable
         }
 
         // Read file to memory stream
-        var objectName = ResponsiveImageHelper.BuildResponsiveObjectKey(EditPhotoGalleryService.MinIoFolder, extension);
+        var objectName = ResponsiveImageHelper.BuildResponsiveObjectKey(
+            EditPhotoGalleryService.MinIoFolder,
+            ResponsiveImageHelper.GetResponsiveUploadExtension());
 
         string exifComment = null;
 
@@ -427,7 +429,7 @@ public partial class Photo_Gallery : IDisposable
 
         foreach (var width in ResponsiveImageHelper.VariantWidths)
         {
-            var resized = await file.RequestImageFileAsync(file.ContentType, width, ResponsiveImageHelper.MaxUploadedHeight);
+            var resized = await ResponsiveImageHelper.RequestResponsiveVariantAsync(file, width);
             await using var readStream = resized.OpenReadStream(10_000_000);
             using var ms = new MemoryStream();
             await readStream.CopyToAsync(ms);
