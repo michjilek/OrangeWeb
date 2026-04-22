@@ -30,6 +30,11 @@
         <div class="busy-card">
             <div class="busy-spinner"></div>
 
+            @if (!string.IsNullOrWhiteSpace(busyMessage))
+            {
+                <p class="busy-message">@busyMessage</p>
+            }
+
             @* Show linear progress bar only while uploading (0–100). *@
             @if (uploadProgress > 0 && uploadProgress < 100)
             {
@@ -76,12 +81,12 @@
                        OnChange="HandleImageChange" />
 
             <div class="modal-actions">
-                <button class="btn" @onclick="CancelEdit">Zrušit</button>
+                <button class="btn" @onclick="CancelEdit" disabled="@isBusy">Zrušit</button>
                 @if (!string.IsNullOrWhiteSpace(Src))
                 {
-                    <button class="btn" @onclick="DeleteEdit">Smazat</button>
+                    <button class="btn" @onclick="DeleteEdit" disabled="@isBusy">Smazat</button>
                 }
-                <button class="btn" @onclick="SaveEdit">Uložit</button>
+                <button class="btn" @onclick="SaveEdit" disabled="@isBusy">Uložit</button>
             </div>
         </div>
     </div>
@@ -126,6 +131,7 @@
     private bool isBusy;
     private int uploadProgress = 0;
     private bool isAwaitingFile;
+    private string busyMessage;
 
     // Pre-signed URL auto-refresh control.
     private CancellationTokenSource _refreshCts;
@@ -179,38 +185,78 @@
     // then request a fresh pre-signed URL for the new object.
     private async Task SaveEdit()
     {
-        if (uploadedImage != null)
+        if (isBusy)
         {
-            _objectKey = await EditImageService.SaveImageAndMapAsync(
-                key: Key,
-                file: uploadedImage,
-                // relativeFolder: "gallery",
-                maxBytes: 10_000_000
-            );
-
-            // Replace Src with a new pre-signed URL that points to the new object.
-            await RefreshSignedUrlAsync();
+            return;
         }
 
-        // Reset modal and temporary state.
-        IsEditorOpen = false;
-        uploadedImage = null;
-        draftImageUrl = null;
-
+        isBusy = true;
+        isAwaitingFile = false;
+        uploadProgress = 0;
+        busyMessage = "Ukládám obrázek...";
         StateHasChanged();
+        await Task.Delay(1);
+
+        try
+        {
+            if (uploadedImage != null)
+            {
+                _objectKey = await EditImageService.SaveImageAndMapAsync(
+                    key: Key,
+                    file: uploadedImage,
+                    // relativeFolder: "gallery",
+                    maxBytes: 10_000_000
+                );
+
+                // Replace Src with a new pre-signed URL that points to the new object.
+                await RefreshSignedUrlAsync();
+            }
+
+            // Reset modal and temporary state.
+            IsEditorOpen = false;
+            uploadedImage = null;
+            draftImageUrl = null;
+        }
+        finally
+        {
+            isBusy = false;
+            isAwaitingFile = false;
+            busyMessage = null;
+            StateHasChanged();
+        }
     }
 
     private async Task DeleteEdit()
     {
-        await EditImageService.DeleteImageAndMapAsync(Key);
+        if (isBusy)
+        {
+            return;
+        }
 
-        Src = "";
-        _objectKey = null;
-        IsEditorOpen = false;
-        uploadedImage = null;
-        draftImageUrl = null;
-
+        isBusy = true;
+        isAwaitingFile = false;
+        uploadProgress = 0;
+        busyMessage = "Mažu obrázek...";
         StateHasChanged();
+        await Task.Delay(1);
+
+        try
+        {
+            await EditImageService.DeleteImageAndMapAsync(Key);
+
+            Src = "";
+            _objectKey = null;
+            IsEditorOpen = false;
+            uploadedImage = null;
+            draftImageUrl = null;
+        }
+        finally
+        {
+            isBusy = false;
+            isAwaitingFile = false;
+            busyMessage = null;
+            StateHasChanged();
+        }
     }
 
     // Show busy overlay right before opening the OS file picker for a smoother UX.
@@ -219,6 +265,7 @@
         isBusy = true;
         isAwaitingFile = true;
         uploadProgress = 0;
+        busyMessage = null;
         StateHasChanged();
     }
 
@@ -228,6 +275,7 @@
         isBusy = false;
         isAwaitingFile = false;
         uploadProgress = 0;
+        busyMessage = null;
     }
     #endregion
 
@@ -298,6 +346,7 @@
         isAwaitingFile = false;
         isBusy = true;
         uploadProgress = 0;
+        busyMessage = "Připravuji náhled...";
         StateHasChanged();
 
         // Small delay so the UI shows the overlay before heavy work starts.
@@ -333,6 +382,7 @@
             // Hide the busy overlay regardless of success or failure.
             isBusy = false;
             isAwaitingFile = false;
+            busyMessage = null;
             StateHasChanged();
         }
     }
