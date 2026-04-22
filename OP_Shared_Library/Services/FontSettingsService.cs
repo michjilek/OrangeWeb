@@ -151,7 +151,7 @@ public class FontSettingsService
 
             if (string.IsNullOrWhiteSpace(loaded.GoogleFontUrl))
             {
-                loaded.GoogleFontUrl = "https://fonts.googleapis.com/css2?family=Arimo&display=swap";
+                loaded.GoogleFontUrl = string.Empty;
             }
 
             if (string.IsNullOrWhiteSpace(loaded.FallbackFontFamily))
@@ -199,7 +199,7 @@ public class FontSettingsService
         };
     }
 
-    // Validates the settings and normalizes the GoogleFonts URL to a canonical, safe form.
+    // Validates the settings and normalizes the Google Fonts URL to a canonical, safe form when one is configured.
     private void Validate(FontSettings settings)
     {
         if (string.IsNullOrWhiteSpace(settings.FontFamily))
@@ -208,36 +208,33 @@ public class FontSettingsService
             throw new ArgumentException("Zadejte prosím název fontu.");
         }
 
-        if (string.IsNullOrWhiteSpace(settings.GoogleFontUrl))
+        if (!string.IsNullOrWhiteSpace(settings.GoogleFontUrl))
         {
-            _customLogger.MyLogger.Error($"FontSettingsService: Validate: Zadejte prosím URL adresu stylu z Google Fonts.");
-            throw new ArgumentException("Zadejte prosím URL adresu stylu z Google Fonts.");
-        }
+            // Ensure URL is absolute and points to fonts.googleapis.com.
+            if (!Uri.TryCreate(settings.GoogleFontUrl, UriKind.Absolute, out var uri) ||
+                !string.Equals(uri.Host, "fonts.googleapis.com", StringComparison.OrdinalIgnoreCase))
+            {
+                _customLogger.MyLogger.Error($"FontSettingsService: Validate: URL musí směřovat na doménu fonts.googleapis.com.");
+                throw new ArgumentException("URL musí směřovat na doménu fonts.googleapis.com.");
+            }
 
-        // Ensure URL is absolute and points to fonts.googleapis.com.
-        if (!Uri.TryCreate(settings.GoogleFontUrl, UriKind.Absolute, out var uri) ||
-            !string.Equals(uri.Host, "fonts.googleapis.com", StringComparison.OrdinalIgnoreCase))
-        {
-            _customLogger.MyLogger.Error($"FontSettingsService: Validate: URL musí směřovat na doménu fonts.googleapis.com.");
-            throw new ArgumentException("URL musí směřovat na doménu fonts.googleapis.com.");
-        }
+            // Check HTTPS.
+            if (!string.Equals(uri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase))
+            {
+                _customLogger.MyLogger.Error($"FontSettingsService: Validate: Použijte prosím zabezpečenou HTTPS adresu Google Fonts.");
+                throw new ArgumentException("Použijte prosím zabezpečenou HTTPS adresu Google Fonts.");
+            }
 
-        // Check HTTPS.
-        if (!string.Equals(uri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase))
-        {
-            _customLogger.MyLogger.Error($"FontSettingsService: Validate: Použijte prosím zabezpečenou HTTPS adresu Google Fonts.");
-            throw new ArgumentException("Použijte prosím zabezpečenou HTTPS adresu Google Fonts.");
-        }
+            // Enforce modern css2 endpoint format.
+            if (!uri.AbsolutePath.StartsWith("/css2", StringComparison.OrdinalIgnoreCase))
+            {
+                _customLogger.MyLogger.Error($"FontSettingsService: Validate: Očekávám Google Fonts URL ve formátu https://fonts.googleapis.com/css2?... .");
+                throw new ArgumentException("Očekávám Google Fonts URL ve formátu https://fonts.googleapis.com/css2?... .");
+            }
 
-        // Enforce modern css2 endpoint format.
-        if (!uri.AbsolutePath.StartsWith("/css2", StringComparison.OrdinalIgnoreCase))
-        {
-            _customLogger.MyLogger.Error($"FontSettingsService: Validate: Očekávám Google Fonts URL ve formátu https://fonts.googleapis.com/css2?... .");
-            throw new ArgumentException("Očekávám Google Fonts URL ve formátu https://fonts.googleapis.com/css2?... .");
+            // Normalize the URL by keeping only scheme, host, path, and query (drops fragments, userinfo, etc.).
+            settings.GoogleFontUrl = GetStandardizeUrl(uri);
         }
-
-        // Normalize the URL by keeping only scheme, host, path, and query (drops fragments, userinfo, etc.).
-        settings.GoogleFontUrl = GetStandardizeUrl(uri);
 
         // Default fallback family if missing.
         if (string.IsNullOrWhiteSpace(settings.FallbackFontFamily))

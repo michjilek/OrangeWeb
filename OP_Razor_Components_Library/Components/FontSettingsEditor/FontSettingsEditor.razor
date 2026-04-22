@@ -126,13 +126,6 @@
                                 </button>
                             </div>
                         </div>
-                        @if (_suggestionStylesheetLinks.Count > 0)
-                        {
-                            @foreach (var url in _suggestionStylesheetLinks)
-                            {
-                                <link rel="stylesheet" href="@url" />
-                            }
-                        }
                     </div>
                 }
 
@@ -239,12 +232,6 @@
 
     // Currently filtered subset for suggestions (based on _fontPickerValue, limit, etc.)
     private IReadOnlyList<GoogleFontDefinition> _filteredFontOptions = Array.Empty<GoogleFontDefinition>();
-
-    // Tracks which suggestion stylesheet URLs have been injected already (avoid duplicates)
-    private readonly HashSet<string> _loadedSuggestionStylesheetUrls = new(StringComparer.OrdinalIgnoreCase);
-
-    // Actual list used to render <link> tags for visible suggestions
-    private List<string> _suggestionStylesheetLinks = new();
 
     // Pagination/limit for suggestion list rendering
     private int _suggestionLimit = DefaultSuggestionLimit;
@@ -625,8 +612,6 @@
         // Visibility of more font button...
         _hasMoreFontSuggestions = limited.Count < candidates.Count;
 
-        // Check urls of stylesheets
-        EnsureSuggestionStylesheets();
     }
 
     // Limit the number of suggestion items !
@@ -735,30 +720,6 @@
         // Only scheme+host+path+query are needed for a safe <link href>
         normalizedUrl = uri.GetComponents(UriComponents.SchemeAndServer | UriComponents.PathAndQuery, UriFormat.UriEscaped);
         return true;
-    }
-
-    // Ensure that for visible suggestions we also preload their stylesheets (once) !
-    private void EnsureSuggestionStylesheets()
-    {
-        var updated = false;
-
-        foreach (var option in _filteredFontOptions)
-        {
-            // Try to build/normalize the CSS import URL for this option
-            // if it succeeds AND we haven't loaded this stylesheet before, add it
-            if (TryBuildPreviewStylesheetUrl(option.CssImportUrl, out var normalized)
-                && _loadedSuggestionStylesheetUrls.Add(normalized))
-            {
-                // mark that something changed (we added a new stylesheet)
-                updated = true;
-            }
-        }
-
-        if (updated)
-        {
-            // Recreate the list to trigger re-render of <link> tags
-            _suggestionStylesheetLinks = _loadedSuggestionStylesheetUrls.ToList();
-        }
     }
 
     // Click handler for a suggestion item !
