@@ -37,6 +37,11 @@
         <div class="busy-card">
             <div class="busy-spinner"></div>
 
+            @if (!string.IsNullOrWhiteSpace(busyMessage))
+            {
+                <p class="busy-message">@busyMessage</p>
+            }
+
             @if (uploadProgress > 0 && uploadProgress < 100)
             {
                 <div class="busy-progress">
@@ -123,12 +128,12 @@
                            OnChange="HandleImageChange" />
 
                 <div class="modal-actions">
-                    <button class="btn" @onclick="CloseModal">Zrušit</button>
+                    <button class="btn" @onclick="CloseModal" disabled="@isBusy">Zrušit</button>
                     @if (!IsNew)
                     {
-                        <button class="btn" @onclick="Delete" disabled="@(SelectedImage is null)">Smazat</button>
+                        <button class="btn" @onclick="Delete" disabled="@(SelectedImage is null || isBusy)">Smazat</button>
                     }
-                    <button class="btn" @onclick="SaveEdit">Uložit</button>
+                    <button class="btn" @onclick="SaveEdit" disabled="@isBusy">Uložit</button>
                 </div>
             </div>
         </div>

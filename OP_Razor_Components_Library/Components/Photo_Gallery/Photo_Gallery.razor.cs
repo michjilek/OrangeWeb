@@ -25,6 +25,7 @@ public partial class Photo_Gallery : IDisposable
     private bool isBusy;
     private int uploadProgress = 0;
     private bool isAwaitingFile;
+    private string busyMessage;
     #endregion
 
     #region Constants
@@ -131,69 +132,91 @@ public partial class Photo_Gallery : IDisposable
     }
     private async Task SaveEdit()
     {
-        if (IsNew)
+        if (isBusy)
         {
-            await SaveNewItem();
             return;
         }
 
-        // Check null of selected image
-        if (SelectedImage is null) return;
+        isBusy = true;
+        isAwaitingFile = false;
+        uploadProgress = 0;
+        busyMessage = "Ukládám fotku...";
+        StateHasChanged();
+        await Task.Delay(1);
 
-        // Set comment
-        string exifComment = null;
-
-        // Get object key from Image path
-        string objectKey = SelectedImage.ImagePath;
-
-        // If it is not null
-        if (uploadedImage != null)
+        try
         {
-            // Save to MinIo
-            var uploadResult = await UploadImageToMinIoAsync(uploadedImage);
+            if (IsNew)
+            {
+                await SaveNewItem();
+                return;
+            }
 
-            // Get ObjectKey
-            objectKey = uploadResult.objectKey;
+            // Check null of selected image
+            if (SelectedImage is null) return;
 
-            // Get comment
-            exifComment = uploadResult.exifOComment;
-        } // If draft is not null, get draft
-        else if (!string.IsNullOrWhiteSpace(draft.ImagePath) &&
-                 !draft.ImagePath.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
-        {
-            objectKey = draft.ImagePath;
+            // Set comment
+            string exifComment = null;
+
+            // Get object key from Image path
+            string objectKey = SelectedImage.ImagePath;
+
+            // If it is not null
+            if (uploadedImage != null)
+            {
+                // Save to MinIo
+                var uploadResult = await UploadImageToMinIoAsync(uploadedImage);
+
+                // Get ObjectKey
+                objectKey = uploadResult.objectKey;
+
+                // Get comment
+                exifComment = uploadResult.exifOComment;
+            } // If draft is not null, get draft
+            else if (!string.IsNullOrWhiteSpace(draft.ImagePath) &&
+                     !draft.ImagePath.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
+            {
+                objectKey = draft.ImagePath;
+            }
+
+            // Set comment to draft title
+            if (!string.IsNullOrWhiteSpace(exifComment) && string.IsNullOrWhiteSpace(draft.ImageTitle))
+            {
+                draft.ImageTitle = exifComment;
+            }
+
+            // Normalize object key
+            objectKey = EditPhotoGalleryService.NormalizeImageReference(objectKey);
+
+            // Set Selected image and draft paths
+            SelectedImage.ImagePath = objectKey ?? string.Empty;
+            SelectedImage.ImageSignedUrl = await EditPhotoGalleryService.ResolveImageUrlAsync(SelectedImage.ImagePath);
+
+            // Set title
+            SelectedImage.ImageTitle = draft.ImageTitle ?? string.Empty;
+
+            draft.ImagePath = SelectedImage.ImagePath;
+
+            // Refresh Preview
+            draftPreview = SelectedImage.ImageSignedUrl ?? SelectedImage.ImagePath;
+
+            // Save Async
+            await EditPhotoGalleryService.SaveAsync();
+
+            // Close modal
+            IsModalOpen = false;
+            IsNew = false;
+
+            // Clear uploaded image
+            uploadedImage = null;
         }
-
-        // Set comment to draft title
-        if (!string.IsNullOrWhiteSpace(exifComment) && string.IsNullOrWhiteSpace(draft.ImageTitle))
+        finally
         {
-            draft.ImageTitle = exifComment;
+            isBusy = false;
+            isAwaitingFile = false;
+            busyMessage = null;
+            StateHasChanged();
         }
-
-        // Normalize object key
-        objectKey = EditPhotoGalleryService.NormalizeImageReference(objectKey);
-
-        // Set Selected image and draft paths
-        SelectedImage.ImagePath = objectKey ?? string.Empty;
-        SelectedImage.ImageSignedUrl = await EditPhotoGalleryService.ResolveImageUrlAsync(SelectedImage.ImagePath);
-
-        // Set title
-        SelectedImage.ImageTitle = draft.ImageTitle ?? string.Empty;
-
-        draft.ImagePath = SelectedImage.ImagePath;
-
-        // Refresh Preview
-        draftPreview = SelectedImage.ImageSignedUrl ?? SelectedImage.ImagePath;
-
-        // Save Async
-        await EditPhotoGalleryService.SaveAsync();
-
-        // Close modal
-        IsModalOpen = false;
-        IsNew = false;
-
-        // Clear uploaded image
-        uploadedImage = null;
     }
     private async Task SaveNewItem()
     {
@@ -259,14 +282,36 @@ public partial class Photo_Gallery : IDisposable
     }
     private async Task Delete()
     {
+        if (isBusy)
+        {
+            return;
+        }
+
         if (SelectedImage is null || EditPhotoGalleryService.Items.Count == 0) return;
 
-        EditPhotoGalleryService.RemoveItem(SelectedImage);
-        await EditPhotoGalleryService.SaveAsync();
+        isBusy = true;
+        isAwaitingFile = false;
+        uploadProgress = 0;
+        busyMessage = "Mažu fotku...";
+        StateHasChanged();
+        await Task.Delay(1);
 
-        IsModalOpen = false;
-        uploadedImage = null;
-        draftPreview = null;
+        try
+        {
+            EditPhotoGalleryService.RemoveItem(SelectedImage);
+            await EditPhotoGalleryService.SaveAsync();
+
+            IsModalOpen = false;
+            uploadedImage = null;
+            draftPreview = null;
+        }
+        finally
+        {
+            isBusy = false;
+            isAwaitingFile = false;
+            busyMessage = null;
+            StateHasChanged();
+        }
     }
     private void OpenNew()
     {
@@ -291,6 +336,7 @@ public partial class Photo_Gallery : IDisposable
         isBusy = true;
         isAwaitingFile = true;
         uploadProgress = 0;
+        busyMessage = null;
         StateHasChanged();
     }
     private void CancelBusy()
@@ -298,6 +344,7 @@ public partial class Photo_Gallery : IDisposable
         isBusy = false;
         isAwaitingFile = false;
         uploadProgress = 0;
+        busyMessage = null;
     }
     #endregion
 
@@ -384,6 +431,7 @@ public partial class Photo_Gallery : IDisposable
         isAwaitingFile = false;
         isBusy = true;
         uploadProgress = 0;
+        busyMessage = "Připravuji náhled...";
         StateHasChanged();
         // To draw overlay
         await Task.Delay(1);
@@ -414,6 +462,7 @@ public partial class Photo_Gallery : IDisposable
         {
             isBusy = false;
             isAwaitingFile = false;
+            busyMessage = null;
             StateHasChanged();
         }
     }

@@ -337,6 +337,13 @@
     gap: 10px;
 }
 
+.busy-message {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-align: center;
+}
+
 .busy-spinner {
     width: 32px;
     height: 32px;
