@@ -11,7 +11,6 @@ public partial class Home_Page : IDisposable
     #endregion
 
     #region Private Properties
-    private bool isLoaded = false;
     private bool isHeroImageLoaded = false;
     #endregion
 
@@ -26,7 +25,6 @@ public partial class Home_Page : IDisposable
 
         EditModeService.OnEditModeChanged += HandleEditModeChanged;
 
-        isLoaded = true;
     }
     public void Dispose()
     {

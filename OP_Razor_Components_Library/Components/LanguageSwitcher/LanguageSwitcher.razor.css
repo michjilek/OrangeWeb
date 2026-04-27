@@ -1,6 +1,8 @@
-﻿.language-switcher {
+.language-switcher {
     position: relative;
     display: inline-block;
+    min-width: 32px;
+    min-height: 32px;
 }
 
     .language-switcher .icon-btn {
@@ -38,6 +40,7 @@
     min-width: 120px;
     box-shadow: 0 4px 12px rgba(0,0,0,.15);
     z-index: 999;
+    white-space: nowrap;
 }
 
     .lang-menu li {

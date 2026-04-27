@@ -96,10 +96,11 @@
     justify-content: end;
     padding: 10px;
     border-bottom: 1px solid var(--Mainlayout_socialmedia_bar_border_color);
-    height: 39px;
+    min-height: 39px;
     align-items: center;
     gap: 12px;
     align-items: center;
+    flex-wrap: wrap;
 }
 
     .social-media a {
@@ -183,6 +184,7 @@
     align-items: center;
     height: 100%;
     gap: 10px;
+    min-width: 0;
 }
 
 .admin-tools {

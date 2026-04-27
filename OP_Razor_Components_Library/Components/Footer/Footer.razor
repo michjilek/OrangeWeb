@@ -9,35 +9,33 @@
 @inject IJSRuntime JSRuntime
 @implements IDisposable
 
-@if (isLoaded)
-{
-    <div class="footer centered">
-        <p class="subtitle mt"><EditableText Id="Street" EditMode="@EditModeService.IsEditing" /></p>
-        <p class="mt_less pb"><EditableText Id="City" EditMode="@EditModeService.IsEditing" /></p>
-        <p class="text mt_less">Tel.: <EditableText Id="Mobile" EditMode="@EditModeService.IsEditing" /></p>
-        <p class="text">Email: <EditableText Id="Email" EditMode="@EditModeService.IsEditing" /></p>
-        <hr class="footer_hr mt">
-            <div class="footer_p mt">
-            <EditableImage Key="Img_footer_company" Sizes="160px">
-                <ImageContent Context="image">
-                    <img src="@image.Src"
-                         srcset="@image.SrcSet"
-                         sizes="@image.Sizes"
-                         alt="Footer company mark"
-                         class="footer-company-image"
-                         loading="lazy"
-                         decoding="async" />
-                </ImageContent>
-            </EditableImage>
-        </div>
-        <p class="footer-year mt_less"><EditableText Id="Actual_Year" EditMode="@EditModeService.IsEditing" /></p>
-        <p class="footer-year mt_less pb">Version: @_version</p>
+<div class="footer centered">
+    <p class="subtitle mt"><EditableText Id="Street" EditMode="@EditModeService.IsEditing" /></p>
+    <p class="mt_less pb"><EditableText Id="City" EditMode="@EditModeService.IsEditing" /></p>
+    <p class="text mt_less">Tel.: <EditableText Id="Mobile" EditMode="@EditModeService.IsEditing" /></p>
+    <p class="text">Email: <EditableText Id="Email" EditMode="@EditModeService.IsEditing" /></p>
+    <hr class="footer_hr mt">
+        <div class="footer_p mt">
+        <EditableImage Key="Img_footer_company" Sizes="160px">
+            <ImageContent Context="image">
+                <img src="@image.Src"
+                     srcset="@image.SrcSet"
+                     sizes="@image.Sizes"
+                     alt="Footer company mark"
+                     width="160"
+                     height="22"
+                     class="footer-company-image"
+                     loading="lazy"
+                     decoding="async" />
+            </ImageContent>
+        </EditableImage>
     </div>
-}
+    <p class="footer-year mt_less"><EditableText Id="Actual_Year" EditMode="@EditModeService.IsEditing" /></p>
+    <p class="footer-year mt_less pb">Version: @_version</p>
+</div>
 
 @code {
     #region Private Properties
-    private bool isLoaded = false;
     private string _version = string.Empty;
     #endregion
 
@@ -53,7 +51,6 @@
 
         EditModeService.OnEditModeChanged += HandleEditModeChanged;
 
-        isLoaded = true;
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

@@ -23,6 +23,7 @@
     display: inline-block;
     height: 1.4rem;
     width: auto;
+    aspect-ratio: 160 / 22;
     object-fit: contain;
     vertical-align: middle;
 }

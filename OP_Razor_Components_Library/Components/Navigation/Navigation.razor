@@ -6,64 +6,60 @@
 @inject NavigationService NavigationService
 @implements IDisposable
 
-@if (isLoaded)
-{
-    <nav class="navbar">
-        <div class="navbar-right">
-            @if (EditModeService.IsEditing)
-            {
-                <NavLink class="nav-item uppercase-text" href="/">
-                    HOME
-                </NavLink>
-            }
-
-            @foreach (var navigationItem in NavigationService.NavigationItems)
-            {
-                <NavLink class="nav-item uppercase-text"
-                         @key="navigationItem.Id"
-                         href="@navigationItem.Href">
-                         <EditableText Id ="@navigationItem.TextId"
-                                            EditMode="@EditModeService.IsEditing"/>
-                </NavLink>
-            }
-        </div>
-        <button class="navbar-toggler" @onclick="ToggleMenu">☰</button>
-
-        @*when we clicked outside mobile menu, close mobile-menu *@
-        @if (_isMenuOpen)
+<nav class="navbar">
+    <div class="navbar-right">
+        @if (EditModeService.IsEditing)
         {
-            <div class="menu-backdrop" @onclick="CloseMenu"></div>
+            <NavLink class="nav-item uppercase-text" href="/">
+                HOME
+            </NavLink>
         }
 
-        <div class="mobile-menu"
-             style="@(_isMenuOpen ? "display:flex;" : "display:none;")">
-            @if (EditModeService.IsEditing)
-            {
-                <NavLink class="nav-item uppercase-text"
-                         href="/"
-                         @onclick="CloseMenu">
-                    HOME
-                </NavLink>
-            }
-            @foreach (var navigationItem in NavigationService.NavigationItems)
-            {
-                <NavLink class="nav-item uppercase-text"
-                         @key="navigationItem.Id"
-                         href="@navigationItem.Href"
-                         @onclick="CloseMenu">
-                    <EditableText Id="@navigationItem.TextId"
-                                  EditMode="@EditModeService.IsEditing" />
-                </NavLink>
-            }
-        </div>
-    </nav>
-}
+        @foreach (var navigationItem in NavigationService.NavigationItems)
+        {
+            <NavLink class="nav-item uppercase-text"
+                     @key="navigationItem.Id"
+                     href="@navigationItem.Href">
+                     <EditableText Id ="@navigationItem.TextId"
+                                        EditMode="@EditModeService.IsEditing"/>
+            </NavLink>
+        }
+    </div>
+    <button class="navbar-toggler" @onclick="ToggleMenu">☰</button>
+
+    @*when we clicked outside mobile menu, close mobile-menu *@
+    @if (_isMenuOpen)
+    {
+        <div class="menu-backdrop" @onclick="CloseMenu"></div>
+    }
+
+    <div class="mobile-menu"
+         style="@(_isMenuOpen ? "display:flex;" : "display:none;")">
+        @if (EditModeService.IsEditing)
+        {
+            <NavLink class="nav-item uppercase-text"
+                     href="/"
+                     @onclick="CloseMenu">
+                HOME
+            </NavLink>
+        }
+        @foreach (var navigationItem in NavigationService.NavigationItems)
+        {
+            <NavLink class="nav-item uppercase-text"
+                     @key="navigationItem.Id"
+                     href="@navigationItem.Href"
+                     @onclick="CloseMenu">
+                <EditableText Id="@navigationItem.TextId"
+                              EditMode="@EditModeService.IsEditing" />
+            </NavLink>
+        }
+    </div>
+</nav>
 
 @code {
 
     #region Private Properties
     private bool _isMenuOpen = false;
-    private bool isLoaded = false;
     #endregion
 
     #region Private Methods
@@ -87,7 +83,6 @@
         await NavigationService.LoadAsync();
         // NavigationService.OnChanged += Refresh;
 
-        isLoaded = true;
     }
     public void Dispose()
     {
