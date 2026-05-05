@@ -45,6 +45,19 @@
         "Minio__SecretKey": "dhX@kH667ZHhsdp!7BsDuZmt",
         "OP_CONFIG_DIR": "D:\\OneDrive\\OP\\OP_projects\\OrangeWeb\\Configs\\HT"
       }
+    },
+    "HavirovTerapie ProductionLike": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "hotReloadEnabled": false,
+      "applicationUrl": "http://localhost:5245",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ContactFormEmail__Password": "",
+        "Minio__SecretKey": "dhX@kH667ZHhsdp!7BsDuZmt",
+        "OP_CONFIG_DIR": "D:\\OneDrive\\OP\\OP_projects\\OrangeWeb\\Configs\\HT"
+      }
     }
   }
 }
