@@ -1,4 +1,3 @@
-﻿/* MAKE UP SECTION*/
 .main_picture_section {
     position: relative;
     text-align: center;
@@ -25,11 +24,6 @@
 .main-image.is-loaded {
     opacity: 1;
 }
-
-/*.overlay {
-    background-color: var(--Home_page_overlay_color width: 100%);
-    justify-content: center;
-}*/
 
 .overlay {
     background-color: transparent;
@@ -72,7 +66,6 @@
         text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
 
-    /* ZÁKLADNÍ TYPOGRAFIE – MOBIL */
     .content h1 {
         font-size: 2.0rem;
         letter-spacing: 2px;
@@ -94,7 +87,6 @@
     font-size: 1.0rem;
 }
 
-/* SERVICE*/
 .service {
     width: min(calc(100% - 40px), 56rem);
     max-width: 100%;
@@ -137,10 +129,9 @@
         color: var(--Home_page_text_a_text_color);
     }
 
-/* SECOND IMAGE*/
 .service_image {
     position: relative;
-    min-height: 52vh; /* holds height in layout */
+    min-height: 52vh;
     width: 100%;
     overflow: hidden;
 }
@@ -156,7 +147,6 @@
         z-index: 1;
     }
 
-/* HALF SERVICES*/
 .half_services {
     display: flex;
     flex-direction: column;
@@ -170,9 +160,6 @@
     text-align: center;
 }
 
-/* MEDIA */
-
-/* 320+ – malé mobily */
 @media (min-width: 320px) {
     .content h1 {
         font-size: 2.1rem;
@@ -191,7 +178,6 @@
     }
 }
 
-/* 480+ – větší mobily */
 @media (min-width: 480px) {
     .content h1 {
         font-size: 2.4rem;
@@ -232,7 +218,6 @@
     }
 }
 
-/* 768+ – tablet / menší notebook */
 @media (min-width: 768px) {
     .content h1 {
         font-size: 2.8rem;
@@ -284,7 +269,6 @@
         }
 }
 
-/* 1024+ – běžný desktop */
 @media (min-width: 1024px) {
     .content h1 {
         font-size: 3.2rem;
@@ -307,10 +291,8 @@
     .main_picture_section {
         margin: 15px 0px;
     }
-
 }
 
-/* 1280+ – větší notebooky */
 @media (min-width: 1280px) {
     .content h1 {
         font-size: 3.4rem;
@@ -325,7 +307,6 @@
     }
 }
 
-/* 1440+ – velké monitory */
 @media (min-width: 1440px) {
     .content h1 {
         font-size: 3.6rem;
@@ -339,10 +320,8 @@
         font-size: 1.3rem;
         margin-top: 60px;
     }
-
 }
 
-/* 2560+ – 2K a víc */
 @media (min-width: 2560px) {
     .text {
         max-width: 60%;

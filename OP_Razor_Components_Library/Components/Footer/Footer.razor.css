@@ -33,7 +33,6 @@
     color: var(--Footer_year_text_color);
 }
 
-/* MEDIA */
 @media (min-width: 768px) {
     .footer_p {
         font-size: 0.8rem;
