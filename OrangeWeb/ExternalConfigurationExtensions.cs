@@ -115,7 +115,7 @@ namespace OP_Shared_Library.Configurations
 
             // Register endpoint for GET requests (we need to read themes from external folder)
             // for example: GET https://my-domain.cz/_branding/theme.css
-            app.MapGet("/_branding/theme.css", (Microsoft.Extensions.Options.IOptions<CompanyBrandingOptions> brandingOptions) =>
+            app.MapGet("/_branding/theme.css", (HttpContext httpContext, Microsoft.Extensions.Options.IOptions<CompanyBrandingOptions> brandingOptions) =>
             {
                 // Find folder, where we have config (we have here also whatever_theme.css file too)
                 var configDir = ExternalConfigurationExtensions.ResolveConfigDir();
@@ -163,12 +163,14 @@ namespace OP_Shared_Library.Configurations
                     candidatePath = fallbackPath;
                 }
 
+                httpContext.Response.Headers["Cache-Control"] = "public, max-age=604800, stale-while-revalidate=86400";
+
                 // Return CSS file content (UTF-8)
                 return Results.File(candidatePath, "text/css; charset=utf-8");
             });
 
             
-            app.MapGet("/_branding/{**assetPath}", (string assetPath) =>
+            app.MapGet("/_branding/{**assetPath}", (HttpContext httpContext, string assetPath) =>
             {
                 var provider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
                 var configDir = ResolveConfigDir();
@@ -187,6 +189,11 @@ namespace OP_Shared_Library.Configurations
                                                     ? "application/manifest+json"
                                                     : "application/octet-stream";
                         }
+
+                        httpContext.Response.Headers["Cache-Control"] =
+                            Path.GetExtension(externalPath).Equals(".webmanifest", StringComparison.OrdinalIgnoreCase)
+                                ? "public, max-age=86400"
+                                : "public, max-age=2592000, immutable";
 
                         return Results.File(externalPath, externalContentType);
                     }
