@@ -108,6 +108,9 @@
 
     // Sizes attribute for responsive images.
     [Parameter] public string Sizes { get; set; } = "50vw";
+
+    // Optional WebP quality for uploaded responsive variants. Null keeps the browser-generated default.
+    [Parameter] public int? CompressionQuality { get; set; }
     #endregion
 
     #region Constants
@@ -205,7 +208,8 @@
                     key: Key,
                     file: uploadedImage,
                     // relativeFolder: "gallery",
-                    maxBytes: 10_000_000
+                    maxBytes: 10_000_000,
+                    compressionQuality: CompressionQuality
                 );
 
                 // Replace Src with a new pre-signed URL that points to the new object.

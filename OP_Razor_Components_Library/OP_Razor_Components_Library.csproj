@@ -17,6 +17,7 @@
 	<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.7" />
 	<PackageReference Include="Minio" Version="7.0.0" />
 	<PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+	<PackageReference Include="SkiaSharp" Version="3.119.2" />
 	<PackageReference Include="YamlDotNet" Version="16.3.0" />
   </ItemGroup>
   <ItemGroup>

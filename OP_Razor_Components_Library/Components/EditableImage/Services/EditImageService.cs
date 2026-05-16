@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
 using OP_Shared_Library.Struct;
 using OP_Shared_Library.Services;
+using SkiaSharp;
 using System.Linq;
 
 namespace OP_Razor_Components_Library.Components.EditableImage.Services;
@@ -107,7 +108,7 @@ public class EditImageService
         return result;
     }
     // Upload image → returns objectKey
-    public async Task<string> SaveImageAsync(IBrowserFile file, string relativeFolder = "", long maxBytes = 10_000_000)
+    public async Task<string> SaveImageAsync(IBrowserFile file, string relativeFolder = "", long maxBytes = 10_000_000, int? compressionQuality = null)
     {
         if (file is null) { _logger.LogAndReturn($"File is null : {nameof(file)}"); }
 
@@ -126,14 +127,14 @@ public class EditImageService
             ResponsiveImageHelper.GetResponsiveUploadExtension());
 
         // Upload responsive variants
-        await UploadResponsiveVariantsAsync(file, objectName, maxBytes);
+        await UploadResponsiveVariantsAsync(file, objectName, maxBytes, compressionQuality);
 
         return objectName; // we store only the base object key
     }
     // Upload + write to YAML + optionally clean up unused files in the given relativeFolder
-    public async Task<string> SaveImageAndMapAsync(string key, IBrowserFile file, long maxBytes = 10_000_000, bool includeOtherLanguageMaps = true)
+    public async Task<string> SaveImageAndMapAsync(string key, IBrowserFile file, long maxBytes = 10_000_000, bool includeOtherLanguageMaps = true, int? compressionQuality = null)
     {
-        var objectKey = await SaveImageAsync(file, MinIoFolder, maxBytes);
+        var objectKey = await SaveImageAsync(file, MinIoFolder, maxBytes, compressionQuality);
         Set(key, objectKey);
         await SaveToYamlAsync();
 
@@ -195,7 +196,7 @@ public class EditImageService
     #endregion
 
     #region Private Methods
-    private async Task UploadResponsiveVariantsAsync(IBrowserFile file, string objectKey, long maxBytes)
+    private async Task UploadResponsiveVariantsAsync(IBrowserFile file, string objectKey, long maxBytes, int? compressionQuality)
     {
         // Gte max width
         var maxWidth = ResponsiveImageHelper.VariantWidths.Max();
@@ -212,11 +213,80 @@ public class EditImageService
             await readStream.CopyToAsync(ms); // copy to memory stream
             ms.Position = 0; // reset position
 
+            var uploadStream = ms;
+            var uploadFile = resized;
+            var compressed = ReencodeWebp(ms, resized, compressionQuality);
+            if (compressed is not null)
+            {
+                uploadStream = compressed;
+                uploadFile = new UploadImageFile(
+                    name: Path.ChangeExtension(resized.Name, ResponsiveImageHelper.PreferredImageExtension),
+                    contentType: ResponsiveImageHelper.PreferredImageContentType,
+                    size: compressed.Length,
+                    lastModified: resized.LastModified);
+            }
+
             // Determine object key for this variant
             var key = width == maxWidth ? objectKey : ResponsiveImageHelper.BuildVariantKey(objectKey, width);
 
             // Upload to MinIO
-            await _minIoService.PutObjectAsync(key, ms, resized);
+            await _minIoService.PutObjectAsync(key, uploadStream, uploadFile);
+        }
+    }
+
+    private MemoryStream ReencodeWebp(MemoryStream source, IBrowserFile file, int? compressionQuality)
+    {
+        if (!compressionQuality.HasValue)
+        {
+            return null;
+        }
+
+        var quality = Math.Clamp(compressionQuality.Value, 1, 100);
+        var sourceBytes = source.ToArray();
+
+        using var bitmap = SKBitmap.Decode(sourceBytes);
+        if (bitmap is null)
+        {
+            _logger.MyLogger.Warning($"EditImageService: Cannot decode uploaded image '{file.Name}' for WebP compression.");
+            source.Position = 0;
+            return null;
+        }
+
+        using var image = SKImage.FromBitmap(bitmap);
+        using var data = image.Encode(SKEncodedImageFormat.Webp, quality);
+        if (data is null)
+        {
+            _logger.MyLogger.Warning($"EditImageService: Cannot encode uploaded image '{file.Name}' to WebP.");
+            source.Position = 0;
+            return null;
+        }
+
+        var output = new MemoryStream();
+        data.SaveTo(output);
+        output.Position = 0;
+        source.Position = 0;
+
+        return output;
+    }
+
+    private sealed class UploadImageFile : IBrowserFile
+    {
+        public UploadImageFile(string name, string contentType, long size, DateTimeOffset lastModified)
+        {
+            Name = name;
+            ContentType = contentType;
+            Size = size;
+            LastModified = lastModified;
+        }
+
+        public string Name { get; }
+        public DateTimeOffset LastModified { get; }
+        public long Size { get; }
+        public string ContentType { get; }
+
+        public Stream OpenReadStream(long maxAllowedSize = 512000, CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException($"{nameof(UploadImageFile)} only carries upload metadata.");
         }
     }
     #endregion

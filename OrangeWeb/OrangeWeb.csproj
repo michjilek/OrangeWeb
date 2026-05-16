@@ -30,4 +30,7 @@
     <ProjectReference Include="..\OP_Pages_Library\OP_Pages_Library.csproj" />
     <ProjectReference Include="..\OP_Shared_Library\OP_Shared_Library.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.2" />
+  </ItemGroup>
 </Project>
