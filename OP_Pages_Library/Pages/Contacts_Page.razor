@@ -12,6 +12,11 @@
 @inject IContactFormSender ContactFormSender
 @implements IDisposable
 
+<HeadContent>
+    <link rel="stylesheet" href="_content/OP_Pages_Library/Pages/Contacts_Page.razor.rz.scp.css" />
+    <link rel="stylesheet" href="_content/OP_Razor_Components_Library/Components/QuestionForm/QuestionForm.razor.rz.scp.css" />
+</HeadContent>
+
 <h1 class="uppercase-text mb"><EditableText Id="Contacts_title" EditMode="@EditModeService.IsEditing" /></h1>
 
 <section class="contacts_border">

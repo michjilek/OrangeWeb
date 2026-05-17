@@ -4,6 +4,11 @@
 @using OP_Shared_Library.Services
 @inject EditModeService EditModeService
 
+<HeadContent>
+    <link rel="stylesheet" href="_content/OP_Pages_Library/Pages/Actualities_Page.razor.rz.scp.css" />
+    <link rel="stylesheet" href="_content/OP_Razor_Components_Library/Components/Actualities/Actualities.razor.rz.scp.css" />
+</HeadContent>
+
 <section class="actualities-page">
     <h1 class="uppercase-text mb">
         <EditableText Id="Actualities_title" EditMode="@EditModeService.IsEditing" />

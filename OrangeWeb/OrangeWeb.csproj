@@ -3,6 +3,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <DisableScopedCssBundling>true</DisableScopedCssBundling>
     <UserSecretsId>9a14bc04-4222-4275-89e6-a6c0195084df</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>

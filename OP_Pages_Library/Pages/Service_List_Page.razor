@@ -3,6 +3,11 @@
 @using OP_Razor_Components_Library.Components.EditableText
 @inject TranslationsService TranslationsService
 
+<HeadContent>
+    <link rel="stylesheet" href="_content/OP_Pages_Library/Pages/Service_List_Page.razor.rz.scp.css" />
+    <link rel="stylesheet" href="_content/OP_Razor_Components_Library/Components/ServiceList/ServiceList.razor.rz.scp.css" />
+</HeadContent>
+
 @if (isLoaded)
 {
     <h1 class="uppercase-text mb"><EditableText Id="Services_Title_1" EditMode="@EditModeService.IsEditing" /></h1>

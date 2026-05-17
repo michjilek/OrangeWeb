@@ -7,6 +7,11 @@
 @inject EditModeService EditModeService
 @implements IDisposable
 
+<HeadContent>
+    <link rel="stylesheet" href="_content/OP_Pages_Library/Pages/Photo_Gallery_Page.razor.rz.scp.css" />
+    <link rel="stylesheet" href="_content/OP_Razor_Components_Library/Components/Photo_Gallery/Photo_Gallery.razor.rz.scp.css" />
+</HeadContent>
+
 @if (isLoaded)
 {
     <h1 class="uppercase-text mt mb"><EditableText Id="Photo_Gallery_Title" EditMode="@EditModeService.IsEditing" /></h1>

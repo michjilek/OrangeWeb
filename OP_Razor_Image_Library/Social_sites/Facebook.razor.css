@@ -1,4 +1,8 @@
 ﻿
+svg {
+    display: block;
+}
+
 /* Social Sites Group */
 #Social_sites:hover {
     cursor: pointer;
