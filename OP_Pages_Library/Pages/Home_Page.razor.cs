@@ -12,6 +12,7 @@ public partial class Home_Page : IDisposable
 
     #region Private Properties
     private bool isHeroImageLoaded = false;
+    private bool showNews = false;
     #endregion
 
     #region Protected Properties
@@ -29,6 +30,19 @@ public partial class Home_Page : IDisposable
     public void Dispose()
     {
         EditModeService.OnEditModeChanged -= HandleEditModeChanged;
+    }
+    #endregion
+
+    #region Render
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        showNews = true;
+        StateHasChanged();
     }
     #endregion
 

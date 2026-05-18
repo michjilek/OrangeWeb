@@ -10,7 +10,10 @@
 
 <HeadContent>
     <link rel="stylesheet" href="_content/OP_Pages_Library/Pages/Home_Page.razor.rz.scp.css" />
-    <link rel="stylesheet" href="_content/OP_Razor_Components_Library/Components/News/News.razor.rz.scp.css" />
+    @if (showNews)
+    {
+        <link rel="stylesheet" href="_content/OP_Razor_Components_Library/Components/News/News.razor.rz.scp.css" />
+    }
 </HeadContent>
 
 <section class="main_picture_section">
@@ -42,7 +45,10 @@
                 <EditableText Id="Intro_Title_4" EditMode="@EditModeService.IsEditing" />
             </p>
         </div>
-        <News />
+        @if (showNews)
+        {
+            <News />
+        }
     </div>
 </section>
 <section class="service centered">
